@@ -17,3 +17,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/reset-password/{token}', function ($token){
+    return response([
+        'token' => $token
+    ]);
+})->middleware(['guest:'.config('fortify.guard')])
+    ->name('password.reset');
