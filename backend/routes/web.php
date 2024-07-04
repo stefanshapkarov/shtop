@@ -17,9 +17,20 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/reset-password/{token}', function ($token){
-    return view('auth.password-reset', [
-        'token' => $token
-    ]);
-})->middleware(['guest:'.config('fortify.guard')])
-    ->name('password.reset');
+
+Route::get('/welcome-mail', function (\Illuminate\Http\Request $request) {
+    return view('mail.welcome-mail',
+        [
+            'name' => "Stefan"
+        ]
+    );
+});
+
+Route::get('/verify-email', function (\Illuminate\Http\Request $request) {
+    return view('mail.verify-email',
+        [
+            'name' => "Stefan",
+            'url' => "url"
+        ]
+    );
+});
