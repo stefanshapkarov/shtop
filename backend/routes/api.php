@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SocialiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,3 +25,6 @@ Route::get('/reset-password/{token}', function ($token){
     ]);
 })->middleware(['guest:'.config('fortify.guard')])
     ->name('password.reset');
+
+Route::post('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
+Route::post('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);

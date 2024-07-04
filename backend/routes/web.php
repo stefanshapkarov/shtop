@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +20,7 @@ Route::get('/', function () {
 });
 
 
-Route::get('/welcome-mail', function (\Illuminate\Http\Request $request) {
+Route::get('/welcome-mail', function (Request $request) {
     return view('mail.welcome-mail',
         [
             'name' => "Stefan"
@@ -26,11 +28,19 @@ Route::get('/welcome-mail', function (\Illuminate\Http\Request $request) {
     );
 });
 
-Route::get('/verify-email', function (\Illuminate\Http\Request $request) {
+Route::get('/verify-email', function (Request $request) {
     return view('mail.verify-email',
         [
             'name' => "Stefan",
             'url' => "url"
         ]
     );
+});
+
+Route::get('/auth/google/redirect', function (Request $request) {
+    return Socialite::driver("google")->redirect();
+});
+
+Route::get('/auth/google/callback', function (Request $request) {
+    dd(Socialite::driver("google")->user());
 });
