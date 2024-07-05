@@ -1,0 +1,42 @@
+@import "../../shared/styles/colors/colors.scss";
+@import "../../shared/styles/fonts/fonts.scss";
+
+#header-container {
+  display: flex;
+  flex-direction: row;
+  width: 200vh;
+  height: 7rem;
+  background-color: $primary-background-color;
+  align-items: center;
+  justify-content: space-between;
+
+  .header-elements-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 60%;
+    padding: 0 2rem;
+  }
+
+  .header-element {
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+  }
+
+  .logo {
+    height: 100%;
+    margin-right: 10rem;
+  }
+
+  .icon {
+    height: 2rem;
+    width: 2rem;
+    margin-right: 1rem;
+  }
+
+  .header-element-text {
+    font-family: 'Manrope-Regular', sans-serif !important;
+  }
+}
