@@ -43,4 +43,15 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function drivenRidePosts()
+    {
+        return $this->hasMany(RidePost::class, 'driver_id');
+    }
+
+    public function passengerRidePosts()
+    {
+        return $this->belongsToMany(RidePost::class,
+            'ridepost_passenger', 'passenger_id', 'ridepost_id');
+    }
 }
