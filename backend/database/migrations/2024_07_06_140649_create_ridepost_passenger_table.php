@@ -11,14 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ridepost_passenger', function (Blueprint $table) {
+        Schema::create('ride_post_passenger', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('passenger_id');
             $table->unsignedBigInteger('ridepost_id');
             $table->timestamps();
 
-            $table->foreign('passenger_id')->references('id')->on('users');
-            $table->foreign('ridepost_id')->references('id')->on('rideposts');
+            $table->foreign('passenger_id')
+                ->references('id')->on('users')
+                    ->onDelete('cascade')
+                    ->onUpdate('cascade');
+
+            $table->foreign('ridepost_id')
+                ->references('id')->on('ride_posts')
+                    ->onDelete('cascade')
+                    ->onUpdate('cascade');
         });
     }
 

@@ -52,6 +52,6 @@ class User extends Authenticatable
     public function passengerRidePosts()
     {
         return $this->belongsToMany(RidePost::class,
-            'ridepost_passenger', 'passenger_id', 'ridepost_id');
+            'ride_post_passenger', 'passenger_id', 'ridepost_id');
     }
 }

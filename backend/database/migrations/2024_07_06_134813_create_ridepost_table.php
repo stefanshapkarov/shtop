@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rideposts', function (Blueprint $table) {
+        Schema::create('ride_posts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('driver_id')->nullable();
             $table->dateTime('departure_time');
@@ -20,10 +20,12 @@ return new class extends Migration
             $table->float('price_per_seat');
             $table->string('departure_city');
             $table->string('destination_city');
+            $table->timestamps();
+
             $table->foreign('driver_id')
                 ->references('id')->on('users')
-                    ->onDelete('set null')->onUpdate('cascade');
-            $table->timestamps();
+                    ->onDelete('set null')
+                    ->onUpdate('cascade');
         });
     }
 

@@ -10,7 +10,7 @@ class RidePost extends Model
 {
     use HasFactory;
 
-//    protected $guarded = [];
+    protected $guarded = [];
 
     public function driver()
     {
@@ -20,6 +20,6 @@ class RidePost extends Model
     public function passengers()
     {
         return $this->belongsToMany(User::class,
-            'ridepost_passenger', 'ridepost_id', 'passenger_id');
+            'ride_post_passenger', 'ridepost_id', 'passenger_id');
     }
 }
