@@ -28,3 +28,8 @@ Route::get('/reset-password/{token}', function ($token){
 
 Route::post('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
 Route::post('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
+
+Route::middleware('auth:sanctum')
+    ->group(function () {
+        Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'updateProfile'])->name('updateProfile');
+    });
