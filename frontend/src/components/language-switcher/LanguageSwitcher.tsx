@@ -23,7 +23,7 @@ const LanguageSwitcher = () => {
     };
 
     return (<IconButton disableRipple id='language-picker' onClick={() => changeLanguage()}>
-            {isMacedonian ? <MK className='icon'/> : <GB className='icon'/>}
+            {isMacedonian ? <MK/> : <GB/>}
         </IconButton>
     );
 };

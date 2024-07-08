@@ -2,32 +2,24 @@
 @import "../../shared/styles/fonts/fonts.scss";
 
 #header-container {
-  display: flex;
-  flex-direction: row;
-  width: 200vh;
-  height: 7rem;
   background-color: $primary-background-color;
-  align-items: center;
-  justify-content: space-between;
+  height: 7rem;
 
-  .header-elements-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  .header-element-container {
     align-items: center;
-    width: 60%;
-    padding: 0 2rem;
+    justify-content: center;
   }
 
   .header-element {
     display: flex;
     flex-direction: row;
     cursor: pointer;
+    text-decoration: none;
+    color: black;
   }
 
   .logo {
-    height: 100%;
-    margin-right: 10rem;
+    height: 7rem;
   }
 
   .icon {
