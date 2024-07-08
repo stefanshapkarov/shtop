@@ -1,5 +1,5 @@
 import LanguageSwitcher from "../language-switcher/LanguageSwitcher";
-import {Box, Grid, Link, Typography} from "@mui/material";
+import {Grid, Link, Typography} from "@mui/material";
 import Logo from '../../shared/styles/images/logo.png'
 import AI_Icon from '../../shared/styles/icons/ai_icon.png'
 import Car_Icon from '../../shared/styles/icons/car_icon.png'
@@ -20,13 +20,13 @@ export const Header = () => {
     return <Grid container xs={12} id='header-container'>
         <Grid item xs={12} lg={4}>
             <Link href='/'>
-                <img src={Logo} className='logo'/>
+                <img src={Logo} alt='shtop' className='logo'/>
             </Link>
         </Grid>
         {headerElements.map((headerElement, index) => {
             return <Grid item container xs={12} lg={2} key={index} className='header-element-container'>
                 <Link href={headerElement.href} className='header-element'>
-                    <img src={headerElement.imageSrc} className='icon'/>
+                    <img alt={headerElement.text} src={headerElement.imageSrc} className='icon'/>
                     <Typography className='header-element-text' variant='h5'>{headerElement.text}</Typography>
                 </Link>
             </Grid>
