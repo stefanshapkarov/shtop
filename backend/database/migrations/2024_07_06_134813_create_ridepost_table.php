@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('ride_posts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('driver_id')->nullable();
+            $table->foreignId('driver_id')->nullable()->constrained('users')->onDelete('set null')->onUpdate('cascade');
             $table->dateTime('departure_time');
             $table->integer('total_seats');
             $table->integer('available_seats');
@@ -21,11 +21,6 @@ return new class extends Migration
             $table->string('departure_city');
             $table->string('destination_city');
             $table->timestamps();
-
-            $table->foreign('driver_id')
-                ->references('id')->on('users')
-                    ->onDelete('set null')
-                    ->onUpdate('cascade');
         });
     }
 
@@ -34,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ridepost');
+        Schema::dropIfExists('ride_posts');
     }
 };
