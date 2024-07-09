@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('ride_id')->constrained('ride_posts')->onDelete('cascade');
             $table->foreignId('reviewer_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('reviewee_id')->constrained('users')->onDelete('cascade');
-            $table->integer('rating');
+            $table->double('rating');
             $table->text('comment')->nullable();
             $table->timestamps();
         });

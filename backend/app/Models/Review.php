@@ -13,6 +13,10 @@ class Review extends Model
         'ride_id', 'reviewer_id', 'reviewee_id', 'rating', 'comment'
     ];
 
+    protected $casts = [
+        'rating' => 'float'
+    ];
+
     public function ride()
     {
         return $this->belongsTo(RidePost::class, 'ride_id');

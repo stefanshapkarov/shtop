@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RidePostController;
 use App\Http\Controllers\SocialiteController;
 use Illuminate\Http\Request;
@@ -16,17 +17,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
-Route::middleware('auth:sanctum')->post('/ridePost', [RidePostController::class, 'store']);
-Route::middleware('auth:sanctum')->patch('/ridePost/{ridePost:id}', [RidePostController::class, 'update']);
-Route::middleware('auth:sanctum')->patch('/ridePost/addPassenger/{ridePost:id}',
-    [RidePostController::class, 'addPassenger']);
-Route::middleware('auth:sanctum')->get('/ridePost', [RidePostController::class, 'index']);
-Route::middleware('auth:sanctum')->get('/ridePost/{ridePost:id}', [RidePostController::class, 'show']);
-Route::middleware('auth:sanctum')->delete('/ridePost/{ridePost:id}', [RidePostController::class, 'destroy']);
+
+
 
 Route::get('/reset-password/{token}', function ($token){
     return response([
@@ -40,5 +33,22 @@ Route::post('auth/{provider}/callback', [SocialiteController::class, 'handleProv
 
 Route::middleware('auth:sanctum')
     ->group(function () {
+        Route::get('/user', function (Request $request) {
+            return $request->user();
+        });
         Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'updateProfile'])->name('updateProfile');
+
+        // REVIEWS
+        Route::apiResource('reviews', ReviewController::class);
+
+        Route::get('users/{userId}/reviews', [ReviewController::class, 'getUserReviews'])->name('users.reviews');
+        Route::get('my-reviews', [ReviewController::class, 'getMyReviews'])->name('my.reviews');
+
+        // RIDEPOSTS
+        Route::post('/ridePost', [RidePostController::class, 'store']);
+        Route::patch('/ridePost/{ridePost:id}', [RidePostController::class, 'update']);
+        Route::patch('/ridePost/addPassenger/{ridePost:id}', [RidePostController::class, 'addPassenger']);
+        Route::get('/ridePost', [RidePostController::class, 'index']);
+        Route::get('/ridePost/{ridePost:id}', [RidePostController::class, 'show']);
+        Route::delete('/ridePost/{ridePost:id}', [RidePostController::class, 'destroy']);
     });
