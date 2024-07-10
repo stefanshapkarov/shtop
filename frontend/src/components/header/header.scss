@@ -4,6 +4,7 @@
 #header-container {
   background-color: $primary-background-color;
   height: 7rem;
+  border-bottom: 1px solid black;
 
   .header-element-container {
     align-items: center;
@@ -29,6 +30,6 @@
   }
 
   .header-element-text {
-    font-family: 'Manrope-Regular', sans-serif !important;
+    font-family: 'Manrope-Medium', serif !important;
   }
 }
