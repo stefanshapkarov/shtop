@@ -2,6 +2,8 @@ import React from 'react';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import {MainLayout} from "./components/main-layout/MainLayout";
 import {HomePage} from "./pages/home-page/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import {I18nextProvider} from "react-i18next";
 import i18 from "./i18";
 
@@ -13,12 +15,16 @@ const App: React.FC = () => {
                     <Route path="/" element={<MainLayout/>}>
                         <Route index element={<HomePage/>}/>
                         {/*
-          Note: All other routes need to be children of MainLayout route so the header and footer render accordingly
+                            Note: All other routes need to be children of MainLayout route so the header and footer render accordingly
 
-          example:
-          <Route path="list" element={<ListPage />} />
-          */}
-                    </Route>
+                            example:
+                            <Route path="list" element={<ListPage />} />
+                            */}
+                            <Route path="/login" element={<LoginPage />}> </Route>
+                            <Route path="/register" element={<RegisterPage />}> </Route>
+
+                        </Route>
+                        
                 </Routes>
             </Router>
         </I18nextProvider>
