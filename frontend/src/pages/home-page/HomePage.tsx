@@ -37,7 +37,7 @@ export const HomePage = () => {
         if (locationTo)
             queryParams.append('to', getInitialLanguage() === 'mk' ? cities_en[cities_mk.indexOf(locationTo)] : locationTo);
         if (date) queryParams.append('date', dayjs(date).format('DD-MM-YYYY'));
-        if (numPassangers && numPassangers > 1) queryParams.append('numPassangers', numPassangers.toString());
+        if (numPassangers && numPassangers >= 1) queryParams.append('numPassangers', numPassangers.toString());
 
         navigate(`/search-route?${queryParams.toString()}`);
     };
