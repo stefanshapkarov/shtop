@@ -1,6 +1,7 @@
 // src/components/Register.tsx
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import './register.scss';
+import { registerUser } from '../../services/api';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -8,6 +9,8 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
@@ -29,14 +32,25 @@ const Register: React.FC = () => {
     setTermsAccepted(event.target.checked);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Add your registration logic here (e.g., call an API)
-    console.log('Username:', username);
-    console.log('Email:', email);
-    console.log('Password:', password);
-    console.log('Confirm Password:', confirmPassword);
-    console.log('Terms Accepted:', termsAccepted);
+    setError(null);
+    setSuccess(null);
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    try {
+      const response = await registerUser(username, email, password);
+      setSuccess('Registration successful');
+      console.log('Registration successful:', response);
+      // Handle successful registration (e.g., redirect to login page)
+    } catch (error) {
+      console.error('Registration error:', error);
+      setError((error as Error).message);
+    }
   };
 
   return (
@@ -91,7 +105,9 @@ const Register: React.FC = () => {
             Accept <a href="#">terms and conditions</a>
           </label>
         </div>
-        <button type="submit" className="register-button">LOG IN</button>
+        {error && <p className="error">{error}</p>}
+        {success && <p className="success">{success}</p>}
+        <button type="submit" className="register-button">Register</button>
       </form>
       <p className="login-account">
         You have an account? <a href="/login">Login now</a>
