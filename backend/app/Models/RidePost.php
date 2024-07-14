@@ -17,6 +17,11 @@ class RidePost extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function requests()
+    {
+        return $this->hasMany(RideRequest::class);
+    }
+
     public function passengers()
     {
         return $this->belongsToMany(User::class,
