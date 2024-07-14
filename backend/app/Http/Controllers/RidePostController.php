@@ -36,14 +36,12 @@ class RidePostController extends Controller
                 'destination_city' => 'required|string|different:departure_city',
             ]);
 
-            $driver = auth()->user();
-
             $validatedRequestData['departure_time'] =
                 Carbon::createFromFormat('d-m-Y H:i', $validatedRequestData['departure_time'])
                     ->format('Y-m-d H:i:s');
 
             RidePost::create([
-                'driver_id' => $driver->id,
+                'driver_id' => auth()->id(),
                 'departure_time' => $validatedRequestData['departure_time'],
                 'total_seats' => $validatedRequestData['total_seats'],
                 'available_seats' => $validatedRequestData['total_seats'],
