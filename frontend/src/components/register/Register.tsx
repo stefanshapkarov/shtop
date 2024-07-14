@@ -4,10 +4,10 @@ import './register.scss';
 import { registerUser } from '../../services/api';
 
 const Register: React.FC = () => {
-  const [username, setUsername] = useState<string>('');
+  const [name, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [passwordConfirmation, setConfirmPassword] = useState<string>('');
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -37,16 +37,19 @@ const Register: React.FC = () => {
     setError(null);
     setSuccess(null);
 
-    if (password !== confirmPassword) {
+    if (password !== passwordConfirmation) {
       setError('Passwords do not match');
       return;
     }
 
     try {
-      const response = await registerUser(username, email, password);
+      const response = await registerUser(name, email, password, passwordConfirmation);
       setSuccess('Registration successful');
       console.log('Registration successful:', response);
-      // Handle successful registration (e.g., redirect to login page)
+
+      // Handle redirect after registration
+      window.location.href = '/home'; // Or whatever your redirect URL is
+
     } catch (error) {
       console.error('Registration error:', error);
       setError((error as Error).message);
@@ -62,7 +65,7 @@ const Register: React.FC = () => {
           <input
             type="text"
             placeholder="Username"
-            value={username}
+            value={name}
             onChange={handleUsernameChange}
             required
           />
@@ -89,7 +92,7 @@ const Register: React.FC = () => {
           <input
             type="password"
             placeholder="Confirm Password"
-            value={confirmPassword}
+            value={passwordConfirmation}
             onChange={handleConfirmPasswordChange}
             required
           />
