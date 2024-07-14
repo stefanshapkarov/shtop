@@ -44,3 +44,7 @@ Route::get('/auth/google/redirect', function (Request $request) {
 Route::get('/auth/google/callback', function (Request $request) {
     dd(Socialite::driver("google")->user());
 });
+
+Route::get('/login', function () {
+   return view('login');
+})->name('login');

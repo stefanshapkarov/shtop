@@ -22,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_picture',
+        'bio',
+        'location'
     ];
 
     /**
@@ -52,6 +55,16 @@ class User extends Authenticatable
     public function passengerRidePosts()
     {
         return $this->belongsToMany(RidePost::class,
-            'ride_post_passenger', 'passenger_id', 'ridepost_id');
+            'ride_post_passenger', 'passenger_id', 'ride_post_id');
+    }
+
+    public function reviewsGiven()
+    {
+        return $this->hasMany(Review::class, 'reviewer_id');
+    }
+
+    public function reviewsReceived()
+    {
+        return $this->hasMany(Review::class, 'reviewee_id');
     }
 }

@@ -14,7 +14,7 @@ class RidePost extends Model
 
     public function driver()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'driver_id');
     }
 
     public function requests()
@@ -25,6 +25,11 @@ class RidePost extends Model
     public function passengers()
     {
         return $this->belongsToMany(User::class,
-            'ride_post_passenger', 'ridepost_id', 'passenger_id');
+            'ride_post_passenger', 'ride_post_id', 'passenger_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'ride_id');
     }
 }
