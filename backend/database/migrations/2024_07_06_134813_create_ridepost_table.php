@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('ride_posts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('driver_id')->nullable()->constrained('users')->onDelete('set null')->onUpdate('cascade');
+            $table->foreignId('driver_id')->nullable()
+                ->constrained('users')->onDelete('set null')->onUpdate('cascade');
             $table->dateTime('departure_time');
             $table->integer('total_seats');
             $table->integer('available_seats');

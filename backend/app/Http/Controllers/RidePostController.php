@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\GeneralJsonException;
+use App\Http\Resources\RidePostResource;
 use App\Models\RidePost;
 use Exception;
 use Illuminate\Http\Request;
@@ -12,17 +14,17 @@ class RidePostController extends Controller
 
     public function index()
     {
-        return RidePost::all();
+        return RidePostResource::collection(RidePost::all());
     }
 
     public function show(RidePost $ridePost)
     {
-        return $ridePost;
+        return new RidePostResource($ridePost);
     }
 
     public function getRidePostsForLoggedInUser()
     {
-        return RidePost::where('driver_id', auth()->id())->get();
+        return RidePostResource::collection(RidePost::where('driver_id', auth()->id())->get());
     }
 
     public function store(Request $request)
@@ -40,7 +42,7 @@ class RidePostController extends Controller
                 Carbon::createFromFormat('d-m-Y H:i', $validatedRequestData['departure_time'])
                     ->format('Y-m-d H:i:s');
 
-            RidePost::create([
+            $ridePost = RidePost::create([
                 'driver_id' => auth()->id(),
                 'departure_time' => $validatedRequestData['departure_time'],
                 'total_seats' => $validatedRequestData['total_seats'],
@@ -50,7 +52,9 @@ class RidePostController extends Controller
                 'destination_city' => $validatedRequestData['destination_city'],
             ]);
 
-            return response()->json(['message' => 'Ride post created successfully.'], 201);
+            throw_if(!$ridePost, GeneralJsonException::class);
+
+            return new RidePostResource($ridePost);
 
         } catch (Exception) {
 
@@ -75,9 +79,11 @@ class RidePostController extends Controller
                         ->format('Y-m-d H:i:s');
             }
 
-            $ridePost->update($validatedRequestData);
+            $updatedRidePost = $ridePost->update($validatedRequestData);
 
-            return response()->json(['message' => 'Ride post updated successfully.']);
+            throw_if(!$updatedRidePost, GeneralJsonException::class);
+
+            return new RidePostResource($updatedRidePost);
 
         } catch (Exception) {
 

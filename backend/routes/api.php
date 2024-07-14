@@ -18,16 +18,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Ride Requests
-Route::middleware('auth:sanctum')->get('/ridePost/{ridePost:id}/requests/pending',
-    [RideRequestController::class, 'getPendingRequestsForPost']);
-Route::middleware('auth:sanctum')->get('/ridePost/{ridePost:id}/requests/new',
-    [RideRequestController::class, 'createRequestForPost']);
-Route::middleware('auth:sanctum')->get('/ridePost/requests/{rideRequest:id}/accept',
-    [RideRequestController::class, 'acceptRequest']);
-Route::middleware('auth:sanctum')->get('/ridePost/requests/{rideRequest:id}/reject',
-    [RideRequestController::class, 'rejectRequest']);
-
 Route::get('/reset-password/{token}', function ($token){
     return response([
         'token' => $token
@@ -51,11 +41,16 @@ Route::middleware('auth:sanctum')
         Route::get('users/{userId}/reviews', [ReviewController::class, 'getUserReviews'])->name('users.reviews');
         Route::get('my-reviews', [ReviewController::class, 'getMyReviews'])->name('my.reviews');
 
-        // RIDEPOSTS
+        // RIDE POSTS
         Route::post('/ridePost', [RidePostController::class, 'store']);
         Route::patch('/ridePost/{ridePost:id}', [RidePostController::class, 'update']);
-        Route::patch('/ridePost/addPassenger/{ridePost:id}', [RidePostController::class, 'addPassenger']);
         Route::get('/ridePost', [RidePostController::class, 'index']);
         Route::get('/ridePost/{ridePost:id}', [RidePostController::class, 'show']);
         Route::delete('/ridePost/{ridePost:id}', [RidePostController::class, 'destroy']);
+
+        // RIDE REQUESTS
+        Route::get('/ridePost/{ridePost:id}/requests/pending', [RideRequestController::class, 'getPendingRequestsForPost']);
+        Route::get('/ridePost/{ridePost:id}/requests/new', [RideRequestController::class, 'createRequestForPost']);
+        Route::get('/ridePost/requests/{rideRequest:id}/accept', [RideRequestController::class, 'acceptRequest']);
+        Route::get('/ridePost/requests/{rideRequest:id}/reject', [RideRequestController::class, 'rejectRequest']);
     });
