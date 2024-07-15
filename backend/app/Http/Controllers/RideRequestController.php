@@ -6,20 +6,31 @@ use App\Exceptions\GeneralJsonException;
 use App\Http\Resources\RideRequestResource;
 use App\Models\RidePost;
 use App\Models\RideRequest;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class RideRequestController extends Controller
 {
-    public function getPendingRequestsForPost(RidePost $ridePost)
+    /**
+     * @throws AuthorizationException
+     */
+    public function getRequestsForPost(RidePost $ridePost)
     {
+        $this->authorize('getRequestsForPost', $ridePost);
+
         return RideRequestResource::collection(
-            RideRequest::where('ridepost_id', $ridePost->id)->where('status', 'pending')->get());
+            RideRequest::where('ridepost_id', $ridePost->id)->get());
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function getRequestsForLoggedInUser()
     {
-        return new RideRequestResource(RideRequest::where('passenger_id', auth()->id())->get());
+        $this->authorize('getRequestsForLoggedInUser', RideRequest::class);
+
+        return RideRequestResource::collection(RideRequest::where('passenger_id', auth()->id())->get());
     }
 
     /**
@@ -28,10 +39,23 @@ class RideRequestController extends Controller
      */
     public function createRequestForPost(RidePost $ridePost)
     {
+        $this->authorize('createRequestForPost', $ridePost);
+
+        $userId = auth()->id();
+
         if ($ridePost->available_seats > 0) {
 
+            $existingRequest = RideRequest::where('passenger_id', $userId)
+                ->where('ridepost_id', $ridePost->id)
+                ->whereRaw('status IN ("accepted", "pending")')
+                ->first();
+
+            if ($existingRequest) {
+                throw new GeneralJsonException("You already have a request for this ride post.");
+            }
+
             $request = RideRequest::create([
-                'passenger_id' => auth()->id(),
+                'passenger_id' => $userId,
                 'ridepost_id' => $ridePost->id
             ]);
 
@@ -44,8 +68,13 @@ class RideRequestController extends Controller
         return response()->json(['message' => 'Request created successfully.']);
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function acceptRequest(RideRequest $rideRequest)
     {
+        $this->authorize('acceptRequest', $rideRequest);
+
         DB::transaction(function () use ($rideRequest) {
 
             $ridePost = $rideRequest->ridePost;
@@ -69,8 +98,13 @@ class RideRequestController extends Controller
         return response()->json(['message' => 'Request accepted, passenger added to ride.']);
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function rejectRequest(RideRequest $rideRequest)
     {
+        $this->authorize('rejectRequest', $rideRequest);
+
         if ($rideRequest->status == "pending") {
 
             $rideRequest->status = "rejected";

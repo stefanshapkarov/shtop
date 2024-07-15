@@ -49,7 +49,7 @@ Route::middleware('auth:sanctum')
         Route::delete('/ridePost/{ridePost:id}', [RidePostController::class, 'destroy']);
 
         // RIDE REQUESTS
-        Route::get('/ridePost/{ridePost:id}/requests/pending', [RideRequestController::class, 'getPendingRequestsForPost']);
+        Route::get('/ridePost/{ridePost:id}/requests', [RideRequestController::class, 'getRequestsForPost']);
         Route::get('/ridePost/{ridePost:id}/requests/new', [RideRequestController::class, 'createRequestForPost']);
         Route::get('/ridePost/requests/{rideRequest:id}/accept', [RideRequestController::class, 'acceptRequest']);
         Route::get('/ridePost/requests/{rideRequest:id}/reject', [RideRequestController::class, 'rejectRequest']);

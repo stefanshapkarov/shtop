@@ -11,6 +11,10 @@ use Carbon\Carbon;
 
 class RidePostController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(RidePost::class, 'ridePost');
+    }
 
     public function index()
     {
@@ -83,7 +87,7 @@ class RidePostController extends Controller
 
             throw_if(!$updatedRidePost, GeneralJsonException::class);
 
-            return new RidePostResource($updatedRidePost);
+            return new RidePostResource($ridePost);
 
         } catch (Exception) {
 
