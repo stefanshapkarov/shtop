@@ -1,12 +1,26 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { loginUser, logout } from '../../services/api';
+import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import { loginUser } from '../../services/api';
 import './login.scss';
+import { useTranslation } from 'react-i18next';
 
 const Login: React.FC = () => {
+    const { t } = useTranslation();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
-    // const { loginUser, authenticated } = useLoginUser(); // Use the custom hook
+    const [loggedIn, setLoggedIn] = useState<boolean>(false); // State to track login status
+
+    useEffect(() => {
+        const checkLoggedIn = async () => {
+            const accessToken = localStorage.getItem('accessToken');
+            if (accessToken) {
+                setLoggedIn(true);
+                window.location.href = '/'; // Redirect to home page if logged in
+            }
+        };
+
+        checkLoggedIn();
+    }, []);
 
     const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value);
@@ -20,67 +34,61 @@ const Login: React.FC = () => {
         event.preventDefault();
         setError(null);
         try {
-            const data = await loginUser(email, password, false);
-            console.log(data);
+            const data = await loginUser(email, password, false); // Assuming loginUser function handles login
+            localStorage.setItem('accessToken', data.accessToken); // Store authentication token in local storage
+            setLoggedIn(true); // Update login state
+            window.location.href = '/'; // Redirect to home page
         } catch (error: any) {
             console.error('Login error:', error.message);
             setError(error.message);
         }
     };
-    const handleLogout = async () => {
-        try {
-            const response = await logout();
-            console.log(response);
-            window.location.href = '/'; // Redirect to home or login page after logout
-        } catch (error) {
-            console.error('Logout error:', error);
-        }
-    };
 
-        return (
-            <div className="login-container">
-                <h2>Login to your Account</h2>
-                <p>Welcome back! Select method to log in:</p>
-                <div className="social-login">
-                    <button className="google-login">Google</button>
-                    <button className="facebook-login">Facebook</button>
-                </div>
-                <div className="divider">or continue with email</div>
-                <form onSubmit={handleSubmit}>
-                    <div className="input-group">
-                        <input
-                            type="email"
-                            placeholder="Email"
-                            value={email}
-                            onChange={handleEmailChange}
-                            required
-                        />
-                    </div>
-                    <div className="input-group">
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={handlePasswordChange}
-                            required
-                        />
-                    </div>
-                    <div className="options">
-                        <label>
-                            <input type="checkbox" />
-                            Remember me
-                        </label>
-                        <a href="#">Forgot Password?</a>
-                    </div>
-                    <button type="submit" className="login-button">LOG IN</button>
-                </form>
-                {error && <p className="error">{error}</p>}
-                <p className="create-account">
-                    Don't have an account? <a href="/register">Create an account</a>
-                </p>
-                <button onClick={handleLogout} className="logout-button">Logout</button>
+    return (
+        <div className="login-container">
+            <h2>{t('LOGIN')}</h2>
+            <p>{t('WELLCOME-BACK')}</p>
+            <div className="social-login">
+                <button className="google-login">Google</button>
+                <button className="facebook-login">Facebook</button>
             </div>
-        );
+            <div className="divider">{t("EMAIL")}</div>
+
+            <form onSubmit={handleSubmit}>
+                <div className="input-group">
+                    <input
+                        type="email"
+                        placeholder={t("email")}
+                        value={email}
+                        onChange={handleEmailChange}
+                        required
+                    />
+                </div>
+                <div className="input-group">
+                    <input
+                        type="password"
+                        placeholder={t("password")}
+                        value={password}
+                        onChange={handlePasswordChange}
+                        required
+                    />
+                </div>
+                <div className="options">
+                    <label>
+                        <input type="checkbox" />
+                        {t("REMEMBER")}
+                    </label>
+                    <a href="#">{t("FORGOT-PASSWORD")}</a>
+                </div>
+                <button type="submit" className="login-button">{t("LOGIN-B")}</button>
+            </form>
+            {error && <p className="error">{error}</p>}
+
+            <p className="create-account">
+                {t("NO-ACCOUNT")} <a href="/register">{t("CREATE-ACC")}</a>
+            </p>
+        </div>
+    );
 };
 
 export default Login;

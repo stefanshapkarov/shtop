@@ -14,5 +14,16 @@
   "VELES": "Veles",
   "ABOUT_US": "About us",
   "HOW_WE_WORK": "How we work",
-  "HELP_CENTER": "Help center"
+  "HELP_CENTER": "Help center",
+  "LOGIN" : "Log in to you account",
+  "WELLCOME-BACK" : "Welcome back! Select method to log in:",
+  "EMAIL" : "or continue with email",
+  "email" : "Email",
+  "password" : "Password",
+  "REMEMBER" : "Remember me",
+  "FORGOT-PASSWORD" : "Forgot Password?",
+  "LOGIN-B" : "LOG IN",
+  "NO-ACCOUNT": "Don't have an account?",
+  "CREATE-ACC": "Create an account"
+
 }
