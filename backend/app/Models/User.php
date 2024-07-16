@@ -22,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_picture',
+        'bio',
+        'location'
     ];
 
     /**
@@ -43,4 +46,25 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function drivenRidePosts()
+    {
+        return $this->hasMany(RidePost::class, 'driver_id');
+    }
+
+    public function passengerRidePosts()
+    {
+        return $this->belongsToMany(RidePost::class,
+            'ride_post_passenger', 'passenger_id', 'ride_post_id');
+    }
+
+    public function reviewsGiven()
+    {
+        return $this->hasMany(Review::class, 'reviewer_id');
+    }
+
+    public function reviewsReceived()
+    {
+        return $this->hasMany(Review::class, 'reviewee_id');
+    }
 }
