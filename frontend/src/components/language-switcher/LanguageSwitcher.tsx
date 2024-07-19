@@ -20,6 +20,7 @@ const LanguageSwitcher = () => {
             localStorage.setItem('language', 'mk')
         }
         setIsMacedonian(prevState => !prevState);
+        window.location.reload();
     };
 
     return (<IconButton disableRipple id='language-picker' onClick={() => changeLanguage()}>

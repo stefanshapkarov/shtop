@@ -1,0 +1,109 @@
+@import "../../shared/styles/fonts/fonts.scss";
+@import "../../shared/styles/colors/colors.scss";
+
+#search-route-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .title {
+    margin-top: 2rem;
+    font-family: 'Manrope-Medium', serif !important;
+    color: $title !important;
+  }
+
+  .search-route-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 3rem;
+  }
+
+  .search-field {
+    background-color: $third-background-color;
+    width: 14rem;
+    margin-right: 1rem;
+  }
+
+  .search-button {
+    background-color: $primary !important;
+    width: 14rem;
+    height: 3.5rem;
+    font-size: 1rem;
+  }
+
+  .search-route-page-content {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 6rem;
+  }
+
+  .sort-container-headers {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .clear-all-button {
+    text-decoration: underline;
+    text-transform: none;
+    color: $primary;
+    cursor: pointer;
+  }
+
+  .filters-container {
+    width: 30rem;
+  }
+
+  .sorting-option-container {
+    :hover {
+      background-color: $third-background-color;
+      transition: 200ms;
+      border-radius: 1rem;
+    }
+  }
+
+  .sorting-option-content-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    margin-top: 1rem;
+    padding: 0.5rem;
+  }
+
+  .sorting-option-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .radio-button {
+    color: $primary !important;
+  }
+
+  .icon {
+    height: 2.5rem;
+    width: 2.75rem;
+  }
+
+  .divider {
+    margin: 1rem 0 2rem -1.5rem;
+    border: 0.25rem solid $secondary-background-color;
+    border-radius: 1rem;
+    width: 110%;
+  }
+
+  .routes-list {
+    height: 50rem;
+    overflow-y: scroll;
+    margin-bottom: 4rem;
+    padding-right: 0.5rem;
+    padding-bottom: 1rem;
+    scrollbar-width: none;
+  }
+}

@@ -11,6 +11,7 @@ import {HeaderElementType} from "./types/HeaderElementType";
 export const Header = () => {
     const {t} = useTranslation()
 
+
     const headerElements: HeaderElementType[] = [
         {imageSrc: AI_Icon, text: t('SHTOP_AI'), href: '/shtop-ai'},
         {imageSrc: Car_Icon, text: t('FIND_TRANSPORT'), href: '/search-route'},
