@@ -16,9 +16,31 @@ class RidePostController extends Controller
         $this->authorizeResource(RidePost::class, 'ridePost');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return RidePostResource::collection(RidePost::all());
+        $filters = RidePost::query();
+
+        if (!empty($request->departure_city)) {
+            $filters->where('departure_city', $request->departure_city);
+        }
+
+        if (!empty($request->destination_city)) {
+            $filters->where('destination_city', $request->destination_city);
+        }
+
+        if (!empty($request->available_seats)) {
+            $filters->where('available_seats', ">=", $request->available_seats);
+        }
+
+        if (!empty($request->price)) {
+            $filters->where('price_per_seat', "<=", $request->price);
+        }
+
+        if (!empty($request->departure_date)) {
+            $filters->whereDate('departure_date', $request->departure_date);
+        }
+
+        return RidePostResource::collection($filters->simplePaginate(15));
     }
 
     public function show(RidePost $ridePost)
