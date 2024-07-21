@@ -21,6 +21,7 @@ return new class extends Migration
             $table->float('price_per_seat');
             $table->string('departure_city');
             $table->string('destination_city');
+            $table->enum('status', ['pending', 'completed'])->default('pending');
             $table->timestamps();
         });
     }

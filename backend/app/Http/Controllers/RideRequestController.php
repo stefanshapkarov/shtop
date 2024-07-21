@@ -118,4 +118,18 @@ class RideRequestController extends Controller
 
         return response()->json(['message' => 'Request rejected.']);
     }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function destroy(RideRequest $rideRequest)
+    {
+        $this->authorize('destroy', $rideRequest);
+
+        if ($rideRequest->status == "accepted") {
+            $rideRequest->ridePost->passengers()->detach(auth()->id());
+        }
+
+        $rideRequest->delete();
+    }
 }

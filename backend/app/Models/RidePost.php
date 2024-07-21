@@ -19,7 +19,7 @@ class RidePost extends Model
 
     public function requests()
     {
-        return $this->hasMany(RideRequest::class);
+        return $this->hasMany(RideRequest::class, 'ridepost_id');
     }
 
     public function passengers()
