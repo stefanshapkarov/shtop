@@ -10,27 +10,35 @@ import Car_Icon from '../../shared/styles/icons/car_icon.png';
 import Share_Icon from '../../shared/styles/icons/share_transport_icon.png';
 import './header.scss';
 import { HeaderElementType } from "./types/HeaderElementType";
+import { logout } from "../../services/api";
 
 export const Header = () => {
     const { t } = useTranslation();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:1200px)');
-const [loggedIn, setLoggedIn] = useState<boolean>(false);
     const [isAuth, setIsAuth] = useState(false);
 
+    useEffect(() => {
+        const checkLoggedIn = () => {
+            const isAuthenticated = localStorage.getItem('accessToken') !== null;
+            setIsAuth(isAuthenticated);
+            isAuthenticated ? console.log('logged in') : console.log('logged out');
+        };
+        checkLoggedIn();
+    }, []);
 
-    // useEffect(() => {
-    //     // Check if user is logged in on component mount or app load
-    //     const checkLoggedIn = async () => {
-    //         // Example: Check local storage for authentication token or user credentials
-    //         const isAuthenticated = localStorage.getItem('accessToken') !== null; // Adjust as per your authentication method
-    //         setIsAuth(isAuthenticated);
-    //         isAuthenticated ? console.log('logged in') : console.log('logged out');
-    //     };
-
-    //     checkLoggedIn();
-    // }, []);
+    const handleLogout = async () => {
+        try {
+            await logout();
+            localStorage.removeItem("accessToken");
+            setIsAuth(false);
+            console.log("logged out");
+            window.location.href = "/";
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    };
 
     const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -78,12 +86,31 @@ const [loggedIn, setLoggedIn] = useState<boolean>(false);
                                 </ListItem>
                             ))}
 
-                            <ListItem button style={{ padding: '8px 16px' }}>
-                                <Link href="/login" style={{ textDecoration: 'none', color: 'inherit' }}>Login</Link>
-                            </ListItem>
-                            <ListItem button style={{ padding: '8px 16px' }}>
-                                <Link href="/register" style={{ textDecoration: 'none', color: 'inherit' }}>Register</Link>
-                            </ListItem>
+                            {isAuth ? (
+                                <>
+                                    <ListItem button style={{ padding: '8px 16px' }}>
+                                        <Link href="/your-rides" style={{ textDecoration: 'none', color: 'inherit' }}>Your Rides</Link>
+                                    </ListItem>
+                                    <ListItem button style={{ padding: '8px 16px' }}>
+                                        <Link href="/inbox" style={{ textDecoration: 'none', color: 'inherit' }}>Inbox</Link>
+                                    </ListItem>
+                                    <ListItem button style={{ padding: '8px 16px' }}>
+                                        <Link href="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>Profile</Link>
+                                    </ListItem>
+                                    <ListItem button style={{ padding: '8px 16px' }} onClick={handleLogout}>
+                                        <Link href="#" style={{ textDecoration: 'none', color: 'inherit' }}>Logout</Link>
+                                    </ListItem>
+                                </>
+                            ) : (
+                                <>
+                                    <ListItem button style={{ padding: '8px 16px' }}>
+                                        <Link href="/login" style={{ textDecoration: 'none', color: 'inherit' }}>Login</Link>
+                                    </ListItem>
+                                    <ListItem button style={{ padding: '8px 16px' }}>
+                                        <Link href="/register" style={{ textDecoration: 'none', color: 'inherit' }}>Register</Link>
+                                    </ListItem>
+                                </>
+                            )}
                             <ListItem button style={{ padding: '8px 16px' }}>
                                 <LanguageSwitcher />
                             </ListItem>
@@ -105,8 +132,19 @@ const [loggedIn, setLoggedIn] = useState<boolean>(false);
                             <AccountCircleIcon className="profile-icon" style={{ fontSize: '3rem' }} />
                         </IconButton>
                         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-                            <MenuItem onClick={handleMenuClose}><Link href="/login">Login</Link></MenuItem>
-                            <MenuItem onClick={handleMenuClose}><Link href="/register">Register</Link></MenuItem>
+                            {isAuth ? (
+                                <>
+                                    <MenuItem onClick={handleMenuClose}><Link href="/your-rides">Your Rides</Link></MenuItem>
+                                    <MenuItem onClick={handleMenuClose}><Link href="/inbox">Inbox</Link></MenuItem>
+                                    <MenuItem onClick={handleMenuClose}><Link href="/profile">Profile</Link></MenuItem>
+                                    <MenuItem onClick={() => { handleMenuClose(); handleLogout(); }}>Logout</MenuItem>
+                                </>
+                            ) : (
+                                <>
+                                    <MenuItem onClick={handleMenuClose}><Link href="/login">Login</Link></MenuItem>
+                                    <MenuItem onClick={handleMenuClose}><Link href="/register">Register</Link></MenuItem>
+                                </>
+                            )}
                         </Menu>
                     </Grid>
                     <Grid item container xs={12} lg={2} className='header-element-container'>

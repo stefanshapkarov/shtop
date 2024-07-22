@@ -8,13 +8,13 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
-    const [loggedIn, setLoggedIn] = useState<boolean>(false); // State to track login status
+    const [isAuth, setIsAuth] = useState<boolean>(false); // State to track login status
 
     useEffect(() => {
         const checkLoggedIn = async () => {
             const accessToken = localStorage.getItem('accessToken');
             if (accessToken) {
-                setLoggedIn(true);
+                setIsAuth(true);
                 window.location.href = '/'; // Redirect to home page if logged in
             }
         };
@@ -36,13 +36,15 @@ const Login: React.FC = () => {
         try {
             const data = await loginUser(email, password, false); // Assuming loginUser function handles login
             localStorage.setItem('accessToken', data.accessToken); // Store authentication token in local storage
-            setLoggedIn(true); // Update login state
+            setIsAuth(true); // Update login state
             window.location.href = '/'; // Redirect to home page
         } catch (error: any) {
             console.error('Login error:', error.message);
             setError(error.message);
         }
     };
+
+    
 
     return (
         <div className="login-container">

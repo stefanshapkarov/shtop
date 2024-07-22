@@ -1,5 +1,5 @@
 // src/components/Register.tsx
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import './register.scss';
 import { registerUser } from '../../services/api';
 
@@ -11,6 +11,20 @@ const Register: React.FC = () => {
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isAuth, setIsAuth] = useState<boolean>(false); // State to track login status
+
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+        const accessToken = localStorage.getItem('accessToken');
+        if (accessToken) {
+            setIsAuth(true);
+            window.location.href = '/'; // Redirect to home page if logged in
+        }
+    };
+
+    checkLoggedIn();
+}, []);
+
 
   const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
@@ -37,10 +51,19 @@ const Register: React.FC = () => {
     setError(null);
     setSuccess(null);
 
+    event.preventDefault();
+    if (password.length < 8) {
+        setError("The password field must be at least 8 characters.");
+        return;
+    }
+
+
     if (password !== passwordConfirmation) {
       setError('Passwords do not match');
       return;
     }
+
+
 
     try {
       const response = await registerUser(name, email, password, passwordConfirmation);
