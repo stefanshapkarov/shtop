@@ -2,6 +2,9 @@ import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { loginUser } from '../../services/api';
 import './login.scss';
 import { useTranslation } from 'react-i18next';
+import GoogleIcon from '@mui/icons-material/Google';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import { blue } from '@mui/material/colors';
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
@@ -51,9 +54,15 @@ const Login: React.FC = () => {
             <h2>{t('LOGIN')}</h2>
             <p>{t('WELLCOME-BACK')}</p>
             <div className="social-login">
-                <button className="google-login">Google</button>
-                <button className="facebook-login">Facebook</button>
-            </div>
+            <button className="google-login">
+                <GoogleIcon style={{ marginRight: '8px', color: "red"  }} />
+                Google
+            </button>
+            <button className="facebook-login">
+                <FacebookIcon style={{ marginRight: '8px', color: "blue" }} />
+                Facebook
+            </button>
+        </div>
             <div className="divider">{t("EMAIL")}</div>
 
             <form onSubmit={handleSubmit}>
