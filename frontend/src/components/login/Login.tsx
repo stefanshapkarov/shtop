@@ -4,25 +4,33 @@ import './login.scss';
 import { useTranslation } from 'react-i18next';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import { blue } from '@mui/material/colors';
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
-    const [isAuth, setIsAuth] = useState<boolean>(false); // State to track login status
+    const [isAuth, setIsAuth] = useState<boolean>(false);
 
     useEffect(() => {
-        const checkLoggedIn = async () => {
-            const accessToken = localStorage.getItem('accessToken');
-            if (accessToken) {
-                setIsAuth(true);
-                window.location.href = '/'; // Redirect to home page if logged in
-            }
-        };
+        const query = new URLSearchParams(window.location.search);
+        const token = query.get('token');
+        
+        if (token) {
+            localStorage.setItem('accessToken', token);
+            setIsAuth(true);
+            window.location.href = '/'; // Redirect to home page
+        } else {
+            const checkLoggedIn = async () => {
+                const accessToken = localStorage.getItem('accessToken');
+                if (accessToken) {
+                    setIsAuth(true);
+                    window.location.href = '/'; // Redirect to home page if logged in
+                }
+            };
 
-        checkLoggedIn();
+            checkLoggedIn();
+        }
     }, []);
 
     const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -37,9 +45,9 @@ const Login: React.FC = () => {
         event.preventDefault();
         setError(null);
         try {
-            const data = await loginUser(email, password, false); // Assuming loginUser function handles login
+            const data = await loginUser(email, password, false);
             localStorage.setItem('accessToken', data.accessToken); // Store authentication token in local storage
-            setIsAuth(true); // Update login state
+            setIsAuth(true);
             window.location.href = '/'; // Redirect to home page
         } catch (error: any) {
             console.error('Login error:', error.message);
@@ -47,22 +55,28 @@ const Login: React.FC = () => {
         }
     };
 
-    
+    const handleGoogleLogin = () => {
+        window.open('http://localhost:8000/auth/google/redirect', '_self');
+    };
+
+    const handleFacebookLogin = () => {
+        window.open('http://localhost:8000/auth/facebook/redirect', '_self');
+    };
 
     return (
         <div className="login-container">
             <h2>{t('LOGIN')}</h2>
-            <p>{t('WELLCOME-BACK')}</p>
+            <p>{t('WELCOME-BACK')}</p>
             <div className="social-login">
-            <button className="google-login">
-                <GoogleIcon style={{ marginRight: '8px', color: "red"  }} />
-                Google
-            </button>
-            <button className="facebook-login">
-                <FacebookIcon style={{ marginRight: '8px', color: "blue" }} />
-                Facebook
-            </button>
-        </div>
+                <button className="google-login" onClick={handleGoogleLogin}>
+                    <GoogleIcon style={{ marginRight: '8px', color: 'red' }} />
+                    Google
+                </button>
+                <button className="facebook-login" onClick={handleFacebookLogin}>
+                    <FacebookIcon style={{ marginRight: '8px', color: 'blue' }} />
+                    Facebook
+                </button>
+            </div>
             <div className="divider">{t("EMAIL")}</div>
 
             <form onSubmit={handleSubmit}>

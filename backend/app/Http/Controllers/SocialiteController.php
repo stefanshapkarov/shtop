@@ -16,50 +16,90 @@ class SocialiteController extends Controller
         return Socialite::driver($provider)->scopes(['profile', 'email'])->stateless()->redirect();
     }
 
-    public function handleProviderCallback(Request $request, $provider)
-    {
-        $accessToken = $request->input('access_token');
+    // public function handleProviderCallback($provider)
+    // {
+    //     try {
+    //         // Fetch user information from the provider
+    //         $socialUser = Socialite::driver($provider)->stateless()->user();
 
-        try {
-            // Log access token for debugging
-            Log::info('Access Token: ' . $accessToken);
+    //         // Log user info for debugging
+    //         Log::info('Social User Email: ' . $socialUser->getEmail());
+    //         Log::info('Social User Name: ' . $socialUser->getName());
 
-            $socialUser = Socialite::driver($provider)->stateless()->userFromToken($accessToken);
+    //         $email = $socialUser->getEmail();
+    //         $name = $socialUser->getName() ?? substr($email, 0, strpos($email, '@'));
 
-            // Log user info for debugging
-            Log::info('Social User Email: ' . $socialUser->getEmail());
+    //         $user = User::where('email', $email)->first();
 
-            // Extract name from email
-            $email = $socialUser->getEmail();
-            $name = $socialUser->getName() ?? substr($email, 0, strpos($email, '@'));
+    //         if (!$user) {
+    //             $user = User::create([
+    //                 'name' => $name,
+    //                 'email' => $email,
+    //                 'password' => Hash::make(uniqid()),
+    //             ]);
+    //         }
 
-            Log::info('Social User Name: ' . $name);
+    //         Auth::login($user);
 
-        } catch (\Exception $e) {
-            // Log error for debugging
-            Log::error('Error in Socialite: ' . $e->getMessage());
+    //         $token = $user->createToken('socialite-token')->plainTextToken;
+    //         // $accessToken = $request->input('access_token');
+    //         // $accessToken = $socialUser->token;
+    //         $isAuth = false;
+    //         if($token !==null){
+    //             $isAuth = true;
+    //         }
+    //         // return response()->json(['token' => $token]);
 
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
+    //         $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+    //         return redirect()->to($frontendUrl . '?token=' . urlencode($token));
 
-        $user = User::where('email', $socialUser->getEmail())->first();
+    //     } catch (\Exception $e) {
+    //         Log::error('Error in Socialite: ' . $e->getMessage());
+    //         return response()->json(['error' => 'Unauthorized'], 401);
+    //     }
+    // }
+
+    public function handleProviderCallback($provider)
+{
+    try {
+        Log::info('Handling callback for provider: ' . $provider);
+
+        // Fetch user information from the provider
+        $socialUser = Socialite::driver($provider)->stateless()->user();
+
+        Log::info('Social User Retrieved: ', (array) $socialUser);
+
+        $email = $socialUser->getEmail();
+        $name = $socialUser->getName() ?? substr($email, 0, strpos($email, '@'));
+
+        $user = User::where('email', $email)->first();
 
         if (!$user) {
-            // Create a new user if it doesn't exist
             $user = User::create([
-                'name' => $name, // Use extracted name
-                'email' => $socialUser->getEmail(),
-                'password' => Hash::make(uniqid()), // Generate a random password
+                'name' => $name,
+                'email' => $email,
+                'password' => Hash::make(uniqid()),
             ]);
+
+            Log::info('User created: ', ['user' => $user]);
+        } else {
+            Log::info('User already exists: ', ['user' => $user]);
         }
 
-        // Log the user in
         Auth::login($user);
 
-        // Generate Sanctum token (if using Sanctum for API authentication)
         $token = $user->createToken('socialite-token')->plainTextToken;
+        Log::info('Token created: ' . $token);
 
-        return response()->json(['token' => $token]);
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+        Log::info('Redirecting to: ' . $frontendUrl . '?token=' . urlencode($token));
+
+        return redirect()->to($frontendUrl . '?token=' . urlencode($token));
+
+    } catch (\Exception $e) {
+        Log::error('Error in Socialite: ' . $e->getMessage());
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
+}
 
 }
