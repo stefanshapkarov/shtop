@@ -58,6 +58,14 @@ class RidePostAndRequestPolicy
     }
 
     /**
+     * Determine whether the user can complete a Ride Post.
+     */
+    public function complete(User $user, RidePost $ridePost): bool
+    {
+        return $user->id == $ridePost->driver->id;
+    }
+
+    /**
      * Determine whether the user can see all ride requests for a ride post.
      */
     public function getRequestsForPost(User $user, RidePost $ridePost): bool
@@ -95,5 +103,13 @@ class RidePostAndRequestPolicy
     public function rejectRequest(User $user, RideRequest $rideRequest): bool
     {
         return $user->id == $rideRequest->ridePost->driver->id;
+    }
+
+    /**
+     * Determine whether the user can cancel (delete) a Ride Request.
+     */
+    public function destroy(User $user, RideRequest $rideRequest): bool
+    {
+        return $user->id == $rideRequest->passenger->id || $user->id == $rideRequest->ridePost->driver->id;
     }
 }

@@ -6,8 +6,10 @@ use App\Exceptions\GeneralJsonException;
 use App\Http\Resources\RidePostResource;
 use App\Models\RidePost;
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class RidePostController extends Controller
 {
@@ -119,6 +121,38 @@ class RidePostController extends Controller
 
     public function destroy(RidePost $ridePost)
     {
+        DB::transaction(function () use ($ridePost) {
+            foreach ($ridePost->requests as $request) {
+                $request->delete();
+            }
+        });
+
         $ridePost->delete();
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function complete(RidePost $ridePost)
+    {
+        $this->authorize('complete', $ridePost);
+
+        if (Carbon::now()->isAfter($ridePost->departure_time)) {
+
+            DB::transaction(function () use ($ridePost) {
+                foreach ($ridePost->requests as $request) {
+                    $request->delete();
+                }
+            });
+
+            $ridePost->status = "completed";
+
+            $ridePost->save();
+
+            return response()->json(['message' => 'Successfully completed ride.']);
+        } else {
+
+            return response()->json(['message' => 'You must finish the ride to complete it.'], 500);
+        }
     }
 }
