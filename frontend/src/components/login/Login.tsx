@@ -19,13 +19,13 @@ const Login: React.FC = () => {
         if (token) {
             localStorage.setItem('accessToken', token);
             setIsAuth(true);
-            window.location.href = '/'; // Redirect to home page
+            window.location.href = '/';
         } else {
             const checkLoggedIn = async () => {
                 const accessToken = localStorage.getItem('accessToken');
                 if (accessToken) {
                     setIsAuth(true);
-                    window.location.href = '/'; // Redirect to home page if logged in
+                    window.location.href = '/';
                 }
             };
 
@@ -46,9 +46,9 @@ const Login: React.FC = () => {
         setError(null);
         try {
             const data = await loginUser(email, password, false);
-            localStorage.setItem('accessToken', data.accessToken); // Store authentication token in local storage
+            localStorage.setItem('accessToken', data.accessToken);
             setIsAuth(true);
-            window.location.href = '/'; // Redirect to home page
+            window.location.href = '/';
         } catch (error: any) {
             console.error('Login error:', error.message);
             setError(error.message);
@@ -60,7 +60,8 @@ const Login: React.FC = () => {
     };
 
     const handleFacebookLogin = () => {
-        window.open('http://localhost:8000/auth/facebook/redirect', '_self');
+        //change client_id
+        window.open('https://www.facebook.com/v12.0/dialog/oauth?client_id=457244443828565&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fauth%2Ffacebook%2Fcallback&scope=email,public_profile&response_type=code', '_self');
     };
 
     return (

@@ -11,14 +11,14 @@ const Register: React.FC = () => {
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [isAuth, setIsAuth] = useState<boolean>(false); // State to track login status
+  const [isAuth, setIsAuth] = useState<boolean>(false); 
 
   useEffect(() => {
     const checkLoggedIn = async () => {
         const accessToken = localStorage.getItem('accessToken');
         if (accessToken) {
             setIsAuth(true);
-            window.location.href = '/'; // Redirect to home page if logged in
+            window.location.href = '/';
         }
     };
 
@@ -71,7 +71,7 @@ const Register: React.FC = () => {
       console.log('Registration successful:', response);
 
       // Handle redirect after registration
-      window.location.href = '/home'; // Or whatever your redirect URL is
+      window.location.href = '/home';
 
     } catch (error) {
       console.error('Registration error:', error);
