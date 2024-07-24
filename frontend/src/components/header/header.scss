@@ -32,4 +32,44 @@
   .header-element-text {
     font-family: 'Manrope-Medium', serif !important;
   }
+
+  .profile-icon-button {
+    .profile-icon {
+        font-size: 3rem; // Adjust the size as needed
+    }
+}
+
+.header-element-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-icon-button {
+  .profile-icon {
+      font-size: 1.5rem; // Adjust the size as needed
+  }
+}
+
+.logo {
+  max-width: 100%; // Ensure the logo is responsive
+}
+
+.header-element {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+
+  .icon {
+      width: 20px; // Adjust the size as needed
+      height: 20px; // Adjust the size as needed
+      margin-right: 8px;
+  }
+
+  .header-element-text {
+      font-size: 1rem;
+  }
+}
+
 }
