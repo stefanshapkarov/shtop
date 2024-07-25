@@ -157,28 +157,6 @@ export const SearchRoute = () => {
         setUpdate(prevState => prevState + 1)
     }
 
-    const getETT = (departure: Date, arrival: Date) => {
-        let differenceMs: number = Math.abs(arrival.getTime() - departure.getTime());
-        let differenceHours: number = Math.floor(differenceMs / (1000 * 60 * 60));
-        let differenceMinutes: number = Math.floor((differenceMs % (1000 * 60 * 60)) / (1000 * 60));
-
-        let result = '';
-
-        if (differenceHours / 10 < 1)
-            result += '0' + differenceHours.toString();
-        else
-            result += differenceHours.toString();
-
-        result += ':'
-
-        if (differenceMinutes / 10 < 1)
-            result += '0' + differenceMinutes.toString();
-        else
-            result += differenceMinutes.toString();
-
-        return result;
-    }
-
     return <>
         <Box id='search-route-page-container'>
             <Typography variant='h2' className='title'>{t('WHERE_TO')}</Typography>
@@ -272,14 +250,7 @@ export const SearchRoute = () => {
                     <Typography>{filteredRoutes.length} {t('AVAILABLE')}</Typography>
                     <Box className='routes-list' ref={routesListRef}>
                         {filteredRoutes.map((route) => (
-                            <RouteCard
-                                departureTime={format(route.departureTime, 'HH:mm')}
-                                estimatedTimeOfArrival={format(route.estimatedTimeOfArrival, 'HH:mm')}
-                                estimatedTimeOfTravel={getETT(route.departureTime, route.estimatedTimeOfArrival)}
-                                departureCity={route.departureCity} destinationCity={route.destinationCity}
-                                name={route.driver.name}
-                                price={route.pricePerSeat.toString()} profilePicture={route.driver.profilePicture}
-                                totalSeats={route.totalSeats} availableSeats={route.totalSeats - route.availableSeats}/>
+                            <RouteCard ride={route} moreStyles={true} key={route.id}/>
                         ))}
                     </Box>
                 </Box>

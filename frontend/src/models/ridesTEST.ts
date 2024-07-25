@@ -23,8 +23,8 @@ const driverTest: UserType = {
 const driverTest2: UserType = {
     id: 2,
     createdAt: new Date(Date.now()),
-    name: 'Lile',
-    bio: null,
+    name: 'Лиле',
+    bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt.',
     location: null,
     profilePicture: null,
     admin: 0,

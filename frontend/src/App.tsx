@@ -5,6 +5,7 @@ import {HomePage} from "./pages/home-page/HomePage";
 import {I18nextProvider} from "react-i18next";
 import i18 from "./i18";
 import {SearchRoute} from "./pages/search-route-page/SearchRoute";
+import {RoutePage} from "./pages/route-page/RoutePage";
 
 const App: React.FC = () => {
     return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
                     <Route path="/" element={<MainLayout/>}>
                         <Route index element={<HomePage/>}/>
                         <Route path="search-route" element={<SearchRoute/>}/>
+                        <Route path="route" element={<RoutePage/>}/>
                         {/*
           Note: All other routes need to be children of MainLayout route so the header and footer render accordingly
 

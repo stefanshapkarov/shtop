@@ -1,0 +1,98 @@
+@import '../../shared/styles/colors/colors.scss';
+@import "../../shared/styles/fonts/fonts.scss";
+
+#route-page-wrapper {
+  background-color: $primary-background-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 0 8rem 0;
+
+  .route-info-container {
+    background-color: $secondary-background-color;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 2rem;
+    height: 40rem;
+    width: 45rem;
+    padding: 0 8rem;
+  }
+
+  .date {
+    margin-top: 1rem;
+    font-family: 'Manrope-Medium', serif !important;
+  }
+
+  .divider {
+    margin: 1rem 0;
+    border: 1px solid $primary;
+    width: 100%;
+  }
+
+  .drive-info-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 95%;
+    cursor: pointer;
+  }
+
+  .driver-picture-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .profile-picture {
+    height: 3rem;
+    width: 3rem;
+    border-radius: 2rem;
+  }
+
+  .arrow {
+    height: 2rem;
+    width: 2rem;
+    transform: rotate(-90deg) !important;
+    transition: 350ms;
+  }
+
+  .arrow-extended {
+    transform: rotate(0deg) !important;
+    transition: 350ms;
+  }
+
+  .driver-info-collapsable {
+    margin-top: 0.5rem;
+    width: 80%;
+    height: 0;
+    overflow-y: hidden;
+    cursor: pointer;
+    transition: 350ms ease;
+  }
+
+  .driver-info-collapsable-opened {
+    height: 12rem;
+    transition: 350ms ease;
+  }
+
+  .bio {
+    margin: 0.25rem 0 1rem 1rem;
+  }
+
+  .star {
+    height: 1.25rem;
+    width: 1.25rem;
+    color: $primary;
+  }
+
+  .star-empty {
+    color: $primary-background-color !important;
+  }
+
+  .driver-info-extended {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+  }
+}
