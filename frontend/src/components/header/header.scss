@@ -43,6 +43,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  text-decoration: none;
 }
 
 .profile-icon-button {
@@ -70,6 +71,16 @@
   .header-element-text {
       font-size: 1rem;
   }
+
 }
+
+// .link-button {
+//   text-decoration: none; /* Remove underline */
+//   color: #ff6347; /* Set the desired color */
+// }
+
+// .link-button:hover {
+//   color: #ff4500; /* Optional: Change color on hover */
+// }
 
 }
