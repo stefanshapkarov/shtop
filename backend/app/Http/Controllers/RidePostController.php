@@ -78,7 +78,6 @@ class RidePostController extends Controller
                 'driver_id' => auth()->id(),
                 'departure_time' => $validatedRequestData['departure_time'],
                 'total_seats' => $validatedRequestData['total_seats'],
-                'available_seats' => $validatedRequestData['total_seats'],
                 'price_per_seat' => $validatedRequestData['price_per_seat'],
                 'departure_city' => $validatedRequestData['departure_city'],
                 'destination_city' => $validatedRequestData['destination_city'],
