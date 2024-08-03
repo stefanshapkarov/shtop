@@ -17,7 +17,6 @@ return new class extends Migration
                 ->constrained('users')->onDelete('set null')->onUpdate('cascade');
             $table->dateTime('departure_time');
             $table->integer('total_seats');
-            $table->integer('available_seats');
             $table->float('price_per_seat');
             $table->string('departure_city');
             $table->string('destination_city');
