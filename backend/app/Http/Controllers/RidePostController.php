@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use App\Exceptions\GeneralJsonException;
 use App\Http\Resources\RidePostResource;
 use App\Models\RidePost;
+use App\Notifications\RideCancelled;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\ValidationException;
 
 class RidePostController extends Controller
 {
@@ -31,7 +36,11 @@ class RidePostController extends Controller
         }
 
         if (!empty($request->available_seats)) {
-            $filters->where('available_seats', ">=", $request->available_seats);
+            $filters->whereRaw('total_seats - (SELECT COUNT(*)
+                                                    FROM ride_post_passenger
+                                                    WHERE ride_post_passenger.ride_post_id = ride_posts.id)
+                                     >= ?',
+                [$request->available_seats]);
         }
 
         if (!empty($request->price)) {
@@ -48,11 +57,6 @@ class RidePostController extends Controller
     public function show(RidePost $ridePost)
     {
         return new RidePostResource($ridePost);
-    }
-
-    public function getRidePostsForLoggedInUser()
-    {
-        return RidePostResource::collection(RidePost::where('driver_id', auth()->id())->get());
     }
 
     public function store(Request $request)
@@ -84,9 +88,12 @@ class RidePostController extends Controller
 
             return new RidePostResource($ridePost);
 
+        } catch (ValidationException $e) {
+
+            return response()->json(['message' => 'Invalid input.'], 500);
         } catch (Exception) {
 
-            return response()->json(['message' => 'Unable to create ride post, check your input and try again.'], 500);
+            return response()->json(['message' => 'An error occurred when storing the ride post.'], 500);
         }
     }
 
@@ -113,9 +120,12 @@ class RidePostController extends Controller
 
             return new RidePostResource($ridePost);
 
+        } catch (ValidationException $e) {
+
+            return response()->json(['message' => 'Invalid input.'], 500);
         } catch (Exception) {
 
-            return response()->json(['message' => 'Unable to update ride post, check your input and try again.'], 500);
+            return response()->json(['message' => 'An error occurred when updating the ride post.'], 500);
         }
     }
 
@@ -126,6 +136,10 @@ class RidePostController extends Controller
                 $request->delete();
             }
         });
+
+        if ($ridePost->status == 'pending') {
+            Notification::send($ridePost->passengers, new RideCancelled($ridePost));
+        }
 
         $ridePost->delete();
     }
