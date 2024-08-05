@@ -131,16 +131,15 @@ class RidePostController extends Controller
     public function destroy(RidePost $ridePost)
     {
         DB::transaction(function () use ($ridePost) {
-            foreach ($ridePost->requests as $request) {
-                $request->delete();
+
+            $ridePost->requests()->delete();
+
+            if ($ridePost->status == 'pending') {
+                Notification::send($ridePost->passengers, new RideCancelled($ridePost));
             }
+
+            $ridePost->delete();
         });
-
-        if ($ridePost->status == 'pending') {
-            Notification::send($ridePost->passengers, new RideCancelled($ridePost));
-        }
-
-        $ridePost->delete();
     }
 
     /**
@@ -150,22 +149,21 @@ class RidePostController extends Controller
     {
         $this->authorize('complete', $ridePost);
 
-        if (Carbon::now()->isAfter($ridePost->departure_time)) {
+        DB::transaction(function () use ($ridePost) {
 
-            DB::transaction(function () use ($ridePost) {
-                foreach ($ridePost->requests as $request) {
-                    $request->delete();
-                }
-            });
+            if (Carbon::now()->isAfter($ridePost->departure_time)) {
 
-            $ridePost->status = "completed";
+                    $ridePost->requests()->delete();
 
-            $ridePost->save();
+                    $ridePost->status = "completed";
 
-            return response()->json(['message' => 'Successfully completed ride.']);
-        } else {
+                    $ridePost->save();
 
-            return response()->json(['message' => 'You must finish the ride to complete it.'], 500);
-        }
+            } else {
+                throw new GeneralJsonException("You must finish the ride to complete it.", 405);
+            }
+        });
+
+        return response()->json(['message' => 'Successfully completed ride.']);
     }
 }
