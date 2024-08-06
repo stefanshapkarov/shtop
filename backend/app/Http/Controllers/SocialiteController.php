@@ -26,6 +26,7 @@ class SocialiteController extends Controller
 
             $email = $socialUser->getEmail();
             $name = $socialUser->getName() ?? substr($email, 0, strpos($email, '@'));
+            $avatar = $socialUser->getAvatar();
 
             $user = User::where('email', $email)->first();
 
@@ -34,6 +35,12 @@ class SocialiteController extends Controller
                     'name' => $name,
                     'email' => $email,
                     'password' => Hash::make(uniqid()),
+                    'profile_picture' => $avatar, 
+                ]);
+            }
+            else{
+                $user->update([
+                    'profile_picture' => $avatar,
                 ]);
             }
 

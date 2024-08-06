@@ -44,12 +44,12 @@ const Profile: React.FC = () => {
   if (error) return <Typography color="error">{error}</Typography>;
 
   if (!user) return <Typography>Loading...</Typography>;
-
+  const profilePictureUrl = user.profile_picture || 'path_to_default_profile_picture';
   return (
     <Card sx={{ maxWidth: 700, maxHeight: 700, margin: 'auto', padding: 2, backgroundColor: "#F1F1F1" }}>
       <Stack direction="row" spacing={2} alignItems="center" ml={6}>
         <Avatar
-          src={user.profile_picture || 'path_to_default_profile_picture'}
+          src={profilePictureUrl}
           alt="Profile"
           sx={{ width: 80, height: 80 }}
         />
