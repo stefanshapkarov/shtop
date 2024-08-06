@@ -37,11 +37,3 @@ Route::get('/verify-email', function (Request $request) {
         ]
     );
 });
-
-// Route::get('/auth/google/redirect', function (Request $request) {
-//     return Socialite::driver("google")->redirect();
-// });
-
-
-Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirectToProvider']);
-Route::get('/auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);

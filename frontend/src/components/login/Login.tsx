@@ -4,6 +4,9 @@ import './login.scss';
 import { useTranslation } from 'react-i18next';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
+import axios from "axios";
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
@@ -12,26 +15,26 @@ const Login: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isAuth, setIsAuth] = useState<boolean>(false);
 
-    useEffect(() => {
-        const query = new URLSearchParams(window.location.search);
-        const token = query.get('token');
-        
-        if (token) {
-            localStorage.setItem('accessToken', token);
-            setIsAuth(true);
-            window.location.href = '/';
-        } else {
-            const checkLoggedIn = async () => {
-                const accessToken = localStorage.getItem('accessToken');
-                if (accessToken) {
-                    setIsAuth(true);
-                    window.location.href = '/';
-                }
-            };
+    const navigate = useNavigate();
+    const location = useLocation();
 
-            checkLoggedIn();
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const code = searchParams.get('code');
+
+        if (code) {
+            axios.post(`/api/auth/google/callback`, { code })
+                .then(response => {
+                    const { token } = response.data;
+                    localStorage.setItem('auth_token', token);
+                    navigate('/');
+                })
+                .catch(error => {
+                    console.error('Error during authentication:', error);
+                    setError('Authentication failed');
+                });
         }
-    }, []);
+    }, ['google', location.search, navigate]);
 
     const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value);
@@ -56,12 +59,11 @@ const Login: React.FC = () => {
     };
 
     const handleGoogleLogin = () => {
-        window.open('http://localhost:8000/auth/google/redirect', '_self');
+        window.location.href = 'http://127.0.0.1:8000/api/auth/google';
     };
 
     const handleFacebookLogin = () => {
-        //change client_id
-        window.open('https://www.facebook.com/v12.0/dialog/oauth?client_id=457244443828565&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fauth%2Ffacebook%2Fcallback&scope=email,public_profile&response_type=code', '_self');
+        window.location.href = 'http://127.0.0.1:8000/api/auth/facebook';
     };
 
     return (

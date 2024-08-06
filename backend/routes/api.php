@@ -25,7 +25,8 @@ Route::get('/reset-password/{token}', function ($token){
 })->middleware(['guest:'.config('fortify.guard')])
     ->name('password.reset');
 
-Route::post('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
+Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
+Route::get('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
 Route::post('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
 
 Route::middleware('auth:sanctum')

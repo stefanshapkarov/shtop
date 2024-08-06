@@ -9,7 +9,9 @@ use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class RidePostController extends Controller
 {
@@ -71,7 +73,7 @@ class RidePostController extends Controller
                     ->format('Y-m-d H:i:s');
 
             $ridePost = RidePost::create([
-                'driver_id' => auth()->id(),
+                'driver_id' => Auth::user()->id,
                 'departure_time' => $validatedRequestData['departure_time'],
                 'total_seats' => $validatedRequestData['total_seats'],
                 'available_seats' => $validatedRequestData['total_seats'],
@@ -84,9 +86,20 @@ class RidePostController extends Controller
 
             return new RidePostResource($ridePost);
 
-        } catch (Exception) {
-
-            return response()->json(['message' => 'Unable to create ride post, check your input and try again.'], 500);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (GeneralJsonException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 400);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Unable to create ride post, check your input and try again.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 
