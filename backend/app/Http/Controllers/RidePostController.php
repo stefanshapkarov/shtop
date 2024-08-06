@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Exceptions\GeneralJsonException;
 use App\Http\Resources\RidePostResource;
 use App\Models\RidePost;
+use App\Notifications\RideCancelled;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
 class RidePostController extends Controller
@@ -33,7 +36,11 @@ class RidePostController extends Controller
         }
 
         if (!empty($request->available_seats)) {
-            $filters->where('available_seats', ">=", $request->available_seats);
+            $filters->whereRaw('total_seats - (SELECT COUNT(*)
+                                                    FROM ride_post_passenger
+                                                    WHERE ride_post_passenger.ride_post_id = ride_posts.id)
+                                     >= ?',
+                [$request->available_seats]);
         }
 
         if (!empty($request->price)) {
@@ -52,11 +59,6 @@ class RidePostController extends Controller
         return new RidePostResource($ridePost);
     }
 
-    public function getRidePostsForLoggedInUser()
-    {
-        return RidePostResource::collection(RidePost::where('driver_id', auth()->id())->get());
-    }
-
     public function store(Request $request)
     {
         try {
@@ -73,10 +75,9 @@ class RidePostController extends Controller
                     ->format('Y-m-d H:i:s');
 
             $ridePost = RidePost::create([
-                'driver_id' => Auth::user()->id,
+                'driver_id' => auth()->id(),
                 'departure_time' => $validatedRequestData['departure_time'],
                 'total_seats' => $validatedRequestData['total_seats'],
-                'available_seats' => $validatedRequestData['total_seats'],
                 'price_per_seat' => $validatedRequestData['price_per_seat'],
                 'departure_city' => $validatedRequestData['departure_city'],
                 'destination_city' => $validatedRequestData['destination_city'],
@@ -87,19 +88,11 @@ class RidePostController extends Controller
             return new RidePostResource($ridePost);
 
         } catch (ValidationException $e) {
-            return response()->json([
-                'message' => 'Validation error',
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (GeneralJsonException $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 400);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Unable to create ride post, check your input and try again.',
-                'error' => $e->getMessage(),
-            ], 500);
+
+            return response()->json(['message' => 'Invalid input.'], 500);
+        } catch (Exception) {
+
+            return response()->json(['message' => 'An error occurred when storing the ride post.'], 500);
         }
     }
 
@@ -126,21 +119,27 @@ class RidePostController extends Controller
 
             return new RidePostResource($ridePost);
 
+        } catch (ValidationException $e) {
+
+            return response()->json(['message' => 'Invalid input.'], 500);
         } catch (Exception) {
 
-            return response()->json(['message' => 'Unable to update ride post, check your input and try again.'], 500);
+            return response()->json(['message' => 'An error occurred when updating the ride post.'], 500);
         }
     }
 
     public function destroy(RidePost $ridePost)
     {
         DB::transaction(function () use ($ridePost) {
-            foreach ($ridePost->requests as $request) {
-                $request->delete();
-            }
-        });
 
-        $ridePost->delete();
+            $ridePost->requests()->delete();
+
+            if ($ridePost->status == 'pending') {
+                Notification::send($ridePost->passengers, new RideCancelled($ridePost));
+            }
+
+            $ridePost->delete();
+        });
     }
 
     /**
@@ -150,22 +149,21 @@ class RidePostController extends Controller
     {
         $this->authorize('complete', $ridePost);
 
-        if (Carbon::now()->isAfter($ridePost->departure_time)) {
+        DB::transaction(function () use ($ridePost) {
 
-            DB::transaction(function () use ($ridePost) {
-                foreach ($ridePost->requests as $request) {
-                    $request->delete();
-                }
-            });
+            if (Carbon::now()->isAfter($ridePost->departure_time)) {
 
-            $ridePost->status = "completed";
+                    $ridePost->requests()->delete();
 
-            $ridePost->save();
+                    $ridePost->status = "completed";
 
-            return response()->json(['message' => 'Successfully completed ride.']);
-        } else {
+                    $ridePost->save();
 
-            return response()->json(['message' => 'You must finish the ride to complete it.'], 500);
-        }
+            } else {
+                throw new GeneralJsonException("You must finish the ride to complete it.", 405);
+            }
+        });
+
+        return response()->json(['message' => 'Successfully completed ride.']);
     }
 }
