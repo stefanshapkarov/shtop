@@ -1,4 +1,6 @@
 import axios from 'axios';
+// import Cookies from 'js-cookie';
+
 
 
 
@@ -45,6 +47,11 @@ export const loginUser = async (email: string, password: string, remember: boole
       password,
       remember
     });
+
+      localStorage.setItem('accessToken', response.data.token);
+      console.log('Stored token:', localStorage.getItem('accessToken'));
+
+    return response.data;
     // , {
     //   headers: {
     //     'X-XSRF-TOKEN': xsrfToken,
@@ -61,6 +68,7 @@ export const loginUser = async (email: string, password: string, remember: boole
     }
   }
 };
+
 
 export const registerUser = async (name: string, email: string, password: string, password_confirmation: string) => {
   try {
@@ -81,6 +89,31 @@ export const registerUser = async (name: string, email: string, password: string
   }
 };
 
+
+
+
+
+
+export const getUserData = async () => {
+  const xsrfToken =await getCsrfToken();
+  const response = await api.get('/api/user', {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+      // 'X-XSRF-TOKEN': xsrfToken,
+    },
+    withCredentials: true
+  });
+  return response.data;
+};
+
+// export const updateProfile = async (profileData) => {
+//   const response = await axios.put('/profile', profileData, {
+//     headers: {
+//       'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+//     }
+//   });
+//   return response.data;
+// };
 
 export const getCurrentUser = async () => {
   try {
