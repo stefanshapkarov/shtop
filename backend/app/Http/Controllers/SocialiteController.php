@@ -27,7 +27,7 @@ class SocialiteController extends Controller
             $socialUser = Socialite::driver($provider)->stateless()->userFromToken($accessToken);
 
             // Log user info for debugging
-            Log::info('Social User Details: ' . json_encode($socialUser));
+            Log::info('Social User Email: ' . $socialUser->getEmail());
 
             // Extract name from email
             $email = $socialUser->getEmail();

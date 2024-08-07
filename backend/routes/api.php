@@ -25,7 +25,8 @@ Route::get('/reset-password/{token}', function ($token){
 })->middleware(['guest:'.config('fortify.guard')])
     ->name('password.reset');
 
-Route::post('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
+Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
+Route::get('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
 Route::post('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
 
 Route::middleware('auth:sanctum')
@@ -47,10 +48,12 @@ Route::middleware('auth:sanctum')
         Route::get('/ridePost', [RidePostController::class, 'index']);
         Route::get('/ridePost/{ridePost:id}', [RidePostController::class, 'show']);
         Route::delete('/ridePost/{ridePost:id}', [RidePostController::class, 'destroy']);
+        Route::get('/ridePost/{ridePost:id}/complete', [RidePostController::class, 'complete']);
 
         // RIDE REQUESTS
         Route::get('/ridePost/{ridePost:id}/requests', [RideRequestController::class, 'getRequestsForPost']);
         Route::get('/ridePost/{ridePost:id}/requests/new', [RideRequestController::class, 'createRequestForPost']);
         Route::get('/ridePost/requests/{rideRequest:id}/accept', [RideRequestController::class, 'acceptRequest']);
         Route::get('/ridePost/requests/{rideRequest:id}/reject', [RideRequestController::class, 'rejectRequest']);
+        Route::get('/ridePost/requests/{rideRequest:id}/cancel', [RideRequestController::class, 'destroy']);
     });

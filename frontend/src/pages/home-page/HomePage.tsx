@@ -1,8 +1,8 @@
-import {useTranslation} from "react-i18next";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {Autocomplete, Box, Button, TextField, Typography} from "@mui/material";
-import HomePageLogo from '../../shared/styles/images/home-page-logo.png'
-import './home-page.scss'
-import {useState} from "react";
+import HomePageLogo from '../../shared/styles/images/home-page-logo.png';
+import './home-page.scss';
 import {cities_en} from "../../models/cities/cities_en";
 import {DemoContainer} from '@mui/x-date-pickers/internals/demo';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
@@ -19,6 +19,7 @@ import Robot from '../../shared/styles/images/ai_robot.png'
 
 import {InfoCard} from "./components/info-card/InfoCard";
 
+import { logout } from "../../services/api";
 
 export const HomePage = () => {
 
@@ -28,6 +29,42 @@ export const HomePage = () => {
     const [date, setDate] = useState<any>(null);
     const [numPassangers, setNumPassangers] = useState<number | null>(null);
     const navigate = useNavigate();
+    const [isAuth, setIsAuth] = useState<boolean>(false);
+
+
+
+    useEffect(() => {
+
+        const query = new URLSearchParams(window.location.search);
+        const token = query.get('token');
+        if(token){
+            localStorage.setItem('accessToken', token);
+            setIsAuth(true);
+            window.location.href = '/';
+        }
+        else{
+        const checkLoggedIn = async () => {
+            console.log(localStorage.getItem("accessToken"));
+            const isAuth = localStorage.getItem("accessToken") !== null;
+            setIsAuth(isAuth);
+        };
+
+        checkLoggedIn();}
+    }, []);
+
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            localStorage.removeItem("accessToken");
+            setIsAuth(false);
+            console.log("logged out");
+            window.location.reload();
+            // window.location.href = "/login";
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    };
 
     const handleSearch = () => {
         const queryParams = new URLSearchParams();
@@ -42,8 +79,17 @@ export const HomePage = () => {
         navigate(`/search-route?${queryParams.toString()}`);
     };
 
+
     return <>
         <Box id='homepage-container'>
+            <>
+
+                {isAuth ? (
+                    <button onClick={handleLogout}>{t("LOGOUT")}</button>
+                ) : (
+                    <p>{t("NOT_LOGGED_IN")}</p>
+                )}
+            </>
             <Box className='logo-container'>
                 <Typography variant='h3' className='title'>{t('HOME_PAGE_TITLE')}</Typography>
                 <img src={HomePageLogo} alt='home-page-logo' className='home-page-logo'/>
@@ -89,3 +135,6 @@ export const HomePage = () => {
         </Box>
     </>
 }
+
+
+export default HomePage;

@@ -6,8 +6,12 @@ use App\Exceptions\GeneralJsonException;
 use App\Http\Resources\RideRequestResource;
 use App\Models\RidePost;
 use App\Models\RideRequest;
+use App\Notifications\PassengerKickedFromRide;
+use App\Notifications\PassengerLeftRide;
+use App\Notifications\RideRequestAccepted;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Throwable;
 
 class RideRequestController extends Controller
@@ -24,16 +28,6 @@ class RideRequestController extends Controller
     }
 
     /**
-     * @throws AuthorizationException
-     */
-    public function getRequestsForLoggedInUser()
-    {
-        $this->authorize('getRequestsForLoggedInUser', RideRequest::class);
-
-        return RideRequestResource::collection(RideRequest::where('passenger_id', auth()->id())->get());
-    }
-
-    /**
      * @throws GeneralJsonException
      * @throws Throwable
      */
@@ -43,33 +37,42 @@ class RideRequestController extends Controller
 
         $userId = auth()->id();
 
-        if ($ridePost->available_seats > 0) {
+        DB::transaction(function () use ($ridePost, $userId) {
 
-            $existingRequest = RideRequest::where('passenger_id', $userId)
-                ->where('ridepost_id', $ridePost->id)
-                ->whereRaw('status IN ("accepted", "pending")')
-                ->first();
+            $available_seats = $ridePost->total_seats - $ridePost->passengers()->count();
 
-            if ($existingRequest) {
-                throw new GeneralJsonException("You already have a request for this ride post.");
+            if ($available_seats > 0) {
+
+                // Check if user has a request for current ride, or an accepted request for another pending ride
+                $existingRequest =
+                    RideRequest::where('passenger_id', $userId)->where('ridepost_id', $ridePost->id)->first();
+                if ($existingRequest != null) {
+
+                    throw new GeneralJsonException("You already have a request for this ride post.");
+                }
+                if ($this->isPassengerPartOfAPendingRide($userId)) {
+
+                    throw new GeneralJsonException("You are already part of another pending ride post.");
+                }
+
+                $request = RideRequest::create([
+                    'passenger_id' => $userId,
+                    'ridepost_id' => $ridePost->id
+                ]);
+
+                throw_if(!$request, GeneralJsonException::class, "Unable to create request.");
+
+            } else {
+                throw new GeneralJsonException("Unable to create request - no seats available.");
             }
-
-            $request = RideRequest::create([
-                'passenger_id' => $userId,
-                'ridepost_id' => $ridePost->id
-            ]);
-
-        } else {
-            throw new GeneralJsonException("Unable to create request - no seats available.");
-        }
-
-        throw_if(!$request, GeneralJsonException::class, "Unable to create request.");
+        });
 
         return response()->json(['message' => 'Request created successfully.']);
     }
 
     /**
      * @throws AuthorizationException
+     * @throws GeneralJsonException
      */
     public function acceptRequest(RideRequest $rideRequest)
     {
@@ -77,12 +80,17 @@ class RideRequestController extends Controller
 
         DB::transaction(function () use ($rideRequest) {
 
+            if ($this->isPassengerPartOfAPendingRide($rideRequest->passenger->id)) {
+                throw new GeneralJsonException("Passenger got accepted in another ride.");
+            }
+
             $ridePost = $rideRequest->ridePost;
 
-            if ($ridePost->available_seats > 0) {
+            $available_seats = $ridePost->total_seats - $ridePost->passengers()->count();
+
+            if ($available_seats > 0) {
 
                 $ridePost->passengers()->attach($rideRequest->passenger);
-                $ridePost->available_seats -= 1;
 
                 $rideRequest->status = "accepted";
 
@@ -95,6 +103,8 @@ class RideRequestController extends Controller
             }
         });
 
+        Notification::send($rideRequest->passenger, new RideRequestAccepted($rideRequest->ridePost));
+
         return response()->json(['message' => 'Request accepted, passenger added to ride.']);
     }
 
@@ -105,17 +115,55 @@ class RideRequestController extends Controller
     {
         $this->authorize('rejectRequest', $rideRequest);
 
-        if ($rideRequest->status == "pending") {
+        DB::transaction(function () use ($rideRequest) {
 
-            $rideRequest->status = "rejected";
+            if ($rideRequest->status == "pending") {
 
-            $rideRequest->save();
+                $rideRequest->status = "rejected";
 
-        } else {
+                $rideRequest->save();
 
-            return response()->json(['message' => 'Request is not pending, unable to update.']);
-        }
+            } else {
+                throw new GeneralJsonException("Request is not pending.");
+            }
+        });
 
         return response()->json(['message' => 'Request rejected.']);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function destroy(RideRequest $rideRequest)
+    {
+        $this->authorize('destroy', $rideRequest);
+
+        DB::transaction(function () use ($rideRequest) {
+
+            if ($rideRequest->status == "accepted") {
+
+                $rideRequest->ridePost->passengers()->detach($rideRequest->passenger->id);
+
+                if (auth()->id() == $rideRequest->passenger->id) {
+                    Notification::send($rideRequest->ridePost->driver, new PassengerLeftRide());
+                } else {
+                    Notification::send($rideRequest->passenger, new PassengerKickedFromRide());
+                }
+            }
+
+            $rideRequest->delete();
+        });
+    }
+
+    private function isPassengerPartOfAPendingRide($userId)
+    {
+        $rideRequest = RideRequest::where('passenger_id', $userId)->where('status', 'accepted')->first();
+
+        if ($rideRequest === null) {
+
+            return false;
+        }
+
+        return true;
     }
 }
