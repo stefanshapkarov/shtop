@@ -68,5 +68,11 @@
   "VERIFIED": "Верифициран",
   "YES": "Да",
   "NO": "Не",
-  "DRIVER": "Возач"
+  "DRIVER": "Возач",
+  "ACCEPTED_PASSENGERS": "Прифатени патници",
+  "CONTACT": "Контактирајте со",
+  "ACCEPT": "Прифати",
+  "DECLINE": "Одбиј",
+  "REMOVE": "Избриши",
+  "PENDING_REQUESTS": "Барања за превоз"
 }

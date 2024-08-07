@@ -68,5 +68,11 @@
   "VERIFIED": "Verified",
   "YES": "Yes",
   "NO": "No",
-  "DRIVER": "Driver"
+  "DRIVER": "Driver",
+  "ACCEPTED_PASSENGERS": "Accepted passengers",
+  "CONTACT": "Contact",
+  "ACCEPT": "Accept",
+  "DECLINE": "Decline",
+  "REMOVE": "Remove",
+  "PENDING_REQUESTS": "Pending requests"
 }

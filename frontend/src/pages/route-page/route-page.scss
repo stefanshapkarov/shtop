@@ -14,7 +14,7 @@
     flex-direction: column;
     align-items: center;
     border-radius: 2rem;
-    height: 40rem;
+    min-height: 40rem;
     width: 45rem;
     padding: 0 8rem;
   }
@@ -94,5 +94,53 @@
     display: flex;
     justify-content: space-between;
     align-items: start;
+  }
+
+  .accepted-passengers-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    padding-left: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .users-list {
+    height: 10rem;
+    overflow-y: scroll;
+    scrollbar-width: none;
+  }
+
+  .user-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    padding: 0 2rem 0 0;
+  }
+
+  .pair {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .chat-icon {
+    height: 1.75rem;
+  }
+
+  .contact-user-text {
+    color: $blue;
+  }
+
+  .button {
+    text-transform: none;
+    width: 5rem;
+  }
+
+  .button-green {
+    background-color: $primary;
+    margin-right: 1rem;
   }
 }

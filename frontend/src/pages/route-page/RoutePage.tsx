@@ -1,4 +1,4 @@
-import {Box, Divider, Typography} from "@mui/material";
+import {Box, Button, Divider, Typography} from "@mui/material";
 import './route-page.scss'
 import {ridesTEST} from "../../models/ridesTEST";
 import {Ride} from "../../models/ride/Ride";
@@ -9,6 +9,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {format} from "date-fns";
 import StarIcon from '@mui/icons-material/Star';
 import {useState} from "react";
+import Chat_Icon from '../../shared/styles/icons/chat_icon.png'
 
 export const RoutePage = () => {
 
@@ -46,7 +47,9 @@ export const RoutePage = () => {
                     <KeyboardArrowDownIcon className={isExtended ? 'arrow arrow-extended' : 'arrow'}/>
                 </Box>
             </Box>
-            <Box className={isExtended ? 'driver-info-collapsable driver-info-collapsable-opened' : 'driver-info-collapsable' } onClick={() => setIsExtended(!isExtended)}>
+            <Box
+                className={isExtended ? 'driver-info-collapsable driver-info-collapsable-opened' : 'driver-info-collapsable'}
+                onClick={() => setIsExtended(!isExtended)}>
                 <Typography fontWeight='bold'>{t('BIO')}:</Typography>
                 <Typography variant='body2' className='bio'>{rideTest.driver.bio}</Typography>
                 <Box className='driver-info-extended'>
@@ -56,7 +59,7 @@ export const RoutePage = () => {
                                     className='bio'>{format(rideTest.driver.createdAt, "P")}</Typography>
                     </Box>
                     <Box>
-                    <Typography fontWeight='bold'>{t('RATING')}:</Typography>
+                        <Typography fontWeight='bold'>{t('RATING')}:</Typography>
                         <Box className='bio'>
                             {[...Array(5)].map((_, index) => (
                                 <StarIcon key={index}
@@ -66,11 +69,67 @@ export const RoutePage = () => {
                     </Box>
                     <Box>
                         <Typography fontWeight='bold'>{t('VERIFIED')}:</Typography>
-                        <Typography variant='body2' className='bio'>{rideTest.driver.isVerified ? t('YES') : t('NO')}</Typography>
+                        <Typography variant='body2'
+                                    className='bio'>{rideTest.driver.isVerified ? t('YES') : t('NO')}</Typography>
                     </Box>
                 </Box>
             </Box>
             <Divider className='divider'/>
+            <Box className='accepted-passengers-container'>
+                <Typography variant='h6'>
+                    {t('ACCEPTED_PASSENGERS')}:
+                    ( {rideTest.totalSeats - rideTest.availableSeats} / {rideTest.totalSeats} )
+                </Typography>
+                <Box className='users-list'>
+                    {Array.from({length: 5}).map(() => (
+                        <Box className='user-list-item'>
+                            <Box className='pair'>
+                                <img src={rideTest.driver.profilePicture ? rideTest.driver.profilePicture : Anon_Photo}
+                                     alt='driver-photo'
+                                     className='profile-picture'/>
+                                <Typography variant='h6'>{rideTest.driver.name}</Typography>
+                            </Box>
+                            <Box className='pair'>
+                                <img className='chat-icon' src={Chat_Icon} alt='chat'/>
+                                <Typography
+                                    className='contact-user-text'>{t('CONTACT')} {rideTest.driver.name}</Typography>
+                            </Box>
+                            <Button variant='contained' size='small' color='error'
+                                    className='button'>{t('REMOVE')}</Button>
+                        </Box>
+                    ))}
+                </Box>
+            </Box>
+            <Divider className='divider'/>
+            <Box className='accepted-passengers-container'>
+                <Typography variant='h6'>
+                    {t('PENDING_REQUESTS')}:
+                    ( {rideTest.totalSeats - rideTest.availableSeats} / {rideTest.totalSeats} )
+                </Typography>
+                <Box className='users-list'>
+                    {Array.from({length: 5}).map(() => (
+                        <Box className='user-list-item'>
+                            <Box className='pair'>
+                                <img src={rideTest.driver.profilePicture ? rideTest.driver.profilePicture : Anon_Photo}
+                                     alt='driver-photo'
+                                     className='profile-picture'/>
+                                <Typography variant='h6'>{rideTest.driver.name}</Typography>
+                            </Box>
+                            <Box className='pair'>
+                                <img className='chat-icon' src={Chat_Icon} alt='chat'/>
+                                <Typography
+                                    className='contact-user-text'>{t('CONTACT')} {rideTest.driver.name}</Typography>
+                            </Box>
+                            <Box>
+                                <Button variant='contained' size='small' color='error'
+                                        className='button button-green'>{t('ACCEPT')}</Button>
+                                <Button variant='contained' size='small' color='error'
+                                        className='button'>{t('DECLINE')}</Button>
+                            </Box>
+                        </Box>
+                    ))}
+                </Box>
+            </Box>
         </Box>
     </Box>
 }
