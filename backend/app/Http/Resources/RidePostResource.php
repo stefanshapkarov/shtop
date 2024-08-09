@@ -19,7 +19,7 @@ class RidePostResource extends JsonResource
             'driver' => new UserResource($this->driver),
             'departure_time' => $this->departure_time,
             'total_seats' => $this->total_seats,
-            'available_seats' => $this->available_seats,
+            'available_seats' => $this->total_seats - $this->passengers()->count(),
             'price_per_seat' => $this->price_per_seat,
             'departure_city' => $this->departure_city,
             'destination_city' => $this->destination_city,
