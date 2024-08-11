@@ -2,6 +2,8 @@
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import './register.scss';
 import { registerUser } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Register: React.FC = () => {
   const [name, setUsername] = useState<string>('');
@@ -11,19 +13,15 @@ const Register: React.FC = () => {
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [isAuth, setIsAuth] = useState<boolean>(false); 
+  const { user } = useAuth() as { user: any };
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkLoggedIn = async () => {
-        const accessToken = localStorage.getItem('accessToken');
-        if (accessToken) {
-            setIsAuth(true);
-            window.location.href = '/';
-        }
-    };
 
-    checkLoggedIn();
-}, []);
+    useEffect(() => {
+      if (user) {
+          navigate('/');
+      }
+    }, [user, navigate]);
 
 
   const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -57,21 +55,16 @@ const Register: React.FC = () => {
         return;
     }
 
-
     if (password !== passwordConfirmation) {
       setError('Passwords do not match');
       return;
     }
 
-
-
     try {
       const response = await registerUser(name, email, password, passwordConfirmation);
       setSuccess('Registration successful');
       console.log('Registration successful:', response);
-
-      // Handle redirect after registration
-      window.location.href = '/home';
+      navigate('/login');
 
     } catch (error) {
       console.error('Registration error:', error);

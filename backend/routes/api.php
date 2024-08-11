@@ -29,11 +29,13 @@ Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']
 Route::get('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
 Route::post('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
 
+
 Route::middleware('auth:sanctum')
     ->group(function () {
         Route::get('/user', function (Request $request) {
             return $request->user();
         });
+        
         Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'updateProfile'])->name('updateProfile');
 
         // REVIEWS

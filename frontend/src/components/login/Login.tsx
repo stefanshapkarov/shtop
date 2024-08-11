@@ -1,40 +1,46 @@
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
-import { loginUser } from '../../services/api';
-import './login.scss';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import axios from "axios";
-import { useNavigate, useLocation } from 'react-router-dom';
-
+import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
+import './login.scss';
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [rememberMe, setRememberMe] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [isAuth, setIsAuth] = useState<boolean>(false);
+    const { login, user, logout } = useAuth() as { login: Function, user: any, logout: Function };  // Using login, user, and logout from AuthContext
 
     const navigate = useNavigate();
     const location = useLocation();
 
-    useEffect(() => {
-        const searchParams = new URLSearchParams(location.search);
-        const code = searchParams.get('code');
+    // useEffect(() => {
+    //     const searchParams = new URLSearchParams(location.search);
+    //     const code = searchParams.get('code');
 
-        if (code) {
-            axios.post(`/api/auth/google/callback`, { code })
-                .then(response => {
-                    const { token } = response.data;
-                    localStorage.setItem('auth_token', token);
-                    navigate('/');
-                })
-                .catch(error => {
-                    console.error('Error during authentication:', error);
-                    setError('Authentication failed');
-                });
+    //     if (code) {
+    //         axios.post(`/api/auth/google/callback`, { code })
+    //             .then(response => {
+    //                 const { token } = response.data;
+    //                 localStorage.setItem('auth_token', token);
+    //                 navigate('/');
+    //             })
+    //             .catch(error => {
+    //                 console.error('Error during authentication:', error);
+    //                 setError('Authentication failed');
+    //             });
+    //     }
+    // }, [location.search, navigate]);
+
+    useEffect(() => {
+        if (user) {
+            navigate('/');
         }
-    }, ['google', location.search, navigate]);
+    }, [user, navigate]);
 
     const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value);
@@ -44,14 +50,15 @@ const Login: React.FC = () => {
         setPassword(event.target.value);
     };
 
+    const handleRememberMeChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setRememberMe(event.target.checked);
+    };
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
         try {
-            const data = await loginUser(email, password, false);
-            localStorage.setItem('accessToken', data.accessToken);
-            setIsAuth(true);
-            window.location.href = '/';
+            await login(email, password, rememberMe);
+            navigate('/');
         } catch (error: any) {
             console.error('Login error:', error.message);
             setError(error.message);
@@ -103,7 +110,11 @@ const Login: React.FC = () => {
                 </div>
                 <div className="options">
                     <label>
-                        <input type="checkbox" />
+                        <input
+                            type="checkbox"
+                            checked={rememberMe}
+                            onChange={handleRememberMeChange}
+                        />
                         {t("REMEMBER")}
                     </label>
                     <a href="#">{t("FORGOT-PASSWORD")}</a>
