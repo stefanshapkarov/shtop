@@ -1,4 +1,3 @@
-// src/services/api.ts
 import axios from 'axios';
 
 
@@ -26,8 +25,18 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
   },
 });
+
+
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  console.log(parts.pop()?.split(';').shift() );
+  return null;
+};
 
 const getCsrfToken = async () => {
   await api.get('/sanctum/csrf-cookie');
@@ -37,15 +46,9 @@ export const logout = async () => {
   await api.post('/api/logout');
 };
 
-export const loginUser = async (email: string, password: string, remember: boolean) => {
+export const loginUser = async (email: string, password: string, remember: boolean = false) => {
   try {
     await getCsrfToken();
-
-    // const xsrfToken = getCookie();
-    //
-    // console.log(xsrfToken);
-
-
     const response = await api.post('/api/login', {
       email,
       password,
@@ -57,6 +60,7 @@ export const loginUser = async (email: string, password: string, remember: boole
     //   },
     //   withCredentials: true,
     // });
+    console.log(response);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -89,3 +93,14 @@ export const registerUser = async (name: string, email: string, password: string
 };
 
 
+export const getCurrentUser = async () => {
+  try {
+    const response = await api.get('/api/user',{
+      withCredentials:true,
+    });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

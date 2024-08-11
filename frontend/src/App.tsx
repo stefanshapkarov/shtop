@@ -14,6 +14,7 @@ const App: React.FC = () => {
             <Router>
                 <Routes>
                     <Route path="/" element={<MainLayout/>}>
+                    <Route path="/home" element={<MainLayout />} />
                         <Route index element={<HomePage/>}/>
                         <Route path="search-route" element={<SearchRoute/>}/>
                         {/*
