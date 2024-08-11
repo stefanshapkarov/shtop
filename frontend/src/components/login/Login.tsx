@@ -66,11 +66,11 @@ const Login: React.FC = () => {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = 'http://127.0.0.1:8000/api/auth/google';
+        window.location.href = 'http://localhost:8000/api/auth/google';
     };
 
     const handleFacebookLogin = () => {
-        window.location.href = 'http://127.0.0.1:8000/api/auth/facebook';
+        window.location.href = 'http://localhost:8000/api/auth/facebook';
     };
 
     return (

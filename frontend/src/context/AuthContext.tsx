@@ -36,33 +36,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         fetchUser();
     }, []);
 
-    // Login function (using existing API function)
     const login = async (email: string, password: string, rememberMe?: boolean) => {
         try {
             const userData = await loginUser(email, password, rememberMe || false);
-            setUser(userData); // Update the user state after login
+            setUser(userData);
         } catch (error) {
             console.error('Login failed:', error);
             throw error;
         }
     };
 
-    // Register function (using existing API function)
+    
     const register = async (name: string, email: string, password: string, password_confirmation: string) => {
         try {
             const userData = await registerUser(name, email, password, password_confirmation);
-            setUser(userData); // Update the user state after registration
+            setUser(userData);//diskutabilno
         } catch (error) {
             console.error('Registration failed:', error);
             throw error;
         }
     };
 
-    // Logout function (using existing API function)
     const logout = async () => {
         try {
             await logout();
-            setUser(null); // Clear the user state on logout
+            setUser(null);
         } catch (error) {
             console.error('Logout failed:', error);
         }

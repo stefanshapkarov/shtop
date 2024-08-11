@@ -11,7 +11,6 @@ import Share_Icon from '../../shared/styles/icons/share_transport_icon.png';
 import './header.scss';
 import { HeaderElementType } from "./types/HeaderElementType";
 import { logout } from "../../services/api";
-import { getCurrentUser } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,8 +31,6 @@ export const Header = () => {
             setIsAuth(false);
         }
     }, [user]);
-
-
 
     const handleLogout = async () => {
         try {

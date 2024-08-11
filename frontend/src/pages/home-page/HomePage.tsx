@@ -21,7 +21,6 @@ import { useAuth } from '../../context/AuthContext';
 
 import {InfoCard} from "./components/info-card/InfoCard";
 
-import { getCurrentUser, logout } from "../../services/api";
 
 export const HomePage = () => {
 
@@ -40,21 +39,7 @@ export const HomePage = () => {
         }
       }, [user, navigate]);    
 
-
-
-    // const handleLogout = async () => {
-    //     try {
-    //         await logout();
-    //         localStorage.removeItem("accessToken");
-    //         setIsAuth(false);
-    //         console.log("logged out");
-    //         window.location.reload();
-    //         // window.location.href = "/login";
-    //     } catch (error) {
-    //         console.error("Logout error:", error);
-    //     }
-    // };
-
+      
     const handleSearch = () => {
         const queryParams = new URLSearchParams();
 

@@ -61,9 +61,6 @@ export const loginUser = async (email: string, password: string, remember: boole
     //   withCredentials: true,
     // });
     console.log(response);
-    console.log(response.data.token);
-    getCurrentUser();
-
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
