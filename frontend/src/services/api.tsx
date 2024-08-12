@@ -1,4 +1,3 @@
-// src/services/api.ts
 import axios from 'axios';
 
 
@@ -7,11 +6,11 @@ import axios from 'axios';
 //   const cookie = document.cookie
 //       .split("; ")
 //       .find((item) => item.startsWith("XSRF-TOKEN="));
-//
+
 //   if (!cookie) {
 //     return null;
 //   }
-//
+
 //   return decodeURIComponent(cookie.split("=")[1]);
 // }
 
@@ -26,6 +25,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
   },
 });
 
@@ -37,15 +37,9 @@ export const logout = async () => {
   await api.post('/api/logout');
 };
 
-export const loginUser = async (email: string, password: string, remember: boolean) => {
+export const loginUser = async (email: string, password: string, remember: boolean = false) => {
   try {
     await getCsrfToken();
-
-    // const xsrfToken = getCookie();
-    //
-    // console.log(xsrfToken);
-
-
     const response = await api.post('/api/login', {
       email,
       password,
@@ -57,10 +51,10 @@ export const loginUser = async (email: string, password: string, remember: boole
     //   },
     //   withCredentials: true,
     // });
+    console.log(response);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      // Handle Axios error
       throw new Error(error.response?.data.message || 'An error occurred');
     } else {
       throw new Error('An unexpected error occurred');
@@ -70,7 +64,7 @@ export const loginUser = async (email: string, password: string, remember: boole
 
 export const registerUser = async (name: string, email: string, password: string, password_confirmation: string) => {
   try {
-    await getCsrfToken(); // Ensure CSRF token is set
+    await getCsrfToken();
     const response = await api.post('/api/register', {
       name,
       email,
@@ -80,7 +74,6 @@ export const registerUser = async (name: string, email: string, password: string
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      // Handle Axios error
       throw new Error(error.response?.data.message || 'An error occurred');
     } else {
       throw new Error('An unexpected error occurred');
@@ -89,3 +82,14 @@ export const registerUser = async (name: string, email: string, password: string
 };
 
 
+export const getCurrentUser = async () => {
+  try {
+    const response = await api.get('/api/user',{
+      withCredentials:true,
+    });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

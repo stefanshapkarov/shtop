@@ -37,3 +37,7 @@ Route::get('/verify-email', function (Request $request) {
         ]
     );
 });
+
+
+Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
+Route::get('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);

@@ -16,10 +16,11 @@ import Coins from '../../shared/styles/icons/coins_icon.png'
 import Profile from '../../shared/styles/icons/profile_icon.png'
 import Lightning from '../../shared/styles/icons/lightning_icon.png'
 import Robot from '../../shared/styles/images/ai_robot.png'
+import { useAuth } from '../../context/AuthContext';
+
 
 import {InfoCard} from "./components/info-card/InfoCard";
 
-import { logout } from "../../services/api";
 
 export const HomePage = () => {
 
@@ -28,44 +29,17 @@ export const HomePage = () => {
     const [locationTo, setLocationTo] = useState<string | null>(null);
     const [date, setDate] = useState<any>(null);
     const [numPassangers, setNumPassangers] = useState<number | null>(null);
-    const navigate = useNavigate();
     const [isAuth, setIsAuth] = useState<boolean>(false);
-
-
+    const { user } = useAuth() as { user: any };
+    const navigate = useNavigate();
 
     useEffect(() => {
-
-        const query = new URLSearchParams(window.location.search);
-        const token = query.get('token');
-        if(token){
-            localStorage.setItem('accessToken', token);
+        if (user) {
             setIsAuth(true);
-            window.location.href = '/';
         }
-        else{
-        const checkLoggedIn = async () => {
-            console.log(localStorage.getItem("accessToken"));
-            const isAuth = localStorage.getItem("accessToken") !== null;
-            setIsAuth(isAuth);
-        };
+      }, [user, navigate]);    
 
-        checkLoggedIn();}
-    }, []);
-
-
-    const handleLogout = async () => {
-        try {
-            await logout();
-            localStorage.removeItem("accessToken");
-            setIsAuth(false);
-            console.log("logged out");
-            window.location.reload();
-            // window.location.href = "/login";
-        } catch (error) {
-            console.error("Logout error:", error);
-        }
-    };
-
+      
     const handleSearch = () => {
         const queryParams = new URLSearchParams();
 
@@ -85,7 +59,7 @@ export const HomePage = () => {
             <>
 
                 {isAuth ? (
-                    <button onClick={handleLogout}>{t("LOGOUT")}</button>
+                    <p>{t("LOGGED_IN")}</p>
                 ) : (
                     <p>{t("NOT_LOGGED_IN")}</p>
                 )}
