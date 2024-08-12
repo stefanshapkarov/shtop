@@ -68,7 +68,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     return (
         <AuthContext.Provider value={{ user, loading, login, register, logout }}>
-            {!loading ? children : <div>Loading...</div>}
+            {!loading ? children : (
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100vh',
+                    fontSize: '24px',
+                    color: '#555',
+                }}>
+                    Loading...
+                </div>
+            )}
         </AuthContext.Provider>
     );
 };

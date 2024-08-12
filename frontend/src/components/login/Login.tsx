@@ -7,40 +7,24 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import './login.scss';
 
+
 const Login: React.FC = () => {
     const { t } = useTranslation();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [rememberMe, setRememberMe] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const { login, user, logout } = useAuth() as { login: Function, user: any, logout: Function };  // Using login, user, and logout from AuthContext
+    const { login, user, logout, loading } = useAuth() as { login: Function, user: any, logout: Function, loading: boolean };
 
     const navigate = useNavigate();
     const location = useLocation();
 
-    // useEffect(() => {
-    //     const searchParams = new URLSearchParams(location.search);
-    //     const code = searchParams.get('code');
-
-    //     if (code) {
-    //         axios.post(`/api/auth/google/callback`, { code })
-    //             .then(response => {
-    //                 const { token } = response.data;
-    //                 localStorage.setItem('auth_token', token);
-    //                 navigate('/');
-    //             })
-    //             .catch(error => {
-    //                 console.error('Error during authentication:', error);
-    //                 setError('Authentication failed');
-    //             });
-    //     }
-    // }, [location.search, navigate]);
-
     useEffect(() => {
-        if (user) {
+        if (!loading && user) {
             navigate('/');
         }
-    }, [user, navigate]);
+    }, [user, loading, navigate]);
+
 
     const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value);
@@ -66,11 +50,11 @@ const Login: React.FC = () => {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = 'http://localhost:8000/api/auth/google';
+        window.location.href = 'http://localhost:8000/auth/google';
     };
 
     const handleFacebookLogin = () => {
-        window.location.href = 'http://localhost:8000/api/auth/facebook';
+        window.location.href = 'http://localhost:8000/auth/facebook';
     };
 
     return (
