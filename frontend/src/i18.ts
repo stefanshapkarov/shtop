@@ -4,6 +4,7 @@ import Backend from 'i18next-http-backend';
 
 export const getInitialLanguage = () => {
     const savedLanguage = localStorage.getItem('language');
+    console.log(savedLanguage)
     return savedLanguage || 'mk';
 };
 
