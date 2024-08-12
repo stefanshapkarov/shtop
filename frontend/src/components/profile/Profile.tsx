@@ -5,41 +5,26 @@ import info_message from '../../shared/styles/icons/info_message.png';
 import car_icon from '../../shared/styles/icons/car_icon.png';
 import star from '../../shared/styles/icons/star.png';
 import lightning_icon from '../../shared/styles/icons/lightning_icon.png';
-import { getUserData } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 const Profile: React.FC = () => {
-  const [user, setUser] = useState<any>(null);
+  // const [user, setUser] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [isAuth, setIsAuth] = useState<boolean>(false);
+  const { login, user, logout, loading } = useAuth() as { login: Function, user: any, logout: Function, loading: boolean };
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const handleAuthentication = () => {
-      const query = new URLSearchParams(window.location.search);
-      const token = query.get('token');
-      if (token) {
-        localStorage.setItem('accessToken', token);
-        setIsAuth(true);
-        window.location.href = '/';
-      } else {
-        const isAuthenticated = localStorage.getItem('accessToken') !== null;
-        setIsAuth(isAuthenticated);
+      if (!loading && user) {
+          
+      }else{
+          navigate('/login');
       }
-    };
-
-    const fetchData = async () => {
-      try {
-        if (isAuth) {
-          const response = await getUserData();
-          setUser(response);
-        }
-      } catch (err) {
-        setError('Failed to fetch user data');
-      }
-    };
-
-    handleAuthentication();
-    fetchData();
-  }, [isAuth]);
+  }, [user, loading, navigate]);
 
   if (error) return <Typography color="error">{error}</Typography>;
 
