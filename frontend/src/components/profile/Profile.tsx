@@ -7,6 +7,7 @@ import star from '../../shared/styles/icons/star.png';
 import lightning_icon from '../../shared/styles/icons/lightning_icon.png';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { getUserReviews } from '../../services/api';
 
 
 const Profile: React.FC = () => {
@@ -14,6 +15,42 @@ const Profile: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const { login, user, logout, loading } = useAuth() as { login: Function, user: any, logout: Function, loading: boolean };
+  const [UserRating, setUserRating] = useState<number>(0);
+
+
+  useEffect(() => {
+    const getRating = async () => {
+      try {
+        const response = await getUserReviews(2); // Assuming 2 is the user ID
+        const reviews = response.data;
+
+        let totalRating = 0;
+        let ratingCounts: { [key: number]: number } = {};
+        
+        reviews.forEach((review: { rating: number }) => {
+          totalRating += review.rating;
+        
+          if (ratingCounts[review.rating]) {
+            ratingCounts[review.rating]++;
+          } else {
+            ratingCounts[review.rating] = 1;
+          }
+        });
+        
+        const averageRating = totalRating / reviews.length;
+        
+        console.log("Average Rating:", averageRating.toFixed(2)); // Log the average rating
+        console.log("Rating Counts:", ratingCounts); // Log the distribution of ratings
+        
+        setUserRating(averageRating);
+      } catch (error: any) {
+        setError(error.message);
+      }
+    }
+
+    getRating(); // Call the getRating function
+  }, []); // Empty dependency array to ensure it runs only once on mount
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,12 +102,12 @@ const Profile: React.FC = () => {
           </Typography>
           <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={3}>
             <img src={star} width={20} alt="Star" />
-            <span style={{ marginLeft: '4px' }}>{user.rating || '0.0'}</span>
+            <span style={{ marginLeft: '4px' }}>{UserRating || '0.0'}</span>
           </Typography>
           <Divider sx={{ borderBottomWidth: 2 }} />
           <Stack direction="row" spacing={2} alignItems="center" mb={2} mt={2}>
             <img src={lightning_icon} alt="Member Since" width={10} />
-            <Typography variant="body2">Член од {user.member_since || 'Year'}</Typography>
+            <Typography variant="body2">Член од {user.created_at || 'Year'}</Typography>
           </Stack>
           <Divider sx={{ borderBottomWidth: 2 }} />
           <Typography variant="body2" mt={2}>{user.car_brand || 'Car Brand'}</Typography>

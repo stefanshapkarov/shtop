@@ -89,23 +89,6 @@ export const registerUser = async (name: string, email: string, password: string
   }
 };
 
-
-
-
-
-
-export const getUserData = async () => {
-  const xsrfToken =await getCsrfToken();
-  const response = await api.get('/api/user', {
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-      // 'X-XSRF-TOKEN': xsrfToken,
-    },
-    withCredentials: true
-  });
-  return response.data;
-};
-
 // export const updateProfile = async (profileData) => {
 //   const response = await axios.put('/profile', profileData, {
 //     headers: {
@@ -120,6 +103,17 @@ export const getCurrentUser = async () => {
     const response = await api.get('/api/user',{
       withCredentials:true,
     });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+export const getUserReviews = async (userId: number) => {
+  try {
+    const response = await api.get(`/api/users/${userId}/reviews`);
     console.log(response);
     return response.data;
   } catch (error) {
