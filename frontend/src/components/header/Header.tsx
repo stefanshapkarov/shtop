@@ -61,9 +61,9 @@ export const Header = () => {
 
 
     const headerElements: HeaderElementType[] = [
-        { imageSrc: AI_Icon, text: t('SHTOP_AI'), href: '/shtop-ai' },
-        { imageSrc: Car_Icon, text: t('FIND_TRANSPORT'), href: '/search-route' },
-        { imageSrc: Share_Icon, text: t('SHARE_TRANSPORT'), href: '/share-route' }
+        {imageSrc: AI_Icon, text: t('SHTOP_AI'), href: '/shtop-ai'},
+        {imageSrc: Car_Icon, text: t('FIND_TRANSPORT'), href: '/search-route'},
+        {imageSrc: Share_Icon, text: t('SHARE_TRANSPORT'), href: '/share-transport'}
     ];
 
     return (

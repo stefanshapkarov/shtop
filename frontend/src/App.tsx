@@ -7,6 +7,7 @@ import RegisterPage from "./pages/RegisterPage";
 import {I18nextProvider} from "react-i18next";
 import i18 from "./i18";
 import {SearchRoute} from "./pages/search-route-page/SearchRoute";
+import TransportCard from "./pages/transport-card-page/TransportCard";
 
 const App: React.FC = () => {
     return (
@@ -17,6 +18,7 @@ const App: React.FC = () => {
                     <Route path="/home" element={<MainLayout />} />
                         <Route index element={<HomePage/>}/>
                         <Route path="search-route" element={<SearchRoute/>}/>
+                        <Route path="share-transport" element={<TransportCard/>}/>
                         {/*
                             Note: All other routes need to be children of MainLayout route so the header and footer render accordingly
 

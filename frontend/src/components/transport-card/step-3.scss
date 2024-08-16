@@ -1,0 +1,71 @@
+@import "../../shared/styles/fonts/fonts.scss";
+@import "../../shared/styles/colors/colors.scss";
+
+.transport-card-step-three {
+    background-color: #f9f9f9;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+
+    .fields-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        width: 100%;
+    }
+
+    .MuiTextField-root {
+        background-color: #ffffff;
+        border-radius: 15px;
+
+        .MuiInputBase-root {
+            padding: 10px 15px;
+            font-family: 'Manrope-Medium', serif;
+            font-size: 18px;
+            color: #000000;
+
+            &:hover {
+                border-color: #26a69a;
+            }
+        }
+
+        .MuiInputLabel-root {
+            font-family: 'Manrope-Medium', serif;
+            font-size: 18px;
+            color: #444d4c;
+            top: -5px;
+        }
+
+        .MuiOutlinedInput-root {
+            fieldset {
+                border-color: #ddd;
+            }
+
+            &:hover fieldset {
+                border-color: #26a69a;
+            }
+
+            &.Mui-focused fieldset {
+                border-color: #26a69a;
+            }
+        }
+    }
+
+    .MuiInputLabel-root {
+        font-family: 'Manrope-Medium', serif;
+        font-size: 16px;
+        color: #26a69a;
+    }
+
+    .MuiMenuItem-root {
+        font-family: 'Manrope-Medium', serif;
+        font-size: 16px;
+    }
+
+    .MuiInputBase-root.Mui-focused {
+        color: #26a69a;
+    }
+}

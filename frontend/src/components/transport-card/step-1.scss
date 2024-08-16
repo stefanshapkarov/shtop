@@ -1,0 +1,104 @@
+@import "../../shared/styles/fonts/fonts.scss";
+@import "../../shared/styles/colors/colors.scss";
+
+.transport-card-step-one {
+    background-color: #f0f0f0;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+
+
+    .maps-container {
+        display: flex;
+        justify-content: space-between;
+        width: 1200px;
+        padding: 20px;
+    }
+
+    .map-box {
+        background-color: #e0f7fa;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 50%;
+        text-align: center;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .map-container {
+        margin-top: 10px;
+        height: 400px;
+        width: 100%;
+    }
+
+    .map-title {
+        margin-bottom: 10px;
+        font-weight: bold;
+        font-family: 'Manrope-Medium', serif;
+        font-size: 20px;
+    }
+
+    .checkboxes {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-left: 30px;
+
+        .MuiFormControlLabel-root .MuiTypography-root {
+            font-family: 'Manrope-Medium', serif;
+            font-size: 20px;
+        }
+    }
+
+    .custom-checkbox-label {
+        margin-bottom: 10px;
+    }
+
+    .custom-checkbox-text {
+        font-size: 14px;
+        color: #333;
+    }
+
+    .stop-fields {
+        width: calc(100% - 60px);
+        max-width: 1200px;
+        padding-left: 30px;
+        padding-right: 30px;
+        padding-bottom: 30px;
+        border-radius: 10px;
+        margin: auto;
+        .MuiInputLabel-root {
+            font-family: 'Manrope-Medium', serif;
+            font-size: 20px;
+        }
+    }
+
+    .date-time {
+        padding-left: 3px;
+        .MuiInputLabel-root {
+            font-family: 'Manrope-Medium', serif;
+            font-size: 20px;
+        }
+    }
+
+    .grids {
+        .MuiGrid-item {
+            font-family: 'Manrope-Medium', serif;
+            font-size: 20px;
+        }
+
+        .MuiTypography-root {
+            font-family: 'Manrope-Medium', serif;
+            font-size: 20px;
+        }
+    }
+
+}

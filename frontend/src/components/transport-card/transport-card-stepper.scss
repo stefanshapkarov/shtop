@@ -1,0 +1,45 @@
+$stepper-green: #26a69a;
+
+.button {
+  &--primary {
+    background-color: $stepper-green;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: darken($stepper-green, 10%);
+    }
+
+    &:disabled {
+      background-color: lighten($stepper-green, 30%);
+      cursor: not-allowed;
+    }
+  }
+
+  &--secondary {
+    background-color: #fff;
+    color: $stepper-green;
+    border: 2px solid $stepper-green;
+    padding: 8px 18px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+    &:hover {
+      background-color: $stepper-green;
+      color: #fff;
+    }
+
+    &:disabled {
+      border-color: lighten($stepper-green, 30%);
+      color: lighten($stepper-green, 30%);
+      cursor: not-allowed;
+    }
+  }
+}
