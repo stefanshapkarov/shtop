@@ -148,6 +148,3 @@ export const getCurrentUser = async () => {
     console.log(error);
   }
 };
-
-
-

@@ -5,8 +5,6 @@ import Route_Line from '../../styles/icons/route_line_icon.png'
 import Anon_Profile from '../../styles/images/anon_profile.jpg'
 import {format} from "date-fns";
 import {useNavigate} from "react-router-dom";
-import {useEffect} from "react";
-import dayjs, {Dayjs} from "dayjs";
 import {useTranslation} from "react-i18next";
 import StarIcon from "@mui/icons-material/Star";
 
