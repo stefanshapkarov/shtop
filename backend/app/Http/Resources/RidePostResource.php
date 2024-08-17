@@ -23,6 +23,7 @@ class RidePostResource extends JsonResource
             'price_per_seat' => $this->price_per_seat,
             'departure_city' => $this->departure_city,
             'destination_city' => $this->destination_city,
+            'vehicle' => $this->vehicle,
             'reviews' => ReviewResource::collection($this->reviews),
             'created_at' => $this->created_at->toDateTimeString()
         ];

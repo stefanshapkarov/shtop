@@ -68,6 +68,7 @@ class RidePostController extends Controller
                 'price_per_seat' => 'required|numeric|min:1',
                 'departure_city' => 'required|string',
                 'destination_city' => 'required|string|different:departure_city',
+                'vehicle' => 'required|string',
             ]);
 
             $validatedRequestData['departure_time'] =
@@ -81,6 +82,7 @@ class RidePostController extends Controller
                 'price_per_seat' => $validatedRequestData['price_per_seat'],
                 'departure_city' => $validatedRequestData['departure_city'],
                 'destination_city' => $validatedRequestData['destination_city'],
+                'vehicle' => $validatedRequestData['vehicle'],
             ]);
 
             throw_if(!$ridePost, GeneralJsonException::class);
@@ -105,6 +107,7 @@ class RidePostController extends Controller
                 'price_per_seat' => 'sometimes|numeric|min:1',
                 'departure_city' => 'sometimes|string',
                 'destination_city' => 'sometimes|string|different:departure_city',
+                'vehicle' => 'required|string',
             ]);
 
             if (isset($validatedRequestData['departure_time'])) {
