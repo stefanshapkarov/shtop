@@ -63,7 +63,9 @@
   }
 
   .driver-info-collapsable {
-    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     width: 80%;
     height: 0;
     overflow-y: hidden;
@@ -74,6 +76,9 @@
   .driver-info-collapsable-opened {
     height: 12rem;
     transition: 350ms ease;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    margin-top: 1rem;
   }
 
   .bio {
@@ -101,12 +106,17 @@
     display: flex;
     flex-direction: column;
     justify-content: start;
-    padding-left: 2.5rem;
+    padding: 0 2.5rem;
     margin-bottom: 2rem;
   }
 
+  .is-driver-container {
+    width: 100%;
+  }
+
   .users-list {
-    height: 10rem;
+    height: fit-content;
+    max-height: 10rem;
     overflow-y: scroll;
     scrollbar-width: none;
   }

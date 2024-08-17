@@ -86,5 +86,7 @@
   "NO-ACCOUNT": "Don't have an account?",
   "CREATE-ACC": "Create an account",
   "FETCHING_DATA": "Fetching data",
-  "NO_RIDES_AVAILABLE_AT_THE_MOMENT": "No rides are available at the moment. Try again later."
+  "NO_RIDES_AVAILABLE_AT_THE_MOMENT": "No rides are available at the moment. Try again later.",
+  "REMOVE_DIALOG": "Are you sure you remove this passenger from your ride? Doing so will be irreversible until said user submits another request.",
+  "PASSENGER": "Passenger"
 }

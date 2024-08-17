@@ -39,7 +39,12 @@ Route::middleware('auth:sanctum')
         Route::get('users/{userId}/reviews', [ReviewController::class, 'getUserReviews'])->name('users.reviews');
         Route::get('my-reviews', [ReviewController::class, 'getMyReviews'])->name('my.reviews');
 
-
+        // RIDE REQUESTS
+        Route::get('/ridePost/{ridePost:id}/requests', [RideRequestController::class, 'getRequestsForPost']);
+        Route::get('/ridePost/{ridePost:id}/requests/new', [RideRequestController::class, 'createRequestForPost']);
+        Route::get('/ridePost/requests/{rideRequest:id}/accept', [RideRequestController::class, 'acceptRequest']);
+        Route::get('/ridePost/requests/{rideRequest:id}/reject', [RideRequestController::class, 'rejectRequest']);
+        Route::get('/ridePost/requests/{rideRequest:id}/cancel', [RideRequestController::class, 'destroy']);
     });
 
 // RIDE POSTS
@@ -49,10 +54,3 @@ Route::get('/ridePost', [RidePostController::class, 'index']);
 Route::get('/ridePost/{ridePost:id}', [RidePostController::class, 'show']);
 Route::delete('/ridePost/{ridePost:id}', [RidePostController::class, 'destroy']);
 Route::get('/ridePost/{ridePost:id}/complete', [RidePostController::class, 'complete']);
-
-// RIDE REQUESTS
-Route::get('/ridePost/{ridePost:id}/requests', [RideRequestController::class, 'getRequestsForPost']);
-Route::get('/ridePost/{ridePost:id}/requests/new', [RideRequestController::class, 'createRequestForPost']);
-Route::get('/ridePost/requests/{rideRequest:id}/accept', [RideRequestController::class, 'acceptRequest']);
-Route::get('/ridePost/requests/{rideRequest:id}/reject', [RideRequestController::class, 'rejectRequest']);
-Route::get('/ridePost/requests/{rideRequest:id}/cancel', [RideRequestController::class, 'destroy']);

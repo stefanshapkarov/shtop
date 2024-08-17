@@ -1,6 +1,7 @@
 // src/services/api.ts
 import axios from 'axios';
 import {Ride} from "../models/ride/Ride";
+import {RideRequest} from "../models/ride-request/RideRequest";
 
 
 
@@ -114,7 +115,7 @@ export const fetchRideById = async (id: string): Promise<Ride> => {
 
 export const getRideRequests = async (rideId: string): Promise<any> => {
   const response = await api.get(`/api/ridePost/${rideId}/requests`);
-  return response.data;
+  return response.data.data;
 }
 
 export const makeRideRequest = async (rideId: string) => {
@@ -123,17 +124,17 @@ export const makeRideRequest = async (rideId: string) => {
 }
 
 export const acceptRideRequest = async (requestId: number) => {
-  const response = await api.get(`/ridePost/requests/${requestId}/accept`);
+  const response = await api.get(`api/ridePost/requests/${requestId}/accept`);
   return response.data;
 }
 
 export const rejectRideRequest = async (requestId: number) => {
-  const response = await api.get(`/ridePost/requests/${requestId}/reject`);
+  const response = await api.get(`api/ridePost/requests/${requestId}/reject`);
   return response.data;
 }
 
 export const cancelRideRequest = async (requestId: number) => {
-  const response = await api.get(`/ridePost/requests/${requestId}/cancel`);
+  const response = await api.get(`api/ridePost/requests/${requestId}/cancel`);
   return response.data;
 }
 
@@ -142,7 +143,6 @@ export const getCurrentUser = async () => {
     const response = await api.get('/api/user',{
       withCredentials:true,
     });
-    console.log(response);
     return response.data;
   } catch (error) {
     console.log(error);

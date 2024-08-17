@@ -9,10 +9,21 @@ import {format} from "date-fns";
 import StarIcon from '@mui/icons-material/Star';
 import {useEffect, useState} from "react";
 import Chat_Icon from '../../shared/styles/icons/chat_icon.png'
-import {fetchRideById, getRideRequests} from "../../services/api";
+import {
+    acceptRideRequest,
+    cancelRideRequest,
+    fetchRideById, getCurrentUser,
+    getRideRequests,
+    rejectRideRequest
+} from "../../services/api";
 import {useParams} from "react-router-dom";
 import dayjs, {Dayjs} from "dayjs";
 import {Loader} from "../../shared/components/loader/Loader";
+import {useAuth} from "../../context/AuthContext";
+import {RideRequest} from "../../models/ride-request/RideRequest";
+import {ConfirmDialog} from "../../shared/components/confirm-dialog/ConfirmDialog";
+import {UserType} from "../../models/user-type/UserType";
+import {SelectedPassengerOption} from "../../models/selected-passenger/SelectedPassengerOption";
 
 export const RoutePage = () => {
 
@@ -21,17 +32,32 @@ export const RoutePage = () => {
     const [ride, setRide] = useState<Ride>();
     const {id} = useParams();
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isDriver, setIsDriver] = useState<boolean>(false);
+    const [acceptedRequests, setAcceptedRequests] = useState<RideRequest[]>([])
+    const [pendingRequests, setPendingRequests] = useState<RideRequest[]>([])
+    const [selectedRequest, setSelectedRequest] = useState<any>(undefined)
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+    const [loggedUser, setLoggedUser] = useState<UserType | undefined>(undefined);
 
     useEffect(() => {
-        fetchData();
+        getCurrentUser().then((response) => {
+            setLoggedUser(response);
+            fetchData(response.id);
+        });
     }, []);
 
-    const fetchData = async () => {
-        if (!id)
+    const fetchData = async (loggedUserId: number | undefined) => {
+        if (id === null || id === undefined)
             return;
         setIsLoading(true);
         const rideTmp = await fetchRideById(id);
         setRide(rideTmp);
+        if (loggedUserId === rideTmp?.driver.id) {
+            setIsDriver(true)
+            const requestsTmp: RideRequest[] = await getRideRequests(rideTmp.id.toString())
+            setAcceptedRequests(requestsTmp.filter((request) => request.status === 'accepted'));
+            setPendingRequests(requestsTmp.filter((request) => request.status === 'pending'));
+        }
         setIsLoading(false);
     }
 
@@ -58,7 +84,59 @@ export const RoutePage = () => {
         return result
     }
 
+    const handleDialogClose = () => {
+        setSelectedRequest(undefined);
+        setIsDialogOpen(false);
+    }
+
+    const handleDialogConfirm = () => {
+        if (selectedRequest.action === SelectedPassengerOption.REJECT) {
+            rejectRideRequest(selectedRequest.id)
+            setPendingRequests(prevRequests => prevRequests.filter(request => request.id !== selectedRequest.id));
+        } else if (selectedRequest.action === SelectedPassengerOption.REMOVE) {
+            cancelRideRequest(selectedRequest.id)
+            setAcceptedRequests(prevRequests => prevRequests.filter(request => request.id !== selectedRequest.id))
+        }
+        handleDialogClose();
+    }
+
+    const handleAcceptRequest = (request: any) => {
+        acceptRideRequest(request.id).then(() => setAcceptedRequests(prevRequests => [...prevRequests, request]));
+    }
+
+    const getDialogText = (): string => {
+        let text = ''
+        if (!selectedRequest)
+            return text
+        if (selectedRequest.action === SelectedPassengerOption.REJECT)
+            text += `${t('REMOVE_DIALOG')}\n ${t('PASSENGER')}`;
+        else
+            text += `${t('REJECT_DIALOG')}\n ${t('PASSENGER')}`;
+
+        return text ;
+    }
+
+    const handleRemoveClick = (request: any) => {
+      setSelectedRequest({
+          ...request,
+          action: SelectedPassengerOption.REMOVE
+      })
+      setIsDialogOpen(true);
+    }
+
+    const handleRejectClick = (request: any) => {
+      setSelectedRequest({
+          ...request,
+          action: SelectedPassengerOption.REJECT
+      })
+      setIsDialogOpen(true)
+    }
+
+
     return <Box id='route-page-wrapper'>
+        {isDriver &&
+            <ConfirmDialog isOpen={isDialogOpen} text={getDialogText()} onClose={() => handleDialogClose()}
+                           onConfirm={() => handleDialogConfirm()}/>}
         {ride && !isLoading
             ? <Box className='route-info-container'>
                 <Typography variant='h3'
@@ -77,8 +155,6 @@ export const RoutePage = () => {
                 <Box
                     className={isExtended ? 'driver-info-collapsable driver-info-collapsable-opened' : 'driver-info-collapsable'}
                     onClick={() => setIsExtended(!isExtended)}>
-                    <Typography fontWeight='bold'>{t('BIO')}:</Typography>
-                    <Typography variant='body2' className='bio'>{ride.driver.bio}</Typography>
                     <Box className='driver-info-extended'>
                         <Box>
                             <Typography fontWeight='bold'>{t('MEMBER_SINCE')}:</Typography>
@@ -100,63 +176,72 @@ export const RoutePage = () => {
                                         className='bio'>{ride.driver.is_verified ? t('YES') : t('NO')}</Typography>
                         </Box>
                     </Box>
+                    <Typography fontWeight='bold'>{t('BIO')}:</Typography>
+                    <Typography variant='body2' className='bio'>{ride.driver.bio}</Typography>
                 </Box>
-                <Divider className='divider'/>
-                <Box className='accepted-passengers-container'>
-                    <Typography variant='h6'>
-                        {t('ACCEPTED_PASSENGERS')}:
-                        ( {ride.total_seats - ride.available_seats} / {ride.total_seats} )
-                    </Typography>
-                    <Box className='users-list'>
-                        {Array.from({length: 5}).map(() => (
-                            <Box className='user-list-item'>
-                                <Box className='pair'>
-                                    <img src={ride.driver.profile_picture ? ride.driver.profile_picture : Anon_Photo}
-                                         alt='driver-photo'
-                                         className='profile-picture'/>
-                                    <Typography variant='h6'>{ride.driver.name}</Typography>
-                                </Box>
-                                <Box className='pair'>
-                                    <img className='chat-icon' src={Chat_Icon} alt='chat'/>
-                                    <Typography
-                                        className='contact-user-text'>{t('CONTACT')} {ride.driver.name}</Typography>
-                                </Box>
-                                <Button variant='contained' size='small' color='error'
-                                        className='button'>{t('REMOVE')}</Button>
+                {isDriver &&
+                    <Box className='is-driver-container'>
+                        <Divider className='divider'/>
+                        <Box className='accepted-passengers-container'>
+                            <Typography variant='h6'>
+                                {t('ACCEPTED_PASSENGERS')}:
+                                {ride.total_seats - ride.available_seats}
+                            </Typography>
+                            <Box className='users-list'>
+                                {acceptedRequests.map((request) => (
+                                    <Box className='user-list-item'>
+                                        <Box className='pair'>
+                                            <img
+                                                src={request.passenger.profile_picture ? request.passenger.profile_picture : Anon_Photo}
+                                                alt='driver-photo'
+                                                className='profile-picture'/>
+                                            <Typography variant='h6'>{request.passenger.name}</Typography>
+                                        </Box>
+                                        <Box className='pair'>
+                                            <img className='chat-icon' src={Chat_Icon} alt='chat'/>
+                                            <Typography
+                                                className='contact-user-text'>{t('CONTACT')} {request.passenger.name}</Typography>
+                                        </Box>
+                                        <Button variant='contained' size='small' color='error'
+                                                className='button' onClick={() => handleRemoveClick(request)}>{t('REMOVE')}</Button>
+                                    </Box>
+                                ))}
                             </Box>
-                        ))}
-                    </Box>
-                </Box>
-                <Divider className='divider'/>
-                <Box className='accepted-passengers-container'>
-                    <Typography variant='h6'>
-                        {t('PENDING_REQUESTS')}:
-                        {/*( {ride.totalSeats - ride.availableSeats} / {ride.totalSeats} )*/}
-                    </Typography>
-                    <Box className='users-list'>
-                        {Array.from({length: 5}).map(() => (
-                            <Box className='user-list-item'>
-                                <Box className='pair'>
-                                    <img src={ride.driver.profile_picture ? ride.driver.profile_picture : Anon_Photo}
-                                         alt='driver-photo'
-                                         className='profile-picture'/>
-                                    <Typography variant='h6'>{ride.driver.name}</Typography>
-                                </Box>
-                                <Box className='pair'>
-                                    <img className='chat-icon' src={Chat_Icon} alt='chat'/>
-                                    <Typography
-                                        className='contact-user-text'>{t('CONTACT')} {ride.driver.name}</Typography>
-                                </Box>
-                                <Box>
-                                    <Button variant='contained' size='small' color='error'
-                                            className='button button-green'>{t('ACCEPT')}</Button>
-                                    <Button variant='contained' size='small' color='error'
-                                            className='button'>{t('DECLINE')}</Button>
-                                </Box>
+                        </Box>
+                        <Divider className='divider'/>
+                        <Box className='accepted-passengers-container'>
+                            <Typography variant='h6'>
+                                {t('PENDING_REQUESTS')}: {pendingRequests.length}
+                            </Typography>
+                            <Box className='users-list'>
+                                {pendingRequests.map((request) => (
+                                    <Box className='user-list-item'>
+                                        <Box className='pair'>
+                                            <img
+                                                src={request.passenger.profile_picture ? request.passenger.profile_picture : Anon_Photo}
+                                                alt='driver-photo'
+                                                className='profile-picture'/>
+                                            <Typography variant='h6'>{request.passenger.name}</Typography>
+                                        </Box>
+                                        <Box className='pair'>
+                                            <img className='chat-icon' src={Chat_Icon} alt='chat'/>
+                                            <Typography
+                                                className='contact-user-text'>{t('CONTACT')} {request.passenger.name}</Typography>
+                                        </Box>
+                                        <Box>
+                                            <Button variant='contained' size='small' color='error'
+                                                    className='button button-green'
+                                                    onClick={() => handleAcceptRequest(request)}>{t('ACCEPT')}</Button>
+                                            <Button variant='contained' size='small' color='error'
+                                                    className='button'
+                                                    onClick={() => handleRejectClick(request)}>{t('DECLINE')}</Button>
+                                        </Box>
+                                    </Box>
+                                ))}
                             </Box>
-                        ))}
+                        </Box>
                     </Box>
-                </Box>
+                }
             </Box>
             : <Box className='loader-container'>
                 <Loader/>
