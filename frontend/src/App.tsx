@@ -15,10 +15,9 @@ const App: React.FC = () => {
             <Router>
                 <Routes>
                     <Route path="/" element={<MainLayout/>}>
-                    <Route path="/home" element={<MainLayout />} />
                         <Route index element={<HomePage/>}/>
                         <Route path="search-route" element={<SearchRoute/>}/>
-                        <Route path="route" element={<RoutePage/>}/>
+                        <Route path="route/:id" element={<RoutePage/>}/>
                         {/*
                             Note: All other routes need to be children of MainLayout route so the header and footer render accordingly
 
@@ -27,7 +26,6 @@ const App: React.FC = () => {
                             */}
                             <Route path="/login" element={<LoginPage />}> </Route>
                             <Route path="/register" element={<RegisterPage />}> </Route>
-
                         </Route>
                         
                 </Routes>

@@ -16,38 +16,62 @@ import Coins from '../../shared/styles/icons/coins_icon.png'
 import Profile from '../../shared/styles/icons/profile_icon.png'
 import Lightning from '../../shared/styles/icons/lightning_icon.png'
 import Robot from '../../shared/styles/images/ai_robot.png'
-import { useAuth } from '../../context/AuthContext';
-
 
 import {InfoCard} from "./components/info-card/InfoCard";
 
+import { logout } from "../../services/api";
+import {format} from "date-fns";
 
 export const HomePage = () => {
 
     const {t} = useTranslation();
     const [locationFrom, setLocationFrom] = useState<string | null>(null);
     const [locationTo, setLocationTo] = useState<string | null>(null);
-    const [date, setDate] = useState<any>(null);
+    const [date, setDate] = useState<Date | null>(new Date(Date.now()));
     const [numPassangers, setNumPassangers] = useState<number | null>(null);
-    const [isAuth, setIsAuth] = useState<boolean>(false);
-    const { user } = useAuth() as { user: any };
     const navigate = useNavigate();
+    const [isAuth, setIsAuth] = useState<boolean>(false);
 
     useEffect(() => {
-        if (user) {
+        const query = new URLSearchParams(window.location.search);
+        const token = query.get('token');
+        if(token){
+            localStorage.setItem('accessToken', token);
             setIsAuth(true);
+            window.location.href = '/';
         }
-      }, [user, navigate]);    
+        else{
+        const checkLoggedIn = async () => {
+            console.log(localStorage.getItem("accessToken"));
+            const isAuth = localStorage.getItem("accessToken") !== null;
+            setIsAuth(isAuth);
+        };
 
-      
+        checkLoggedIn();}
+    }, []);
+
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            localStorage.removeItem("accessToken");
+            setIsAuth(false);
+            console.log("logged out");
+            window.location.reload();
+            // window.location.href = "/login";
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    };
+
     const handleSearch = () => {
         const queryParams = new URLSearchParams();
 
         if (locationFrom)
-            queryParams.append('from', getInitialLanguage() === 'mk' ? cities_en[cities_mk.indexOf(locationFrom)] : locationFrom);
+            queryParams.append('from', locationFrom);
         if (locationTo)
-            queryParams.append('to', getInitialLanguage() === 'mk' ? cities_en[cities_mk.indexOf(locationTo)] : locationTo);
-        if (date) queryParams.append('date', dayjs(date).format('DD-MM-YYYY'));
+            queryParams.append('to', locationTo);
+        if (date) queryParams.append('date', format(date, "dd-MM-yyyy"));
         if (numPassangers && numPassangers >= 1) queryParams.append('numPassangers', numPassangers.toString());
 
         navigate(`/search-route?${queryParams.toString()}`);
@@ -59,7 +83,7 @@ export const HomePage = () => {
             <>
 
                 {isAuth ? (
-                    <p>{t("LOGGED_IN")}</p>
+                    <button onClick={handleLogout}>{t("LOGOUT")}</button>
                 ) : (
                     <p>{t("NOT_LOGGED_IN")}</p>
                 )}
@@ -86,7 +110,12 @@ export const HomePage = () => {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DemoContainer components={['DatePicker']}
                                    sx={{marginTop: '-0.5rem'}}>
-                        <DatePicker format='DD/MM/YYYY' label={t('DATE')} value={date} onChange={value => setDate(value)}
+                        <DatePicker disablePast={true} format='DD/MM/YYYY' label={t('DATE')} value={dayjs(date)} onChange={value => {
+                            if (value)
+                                setDate(value.toDate())
+                            else
+                                setDate(null)
+                        }}
                                     className='search-field'/>
                     </DemoContainer>
                 </LocalizationProvider>
@@ -102,7 +131,7 @@ export const HomePage = () => {
             </Box>
             <Box className='ai-info-container'>
                 <Box className={'ai-info-content'}>
-                <img src={Robot} className='robot-image'/>
+                <img src={Robot} className='robot-image' alt='shtop-ai'/>
                 <Typography variant='h4' className='ai-text'>{t('AI_TEXT')}</Typography>
                 </Box>
             </Box>

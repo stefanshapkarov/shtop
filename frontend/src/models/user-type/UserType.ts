@@ -3,11 +3,11 @@ export interface UserType {
     admin: number
     name: string
     email: string
-    profilePicture: string | null;
+    profile_picture: string | null;
     bio: string | null;
     location: string | null;
-    createdAt: Date
-    updatedAt: Date
-    isVerified: boolean
+    created_at: Date
+    updated_at: Date
+    is_verified: boolean
     rating: number
 }
