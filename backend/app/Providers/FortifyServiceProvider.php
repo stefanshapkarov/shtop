@@ -32,7 +32,7 @@ class FortifyServiceProvider extends ServiceProvider
         $this->app->instance(LoginResponse::class, new class implements LoginResponse {
             public function toResponse($request)
             {
-                return Auth::user();
+                return new UserResource(Auth::user());
             }
         });
 

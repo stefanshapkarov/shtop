@@ -24,7 +24,9 @@ class UpdateProfileRequest extends FormRequest
         return [
             'profile_picture' => 'nullable|file',
             'bio' => 'nullable|string',
-            'location' => 'nullable|string'
+            'location' => 'nullable|string',
+            'phone_number' => 'nullable|numeric|digits_between:8,11',
+            'birth_date' => 'nullable|date',
         ];
     }
 }

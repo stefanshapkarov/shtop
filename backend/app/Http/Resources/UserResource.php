@@ -20,8 +20,11 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'profile_picture' => $this->profile_picture,
+            'phone_number' => $this->phone_number,
+            'birth_date' => $this->birth_date,
             'bio' => $this->bio,
             'location' => $this->location,
+            'completed_rides' => $this->drivenRidePosts()->count(),
             'created_at' => (string)$this->created_at,
             'updated_at' => (string)$this->updated_at
         ];
