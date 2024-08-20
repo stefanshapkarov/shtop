@@ -25,6 +25,10 @@ class UserResource extends JsonResource
             'bio' => $this->bio,
             'location' => $this->location,
             'completed_rides' => $this->drivenRidePosts()->count(),
+            'rides_as_driver' => $this->drivenRidePosts,
+            'rides_as_passenger' => $this->passengerRidePosts,
+            'reviews_given' => $this->reviewsGiven,
+            'reviews_received' => $this->reviewsReceived,
             'created_at' => (string)$this->created_at,
             'updated_at' => (string)$this->updated_at
         ];

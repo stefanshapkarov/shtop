@@ -7,9 +7,11 @@ use App\Http\Resources\ReviewResource;
 use App\Models\Review;
 use App\Http\Requests\StoreReviewRequest;
 use App\Http\Requests\UpdateReviewRequest;
+use App\Models\RidePost;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReviewController extends Controller
 {
@@ -26,8 +28,21 @@ class ReviewController extends Controller
     public function store(StoreReviewRequest $request)
     {
         return DB::transaction(function () use ($request) {
+            $rideId = $request->input('ride_id');
+            $ride = RidePost::findOrFail($rideId);
+
+            $passengerIds = $ride->passengers->pluck('id')->toArray();
+
+            throw_if(in_array(Auth::id(), $passengerIds) || $ride->driver_id != Auth::id(),
+                GeneralJsonException::class,
+                'Can`t add a review on a ride where you`re not a passenger or driver.');
+
+            throw_if($ride->status !== 'completed',
+                GeneralJsonException::class,
+                'Can`t add a review on an uncompleted ride.');
+
             $review = Review::create([
-                'ride_id' => $request->input('ride_id'),
+                'ride_id' => $rideId,
                 'reviewer_id' => Auth::id(),
                 'reviewee_id' => $request->input('reviewee_id'),
                 'rating' => $request->input('rating'),
