@@ -49,12 +49,18 @@ const LocationMarker: React.FC<LocationMarkerProps> = ({ position, setPosition, 
 
 interface TransportCardStepOneProps {
     rideData: {
-        departure_time: string;
+        departure_time: Date;
         departure_city: string;
         destination_city: string;
     };
     updateRideData: (newData: Partial<TransportCardStepOneProps['rideData']>) => void;
 }
+
+
+
+const combineDateAndTime = (date: string, time: string): string => {
+    return `${date} ${time}:00`; // Keep seconds as "00" in the backend data
+};
 
 const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({ rideData, updateRideData }) => {
     const { t } = useTranslation();
@@ -65,12 +71,16 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({ rideData, u
         updateRideData({ [field]: city });
     };
 
-    const handleInputChange = (field: keyof TransportCardStepOneProps['rideData']) => (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        updateRideData({ [field]: event.target.value });
+    const formatDateForInput = (date: Date): string => {
+        // Adjust the date to local time
+        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+        return localDate.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
     };
 
+    const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newDate = event.target.value;
+        updateRideData({ departure_time: new Date(newDate) });
+    };
     return (
         <Box display="flex" flexDirection="column" alignItems="center" className="transport-card-step-one">
             <Box display="flex" justifyContent="space-between" width="1200px" mb={2} className="maps-container">
@@ -119,29 +129,17 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({ rideData, u
                 <Grid item xs={6}>
                     <TextField
                         label={t('ADD_DEPT_DATE')}
-                        type="date"
+                        type="datetime-local"
                         fullWidth
-                        value={rideData.departure_time.split(' ')[0]} 
-                        onChange={handleInputChange('departure_time')}
+                        value={formatDateForInput(rideData.departure_time)} // Format the date correctly for input
+                        onChange={handleDateChange}
                         InputLabelProps={{
                             shrink: true,
                         }}
                         margin="normal"
                     />
                 </Grid>
-                <Grid item xs={6}>
-                    <TextField
-                        label={t('ADD_DEPT_TIME')}
-                        type="time"
-                        fullWidth
-                        value={rideData.departure_time.split(' ')[1]} 
-                        onChange={handleInputChange('departure_time')}
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        margin="normal"
-                    />
-                </Grid>
+               
             </Grid>
         </Box>
     );

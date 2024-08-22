@@ -5,13 +5,13 @@ import './step-3.scss';
 
 interface StepProps {
   rideData: {
-    departure_time: string;
+    departure_time: Date;
     departure_city: string;
     destination_city: string;
-    total_seats: string;
-    price_per_seat: string;
-    luggage_space: string;
-    notes: string;
+    total_seats: number;
+    price_per_seat: number;
+  //  luggage_space: string;
+    vehicle: string;
   };
   updateRideData: (newData: Partial<StepProps['rideData']>) => void;
 }
@@ -28,7 +28,11 @@ const TransportCardStepThree: React.FC<StepProps> = ({ rideData, updateRideData 
   const handleInputChange = (field: keyof StepProps['rideData']) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    updateRideData({ [field]: event.target.value });
+    const value = field === 'total_seats' || field === 'price_per_seat'
+      ? parseInt(event.target.value, 10) || 0 
+      : event.target.value; 
+
+    updateRideData({ [field]: value });
   };
 
   return (
@@ -38,13 +42,14 @@ const TransportCardStepThree: React.FC<StepProps> = ({ rideData, updateRideData 
           <TextField
             label={t('NO_FREE_SEATS')}
             type="number"
-            value={rideData.total_seats}
+            value={rideData.total_seats.toString()}
             onChange={handleInputChange('total_seats')}
             fullWidth
             margin="normal"
+            inputProps={{ min: 0 }}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        {/* <Grid item xs={12} md={6}>
           <TextField
             label={t('LUGGAGE_SPACE')}
             select
@@ -59,15 +64,26 @@ const TransportCardStepThree: React.FC<StepProps> = ({ rideData, updateRideData 
               </MenuItem>
             ))}
           </TextField>
+        </Grid> */}
+        <Grid item xs={12} md={6}>
+          <TextField
+            label={t('VEHICLE')}
+            type="string"
+            value={rideData.vehicle.toString()}
+            onChange={handleInputChange('vehicle')}
+            fullWidth
+            margin="normal"
+          />
         </Grid>
         <Grid item xs={12} md={6}>
           <TextField
             label={t('PRICE_PER_SEAT')}
             type="number"
-            value={rideData.price_per_seat}
+            value={rideData.price_per_seat.toString()}
             onChange={handleInputChange('price_per_seat')}
             fullWidth
             margin="normal"
+            inputProps={{ min: 0 }}
           />
         </Grid>
       </Grid>

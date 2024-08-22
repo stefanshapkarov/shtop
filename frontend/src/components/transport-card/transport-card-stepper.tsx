@@ -8,15 +8,15 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import TransportCardStepOne from '../../components/transport-card/step-1';
 import TransportCardStepThree from './step-3';
+import { postRide } from '../../services/api';
 
 interface RideData {
-  departure_time: string;
+  departure_time: Date;
+  total_seats: number;
+  price_per_seat: number;
   departure_city: string;
+  vehicle: string;
   destination_city: string;
-  total_seats: string;
-  price_per_seat: string;
-  luggage_space: string;
-  notes: string;
 }
 
 interface StepProps {
@@ -79,14 +79,15 @@ const TransportCardStepper: React.FC = () => {
   const navigate = useNavigate();
 
   const [rideData, setRideData] = useState<RideData>({
-    departure_time: '',
+    departure_time: new Date(),
+    total_seats: 0,
+    price_per_seat: 0,
     departure_city: '',
+    vehicle: '',
     destination_city: '',
-    total_seats: '',
-    price_per_seat: '',
-    luggage_space: '',
-    notes: '',
   });
+
+  const [isSubmittedSuccessfully, setIsSubmittedSuccessfully] = useState<boolean | null>(null);
 
   const updateRideData = (newData: Partial<RideData>) => {
     setRideData((prevData) => ({
@@ -95,16 +96,36 @@ const TransportCardStepper: React.FC = () => {
     }));
   };
 
+  const handleSubmit = async () => {
+    console.log('Submitting the following data:', rideData);
+
+    try {
+      const response = await postRide(rideData);
+      console.log('Ride post created successfully:', response);
+      setIsSubmittedSuccessfully(true); // Set success state to true
+      navigate('/search-route'); // Redirect to search-route
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setIsSubmittedSuccessfully(false); // Set success state to false if there was an error
+    }
+  };
+
   const steps = [
     <Typography variant="body1">{t('STEP_1')}</Typography>,
     <Typography variant="body1">{t('STEP_2')}</Typography>,
   ];
 
-  const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  const handleNext = () => {
+    if (activeStep === steps.length - 1) {
+      handleSubmit();
+    } else {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
+  };
 
   const handleBack = () => {
     if (activeStep === 0) {
-      navigate('/'); 
+      navigate('/');
     } else {
       setActiveStep((prevActiveStep) => prevActiveStep - 1);
     }
@@ -123,7 +144,9 @@ const TransportCardStepper: React.FC = () => {
       </Stepper>
       {activeStep === steps.length ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2 }}>
-          <Typography variant="h6">Posted</Typography>
+          <Typography variant="h6">
+            {isSubmittedSuccessfully ? 'Ride post created successfully!' : 'There was an error creating the ride post. Please try again.'}
+          </Typography>
         </Box>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2, pb: 2 }}>
