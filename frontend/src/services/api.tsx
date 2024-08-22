@@ -93,3 +93,42 @@ export const getCurrentUser = async () => {
     console.log(error);
   }
 };
+
+const formatDateForBackend = (date: Date): string => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  return `${day}-${month}-${year} ${hours}:${minutes}`;
+};
+
+export const postRide = async (rideData: {
+  departure_time: Date;
+  total_seats: number;
+  price_per_seat: number;
+  departure_city: string;
+  vehicle: string;
+  destination_city: string;
+}) => {
+  try {
+    await getCsrfToken();
+    
+    const formattedRideData = {
+      ...rideData,
+      departure_time: formatDateForBackend(rideData.departure_time),
+  };
+
+  const response = await api.post('/api/ridePost', formattedRideData);
+  return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Error posting ride:', error.response?.data.message || 'An error occurred');
+      throw new Error(error.response?.data.message || 'An error occurred');
+    } else {
+      console.error('Unexpected error:', error);
+      throw new Error('An unexpected error occurred');
+    }
+  }
+};
