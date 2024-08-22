@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    public function updateProfile(Request $request)
+    public function updateProfile(UpdateProfileRequest $request)
     {
         $user = DB::transaction(function () use ($request) {
 
@@ -34,6 +34,8 @@ class ProfileController extends Controller
                 'profile_picture' => $imagePath,
                 'bio' => $request->input('bio'),
                 'location' => $request->input('location'),
+                'birth_date' => $request->input('birth_date'),
+                'phone_number' => $request->input('phone_number'),
             ]);
 
             throw_if(!$updated, GeneralJsonException::class, 'Failed to update profile info.');

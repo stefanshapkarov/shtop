@@ -4,6 +4,8 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RidePostController;
 use App\Http\Controllers\RideRequestController;
 use App\Http\Controllers\SocialiteController;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,7 +30,12 @@ Route::get('/reset-password/{token}', function ($token){
 Route::middleware('auth:sanctum')
     ->group(function () {
         Route::get('/user', function (Request $request) {
-            return $request->user();
+            return new UserResource($request->user());
+        });
+
+        Route::get('/user/{id}', function ($id) {
+            $user = User::findOrFail($id);
+            return new UserResource($user);
         });
 
         Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'updateProfile'])->name('updateProfile');
