@@ -11,12 +11,12 @@ import StarIcon from "@mui/icons-material/Star";
 export const RouteCard = (props: RouteCardProps) => {
 
     const navigate = useNavigate();
-    const { t } = useTranslation()
+    const {t} = useTranslation()
 
     const getDateText = (date: Date | undefined) => {
         if (!date) return;
-        const month = parseInt(date.toString().slice(5,7))
-        const day = parseInt(date.toString().slice(8,10))
+        const month = parseInt(date.toString().slice(5, 7))
+        const day = parseInt(date.toString().slice(8, 10))
         let result = day.toString();
 
         if ([11, 12, 13].includes(day)) {
@@ -30,7 +30,7 @@ export const RouteCard = (props: RouteCardProps) => {
         } else {
             result += t('FOURTH');
         }
-        result += ' ' + t(`${month * -1}`).slice(0,3);
+        result += ' ' + t(`${month * -1}`).slice(0, 3);
 
         return result
     }
@@ -39,12 +39,14 @@ export const RouteCard = (props: RouteCardProps) => {
         <Box className={props.moreStyles ? 'route-card-wrapper' : 'route-card-wrapper-vanilla'}>
             <Box className='route-card-content'>
                 <Box className='time-container'>
+                    {props.moreStyles &&
                     <Box className='date-container'>
                         <Typography variant='h5'
                                     className='text time'>{format(props.ride.departure_time, 'HH:mm')}</Typography>
-                        <Typography variant='h5'
-                                    className='text time'>{getDateText(props.ride.departure_time)}</Typography>
+                            <Typography variant='h5'
+                                        className='text time'>{getDateText(props.ride.departure_time)}</Typography>
                     </Box>
+                    }
                     <img src={Route_Line} alt='line'/>
                     <Box className='info-container'>
                         <Typography variant='h5' className='text'>{props.ride.departure_city}</Typography>

@@ -35,21 +35,21 @@ export const HomePage = () => {
     useEffect(() => {
         const query = new URLSearchParams(window.location.search);
         const token = query.get('token');
-        if(token){
+        if(token) {
             localStorage.setItem('accessToken', token);
             setIsAuth(true);
             window.location.href = '/';
         }
-        else{
-        const checkLoggedIn = async () => {
-            console.log(localStorage.getItem("accessToken"));
-            const isAuth = localStorage.getItem("accessToken") !== null;
-            setIsAuth(isAuth);
-        };
-
-        checkLoggedIn();}
+        else
+            checkLoggedIn();
     }, []);
 
+    const checkLoggedIn = async () => {
+        const accessToken = localStorage.getItem("accessToken")
+        console.log("access token: " + accessToken);
+        const isAuth =  accessToken !== null && accessToken !== undefined;
+        setIsAuth(isAuth);
+    };
 
     const handleLogout = async () => {
         try {
@@ -68,14 +68,26 @@ export const HomePage = () => {
         const queryParams = new URLSearchParams();
 
         if (locationFrom)
-            queryParams.append('from', locationFrom);
+            queryParams.append('from', getLocationFrom());
         if (locationTo)
-            queryParams.append('to', locationTo);
+            queryParams.append('to', getLocationTo());
         if (date) queryParams.append('date', format(date, "dd-MM-yyyy"));
         if (numPassangers && numPassangers >= 1) queryParams.append('numPassangers', numPassangers.toString());
 
         navigate(`/search-route?${queryParams.toString()}`);
     };
+
+    const getLocationFrom = () => {
+        if (locationFrom)
+            return getInitialLanguage() === 'mk' && locationFrom ? cities_en[cities_mk.indexOf(locationFrom)] : locationFrom
+        return ''
+    }
+
+    const getLocationTo = () => {
+        if (locationTo)
+            return getInitialLanguage() === 'mk' && locationTo ? cities_en[cities_mk.indexOf(locationTo)] : locationTo
+        return ''
+    }
 
 
     return <>

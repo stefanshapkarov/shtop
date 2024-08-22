@@ -118,8 +118,8 @@ export const getRideRequests = async (rideId: string): Promise<any> => {
   return response.data.data;
 }
 
-export const makeRideRequest = async (rideId: string) => {
-  const response = await api.get(`/api/ridePost/${rideId}/new`);
+export const makeRideRequest = async (rideId: number) => {
+  const response = await api.get(`/api/ridePost/${rideId}/requests/new`);
   return response.data;
 }
 

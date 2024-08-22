@@ -147,8 +147,9 @@ export const SearchRoute = () => {
             if (locationTo)
                 to = cities_mk[cities_en.indexOf(locationTo)]
         }
-        if (from && to)
+        if (from && to) {
             return `${from} → ${to}`
+        }
         else if (from)
             return `${from} → ${t('ANYWHERE')}`
         else if (to)
