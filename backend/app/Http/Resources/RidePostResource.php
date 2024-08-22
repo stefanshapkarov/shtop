@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\RideRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,8 +25,32 @@ class RidePostResource extends JsonResource
             'departure_city' => $this->departure_city,
             'destination_city' => $this->destination_city,
             'vehicle' => $this->vehicle,
+            'canRequest' => $this->hasRequestForRide(),
             'reviews' => ReviewResource::collection($this->reviews),
             'created_at' => $this->created_at->toDateTimeString()
         ];
+    }
+
+    public function hasRequestForRide()
+    {
+        $userId = auth()->id();
+
+        if ($this->driver->id === $userId) {
+
+            return false;
+        }
+
+        $tmp = RideRequest::with(['passenger', 'ridePost'])
+            ->where('ridepost_id', $this->id)
+            ->where('passenger_id', $userId)
+            ->whereIn('status', ['pending', 'accepted'])
+            ->get();
+
+        if ($tmp->isEmpty()) {
+
+            return true;
+        }
+
+        return false;
     }
 }
