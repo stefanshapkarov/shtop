@@ -8,6 +8,7 @@ import {I18nextProvider} from "react-i18next";
 import i18 from "./i18";
 import {SearchRoute} from "./pages/search-route-page/SearchRoute";
 import ProfilePage from './pages/ProfilePage';
+import ProfileEditPage from './pages/ProfileEditPage';
 
 const App: React.FC = () => {
     return (
@@ -27,6 +28,9 @@ const App: React.FC = () => {
                             <Route path="/login" element={<LoginPage />}> </Route>
                             <Route path="/register" element={<RegisterPage />}> </Route>
                             <Route path="/profile" element={<ProfilePage />}> </Route>
+                            <Route path="/profile-edit" element={<ProfileEditPage />}> </Route>
+
+
 
 
                         </Route>

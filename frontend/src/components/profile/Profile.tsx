@@ -6,7 +6,7 @@ import car_icon from '../../shared/styles/icons/car_icon.png';
 import star from '../../shared/styles/icons/star.png';
 import lightning_icon from '../../shared/styles/icons/lightning_icon.png';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, redirect } from 'react-router-dom';
 import { getUserReviews } from '../../services/api';
 
 
@@ -16,12 +16,24 @@ const Profile: React.FC = () => {
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const { login, user, logout, loading } = useAuth() as { login: Function, user: any, logout: Function, loading: boolean };
   const [UserRating, setUserRating] = useState<number>(0);
+  const formattedYear = user.created_at ? new Date(user.created_at).getFullYear() : 'Year';
+  
+  const navigate = useNavigate();
+  const location = useLocation();
 
+
+  useEffect(() => {
+    if (!loading && user) {
+        
+    }else{
+        navigate('/login');
+    }
+  }, [user, loading, navigate]);
 
   useEffect(() => {
     const getRating = async () => {
       try {
-        const response = await getUserReviews(2); // Assuming 2 is the user ID
+        const response = await getUserReviews(user.id); // Assuming 2 is the user ID
         const reviews = response.data;
 
         let totalRating = 0;
@@ -52,16 +64,8 @@ const Profile: React.FC = () => {
   }, []); // Empty dependency array to ensure it runs only once on mount
 
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
 
-  useEffect(() => {
-      if (!loading && user) {
-          
-      }else{
-          navigate('/login');
-      }
-  }, [user, loading, navigate]);
 
   if (error) return <Typography color="error">{error}</Typography>;
 
@@ -91,7 +95,7 @@ const Profile: React.FC = () => {
           </Stack>
           <Stack direction="row" spacing={2} alignItems="center">
             <img src={info_message} alt="Info Message" width={20} />
-            <Typography variant="body2">{user.info_message || 'Default info message'}</Typography>
+            <Typography variant="body2">{user.bio || 'Default info message'}</Typography>
           </Stack>
         </Box>
         <Divider sx={{ borderBottomWidth: 4 }} />
@@ -107,12 +111,10 @@ const Profile: React.FC = () => {
           <Divider sx={{ borderBottomWidth: 2 }} />
           <Stack direction="row" spacing={2} alignItems="center" mb={2} mt={2}>
             <img src={lightning_icon} alt="Member Since" width={10} />
-            <Typography variant="body2">Член од {user.created_at || 'Year'}</Typography>
+            <Typography variant="body2">Член од {formattedYear || 'Year'}</Typography>
           </Stack>
-          <Divider sx={{ borderBottomWidth: 2 }} />
-          <Typography variant="body2" mt={2}>{user.car_brand || 'Car Brand'}</Typography>
-          <Typography variant="body2" mb={3}>{user.car_color || 'Car Color'}</Typography>
-          <Button variant="contained" color="error">Пријави го користникот</Button>
+          <Divider sx={{ borderBottomWidth: 2}} />
+          <Button onClick={() => navigate('/profile-edit')} variant="contained" color="error">Измени го профилот</Button>
         </Box>
       </CardContent>
     </Card>

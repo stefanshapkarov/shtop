@@ -120,3 +120,32 @@ export const getUserReviews = async (userId: number) => {
     console.log(error);
   }
 };
+
+
+// export const updateUser = async (userData: any) => {
+//   try {
+//     const response = await api.put('/api/profile', userData);
+//     console.log(response);
+//     return response.data;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
+export const updateUser = async (userData: FormData) => {
+  try {
+
+    userData.append('_method', 'PUT');
+    const response = await api.post('/api/profile', userData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+            },
+    });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+

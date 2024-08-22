@@ -31,6 +31,7 @@ class ProfileController extends Controller
             }
 
             $updated = $user->update([
+                'name' => $request->input('name'),
                 'profile_picture' => $imagePath,
                 'bio' => $request->input('bio'),
                 'location' => $request->input('location'),
