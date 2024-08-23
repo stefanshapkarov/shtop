@@ -61,6 +61,7 @@ Route::middleware('auth:sanctum')
     });
 
 // RIDE POSTS UNAUTHORIZED ACCESS
+
 Route::get('/ridePost', [RidePostController::class, 'index']);
 Route::get('/ridePost/{ridePost:id}', [RidePostController::class, 'show']);
 
