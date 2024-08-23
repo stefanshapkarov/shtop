@@ -1,12 +1,6 @@
+import {Ride} from "../../../models/ride/Ride";
+
 export interface RouteCardProps {
-    departureTime: string
-    estimatedTimeOfTravel: string
-    estimatedTimeOfArrival: string
-    departureCity: string
-    destinationCity: string
-    price: string
-    totalSeats: number
-    availableSeats: number
-    name: string
-    profilePicture: string | null
+    ride: Ride,
+    moreStyles: boolean
 }

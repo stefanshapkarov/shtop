@@ -1,6 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Grid, Link, Typography, IconButton, Menu, MenuItem, useMediaQuery, Drawer, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
-import { useTranslation } from "react-i18next";
+import React, {useEffect, useState} from 'react';
+import {
+    Drawer,
+    Grid,
+    IconButton,
+    Link,
+    List,
+    ListItem,
+    ListItemText,
+    Menu,
+    MenuItem,
+    Typography,
+    useMediaQuery
+} from '@mui/material';
+import {useTranslation} from "react-i18next";
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LanguageSwitcher from "../language-switcher/LanguageSwitcher";
@@ -9,10 +21,8 @@ import AI_Icon from '../../shared/styles/icons/ai_icon.png';
 import Car_Icon from '../../shared/styles/icons/car_icon.png';
 import Share_Icon from '../../shared/styles/icons/share_transport_icon.png';
 import './header.scss';
-import { HeaderElementType } from "./types/HeaderElementType";
-import { logout } from "../../services/api";
-import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import {HeaderElementType} from "./types/HeaderElementType";
+import {logout} from "../../services/api";
 
 export const Header = () => {
     const { t } = useTranslation();
@@ -20,17 +30,15 @@ export const Header = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:1200px)');
     const [isAuth, setIsAuth] = useState(false);
-    const { user } = useAuth() as { user: any };
-    const navigate = useNavigate();
 
     useEffect(() => {
-        if (user) {
-            setIsAuth(true);
-        }
-        else {
-            setIsAuth(false);
-        }
-    }, [user]);
+        const checkLoggedIn = () => {
+            const isAuthenticated = localStorage.getItem('accessToken') !== null;
+            setIsAuth(isAuthenticated);
+            isAuthenticated ? console.log('logged in') : console.log('logged out');
+        };
+        checkLoggedIn();
+    }, []);
 
     const handleLogout = async () => {
         try {
