@@ -2,6 +2,9 @@ import {Grid, Link, Typography} from "@mui/material";
 import './footer.scss'
 import {useTranslation} from "react-i18next";
 import Logo from '../../shared/styles/images/logo.png'
+import {getInitialLanguage} from "../../i18";
+import {cities_en} from "../../models/cities/cities_en";
+import {cities_mk} from "../../models/cities/cities_mk";
 
 export const Footer = () => {
 
@@ -21,17 +24,21 @@ export const Footer = () => {
         {text: `${t('HELP_CENTER')}`, path: 'help-center'}
     ]
 
+    const getCity = (city: string) => {
+        return getInitialLanguage() === 'mk' ? cities_en[cities_mk.indexOf(city)] : city
+    }
+
     return <Grid container xs={12} id='footer-container'>
         <Grid item xs={12} lg={4} className='footer-element-container logos'>
             <Link href={'/'}>
-                <img src={Logo} className='logo'/>
+                <img src={Logo} alt='logo' className='logo'/>
             </Link>
         </Grid>
         <Grid item xs={12} lg={4} className='footer-element-container links'>
             <Typography className='footer-element-title' variant='h4'>{t('MOST_POPULAR_ROUTES')}</Typography>
             {popularRoutes.map((route, index) => {
                 return <Link key={index} className='footer-element-text' variant='h5'
-                             href={`search-route?from=${route.from}&to=${route.to}`}>
+                             href={`search-route?from=${getCity(route.from)}&to=${getCity(route.to)}`}>
                     {route.text}
                 </Link>
             })}

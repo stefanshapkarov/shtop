@@ -3,12 +3,12 @@ import {UserType} from "../user-type/UserType";
 export interface Ride {
     id: number
     driver: UserType
-    departureTime: Date
-    estimatedTimeOfArrival: Date
-    totalSeats: number
-    availableSeats: number
-    pricePerSeat: number
-    departureCity: string
-    destinationCity: string
-    createdAt: Date
+    departure_time: Date
+    total_seats: number
+    available_seats: number
+    price_per_seat: number
+    departure_city: string
+    destination_city: string
+    created_at: Date
+    canRequest: boolean
 }

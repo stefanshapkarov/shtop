@@ -48,7 +48,7 @@ class RidePostController extends Controller
         }
 
         if (!empty($request->departure_date)) {
-            $filters->whereDate('departure_date', $request->departure_date);
+            $filters->whereDate('departure_time', $request->departure_date);
         }
 
         return RidePostResource::collection($filters->simplePaginate(15));

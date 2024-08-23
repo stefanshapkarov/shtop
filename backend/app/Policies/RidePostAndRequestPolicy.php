@@ -12,7 +12,7 @@ class RidePostAndRequestPolicy
     /**
      * Determine whether the user can view any Ride Posts.
      */
-    public function viewAny(): bool
+    public function viewAny(?User $user): bool
     {
         return true;
     }
@@ -20,7 +20,7 @@ class RidePostAndRequestPolicy
     /**
      * Determine whether the user can view a Ride Post.
      */
-    public function view(): bool
+    public function view(?User $user): bool
     {
         return true;
     }

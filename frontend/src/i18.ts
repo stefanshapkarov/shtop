@@ -12,7 +12,7 @@ i18n
     .use(initReactI18next) // passes i18n down to react-i18next
     .init({
         backend: {
-            loadPath: '/locales/{{lng}}/{{lng}}.json', // path to translation files
+            loadPath: 'locales/{{lng}}/{{lng}}.json', // path to translation files
         },
         lng: getInitialLanguage(), // default language
         fallbackLng: 'mk', // fallback language if translation not found

@@ -3,8 +3,6 @@
 
 #route-card-container{
   width: 40rem;
-  cursor: pointer;
-  margin-top: 2rem;
 
   .route-card-wrapper:first-of-type:hover {
     background-color: $third-background-color;
@@ -15,6 +13,11 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     padding: 1.5rem;
     border-radius: 1.5rem;
+    cursor: pointer;
+  }
+
+  .route-card-wrapper-vanilla {
+    padding: 1.5rem;
   }
 
   .route-card-content {
@@ -27,6 +30,13 @@
     display: flex;
     flex-direction: row;
     gap: 1rem;
+  }
+
+  .price-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: -0.75rem 0;
   }
 
   .text {
@@ -43,6 +53,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    align-items: start;
   }
 
   .second {

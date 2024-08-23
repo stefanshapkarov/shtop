@@ -49,8 +49,6 @@ Route::middleware('auth:sanctum')
         // RIDE POSTS
         Route::post('/ridePost', [RidePostController::class, 'store']);
         Route::patch('/ridePost/{ridePost:id}', [RidePostController::class, 'update']);
-        Route::get('/ridePost', [RidePostController::class, 'index']);
-        Route::get('/ridePost/{ridePost:id}', [RidePostController::class, 'show']);
         Route::delete('/ridePost/{ridePost:id}', [RidePostController::class, 'destroy']);
         Route::get('/ridePost/{ridePost:id}/complete', [RidePostController::class, 'complete']);
 
@@ -61,3 +59,9 @@ Route::middleware('auth:sanctum')
         Route::get('/ridePost/requests/{rideRequest:id}/reject', [RideRequestController::class, 'rejectRequest']);
         Route::get('/ridePost/requests/{rideRequest:id}/cancel', [RideRequestController::class, 'destroy']);
     });
+
+// RIDE POSTS UNAUTHORIZED ACCESS
+
+Route::get('/ridePost', [RidePostController::class, 'index']);
+Route::get('/ridePost/{ridePost:id}', [RidePostController::class, 'show']);
+
