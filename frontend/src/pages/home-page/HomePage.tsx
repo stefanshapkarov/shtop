@@ -21,6 +21,7 @@ import {InfoCard} from "./components/info-card/InfoCard";
 
 import { logout } from "../../services/api";
 import {format} from "date-fns";
+import { useAuth } from '../../context/AuthContext';
 
 export const HomePage = () => {
 
@@ -31,18 +32,13 @@ export const HomePage = () => {
     const [numPassangers, setNumPassangers] = useState<number | null>(null);
     const navigate = useNavigate();
     const [isAuth, setIsAuth] = useState<boolean>(false);
+    const { user } = useAuth() as { user: any };
 
     useEffect(() => {
-        const query = new URLSearchParams(window.location.search);
-        const token = query.get('token');
-        if(token) {
-            localStorage.setItem('accessToken', token);
+        if (user) {
             setIsAuth(true);
-            window.location.href = '/';
         }
-        else
-            checkLoggedIn();
-    }, []);
+      }, [user, navigate]);   
 
     const checkLoggedIn = async () => {
         const accessToken = localStorage.getItem("accessToken")
@@ -95,7 +91,7 @@ export const HomePage = () => {
             <>
 
                 {isAuth ? (
-                    <button onClick={handleLogout}>{t("LOGOUT")}</button>
+                    <p>{t("LOGGED_IN")}</p>
                 ) : (
                     <p>{t("NOT_LOGGED_IN")}</p>
                 )}

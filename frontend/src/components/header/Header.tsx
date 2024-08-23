@@ -22,7 +22,9 @@ import Car_Icon from '../../shared/styles/icons/car_icon.png';
 import Share_Icon from '../../shared/styles/icons/share_transport_icon.png';
 import './header.scss';
 import {HeaderElementType} from "./types/HeaderElementType";
-import {logout} from "../../services/api";
+import { logout } from "../../services/api";
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export const Header = () => {
     const { t } = useTranslation();
@@ -30,15 +32,17 @@ export const Header = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:1200px)');
     const [isAuth, setIsAuth] = useState(false);
+    const { user } = useAuth() as { user: any };;
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const checkLoggedIn = () => {
-            const isAuthenticated = localStorage.getItem('accessToken') !== null;
-            setIsAuth(isAuthenticated);
-            isAuthenticated ? console.log('logged in') : console.log('logged out');
-        };
-        checkLoggedIn();
-    }, []);
+        if (user) {
+            setIsAuth(true);
+        }
+        else {
+            setIsAuth(false);
+        }
+    }, [user]);
 
     const handleLogout = async () => {
         try {

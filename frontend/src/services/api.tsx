@@ -3,24 +3,8 @@ import axios from 'axios';
 import {Ride} from "../models/ride/Ride";
 import {RideRequest} from "../models/ride-request/RideRequest";
 
-
-
-// function getCookie() {
-//   const cookie = document.cookie
-//       .split("; ")
-//       .find((item) => item.startsWith("XSRF-TOKEN="));
-//
-//   if (!cookie) {
-//     return null;
-//   }
-//
-//   return decodeURIComponent(cookie.split("=")[1]);
-// }
-
-
-
 const api = axios.create({
-  baseURL: 'http://localhost:8000/',
+  baseURL: 'http://localhost:8000',
   withCredentials: true,
   withXSRFToken: true,
   xsrfHeaderName: "X-XSRF-TOKEN",
@@ -42,23 +26,11 @@ export const logout = async () => {
 export const loginUser = async (email: string, password: string, remember: boolean) => {
   try {
     await getCsrfToken();
-
-    // const xsrfToken = getCookie();
-    //
-    // console.log(xsrfToken);
-
-
     const response = await api.post('/api/login', {
       email,
       password,
       remember
     });
-    // , {
-    //   headers: {
-    //     'X-XSRF-TOKEN': xsrfToken,
-    //   },
-    //   withCredentials: true,
-    // });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -143,6 +115,7 @@ export const getCurrentUser = async () => {
     const response = await api.get('/api/user',{
       withCredentials:true,
     });
+    console.log(response);
     return response.data;
   } catch (error) {
     console.log(error);
