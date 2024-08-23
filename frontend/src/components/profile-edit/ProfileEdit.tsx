@@ -16,7 +16,7 @@ const ProfileEdit: React.FC = () => {
   const [profileData, setProfileData] = useState({
     name: user.name || '',
     email: user.email || '',
-    phone: user.phone || '',
+    phone_number: user.phone_number || '',
     birth_date: user.birth_date || '',
     bio: user.bio || '',
     location: user.location || '',
@@ -46,16 +46,6 @@ const ProfileEdit: React.FC = () => {
       console.log('Selected image:', file);
     }
   };
-
-  // const handleSave = async () => {
-  //   try {
-  //     const updatedProfile = await updateUser(profileData); // Use the updateUser function from api.tsx
-  //     console.log('Updated profile data:', updatedProfile); // Optionally log the updated profile
-  //   } catch (error: any) {
-  //     setError(error.message);
-  //     console.error('Failed to update profile:', error); // Log the error for debugging
-  //   }
-  // };
 
   const handleSave = async () => {
     try {
@@ -164,8 +154,8 @@ const ProfileEdit: React.FC = () => {
             <TextField
               variant="outlined"
               label="телефонски број"
-              name="phone"
-              value={profileData.phone}
+              name="phone_number"
+              value={profileData.phone_number}
               onChange={handleInputChange}
               className="input-field"
             />

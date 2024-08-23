@@ -30,9 +30,6 @@ const App: React.FC = () => {
                             <Route path="/profile" element={<ProfilePage />}> </Route>
                             <Route path="/profile-edit" element={<ProfileEditPage />}> </Route>
 
-
-
-
                         </Route>
                         
                 </Routes>

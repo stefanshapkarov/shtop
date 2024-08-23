@@ -1,22 +1,4 @@
 import axios from 'axios';
-// import Cookies from 'js-cookie';
-
-
-
-
-// function getCookie() {
-//   const cookie = document.cookie
-//       .split("; ")
-//       .find((item) => item.startsWith("XSRF-TOKEN="));
-
-//   if (!cookie) {
-//     return null;
-//   }
-
-//   return decodeURIComponent(cookie.split("=")[1]);
-// }
-
-
 
 const api = axios.create({
   baseURL: 'http://localhost:8000',
@@ -89,15 +71,6 @@ export const registerUser = async (name: string, email: string, password: string
   }
 };
 
-// export const updateProfile = async (profileData) => {
-//   const response = await axios.put('/profile', profileData, {
-//     headers: {
-//       'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-//     }
-//   });
-//   return response.data;
-// };
-
 export const getCurrentUser = async () => {
   try {
     const response = await api.get('/api/user',{
@@ -122,15 +95,6 @@ export const getUserReviews = async (userId: number) => {
 };
 
 
-// export const updateUser = async (userData: any) => {
-//   try {
-//     const response = await api.put('/api/profile', userData);
-//     console.log(response);
-//     return response.data;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
 
 export const updateUser = async (userData: FormData) => {
   try {
