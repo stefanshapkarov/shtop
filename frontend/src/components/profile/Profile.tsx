@@ -25,7 +25,7 @@ const Profile: React.FC = () => {
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const { login, user, logout, loading } = useAuth() as { login: Function, user: any, logout: Function, loading: boolean };
   const [UserRating, setUserRating] = useState<number>(0);
-  const formattedYear = user.created_at ? new Date(user.created_at).getFullYear() : 'Year';
+ 
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,11 +33,13 @@ const Profile: React.FC = () => {
   // calculateAverageRating(user.reviews_received);
 
   useEffect(() => {
-    if (!loading && user) {
-        
-    }else{
-        navigate('/login');
-    }
+    if (!loading) {
+      if (!user) {
+          // navigate('/login');
+      } else {
+          setIsAuth(true); // Set authentication state to true if user exists
+      }
+  }
   }, [user, loading, navigate]);
 
   useEffect(() => {
@@ -92,7 +94,7 @@ const Profile: React.FC = () => {
   };
   const age = calculateAge(user.birth_date);  
 
-
+  const formattedYear = user.created_at ? new Date(user.created_at).getFullYear() : 'Year';
 
 
   return (
