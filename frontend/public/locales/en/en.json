@@ -91,5 +91,6 @@
   "PASSENGER": "passenger",
   "REQUEST_A_RIDE": "Request ride",
   "CANCEL_REQUEST": "Cancel request",
-  "REQUEST_SENT": "Request sent!"
+  "REQUEST_SENT": "Request sent!",
+  "REQUEST_HAS_ALREADY_BEEN_SENT": "A request has already been sent for this ride."
 }

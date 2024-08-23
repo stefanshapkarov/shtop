@@ -7,7 +7,7 @@ import Anon_Photo from '../../shared/styles/images/anon_profile.jpg'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {format} from "date-fns";
 import StarIcon from '@mui/icons-material/Star';
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import Chat_Icon from '../../shared/styles/icons/chat_icon.png'
 import {
     acceptRideRequest,
@@ -25,6 +25,7 @@ import {UserType} from "../../models/user-type/UserType";
 import {SelectedPassengerOption} from "../../models/selected-passenger/SelectedPassengerOption";
 import {Hourglass} from "react-loader-spinner";
 import CheckIcon from '@mui/icons-material/Check';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 export const RoutePage = () => {
 
@@ -41,8 +42,7 @@ export const RoutePage = () => {
     const [loggedUser, setLoggedUser] = useState<UserType | undefined>(undefined);
     const navigate = useNavigate();
     const [isWaiting, setIsWaiting] = useState<boolean>(false);
-    const [alert, setAlert] = useState<boolean>(false);
-
+    const alertRef = useRef<any>(null);
 
     useEffect(() => {
         getCurrentUser().then((response) => {
@@ -144,32 +144,46 @@ export const RoutePage = () => {
     const handleRequestClick = () => {
         if (!loggedUser)
             navigate('/login')
-        else if (ride) {
+        else if (ride && ride.canRequest) {
             setIsWaiting(true)
             makeRideRequest(ride.id).then(() => {
                 fireAlert();
-                setIsWaiting(false);
+                setTimeout(() => {
+                    setRide(prevState => (prevState && {
+                        ...prevState,
+                        canRequest: false
+                    }));
+                    setIsWaiting(false);
+                }, 2300);
             })
-        }
+        } else
+            fireAlert();
     }
 
     const fireAlert = () => {
-        document.getElementsByClassName('alert')[0].classList.add('alert-visible');
+        alertRef.current.classList.add('alert-visible');
         setTimeout(() => {
-            document.getElementsByClassName('alert')[0].classList.remove('alert-visible');
-        }, 2500);
+            alertRef.current.classList.remove('alert-visible');
+        }, 2000);
     }
 
 
     return <Box id='route-page-wrapper'>
-        <Alert icon={<CheckIcon className='check-icon'/>} className='alert'
-               onBlur={() => fireAlert()}>{t('REQUEST_SENT')}</Alert>
         {isDriver &&
             <ConfirmDialog isOpen={isDialogOpen} title={getTitleText()} text={getDialogText()}
                            onClose={() => handleDialogClose()}
                            onConfirm={() => handleDialogConfirm()}/>}
         {ride && !isLoading
             ? <Box className='route-info-wrapper'>
+                <Alert
+                    icon={!ride.canRequest ? <WarningAmberIcon className='check-icon'/> :
+                        <CheckIcon className='check-icon'/>}
+                    className={!ride.canRequest ? 'alert orange' : 'alert green'}
+                    ref={alertRef}
+                >
+                    {ride?.canRequest ? t('REQUEST_SENT') : t('REQUEST_HAS_ALREADY_BEEN_SENT')}
+                </Alert>
+
                 <Box className='route-info-container'>
                     <Typography variant='h3'
                                 className='date'>{getDateText(dayjs(ride.departure_time, 'YYYY-MM-DD HH:mm:ss'))}</Typography>
@@ -281,7 +295,7 @@ export const RoutePage = () => {
                     <Button className='book-now-button' variant='contained' onClick={() => handleRequestClick()}
                             disabled={isWaiting}>
                         {!isWaiting
-                            ? t('REQUEST_A_RIDE')
+                            ? (ride.canRequest ? t('REQUEST_A_RIDE') : t('REQUEST_A_RIDE'))
                             : <Hourglass colors={['#ffffff', '#ffffff']} height='32'/>
                         }
                     </Button>

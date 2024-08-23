@@ -15,12 +15,18 @@
     top: 0;
     right: -15.5rem;
     opacity: 0;
-    background-color: $primary;
     color: white;
     font-size: 1.25rem;
     transition: 200ms ease-in;
   }
 
+  .green {
+    background-color: $primary;
+  }
+
+  .orange {
+    background-color: #ffa000;
+  }
 
   .alert-visible {
     opacity: 1;

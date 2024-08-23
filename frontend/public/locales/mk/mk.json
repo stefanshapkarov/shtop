@@ -92,5 +92,6 @@
   "PASSENGER": "патник",
   "REQUEST_A_RIDE": "Побарај превоз",
   "CANCEL_REQUEST": "Откажи барање",
-  "REQUEST_SENT": "Барањето е испратено!"
+  "REQUEST_SENT": "Барањето е испратено!",
+  "REQUEST_HAS_ALREADY_BEEN_SENT": "Веќе е пратено барање за овој превоз."
 }
