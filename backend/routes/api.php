@@ -46,6 +46,12 @@ Route::middleware('auth:sanctum')
         Route::get('users/{userId}/reviews', [ReviewController::class, 'getUserReviews'])->name('users.reviews');
         Route::get('my-reviews', [ReviewController::class, 'getMyReviews'])->name('my.reviews');
 
+        // RIDE POSTS
+        Route::post('/ridePost', [RidePostController::class, 'store']);
+        Route::patch('/ridePost/{ridePost:id}', [RidePostController::class, 'update']);
+        Route::delete('/ridePost/{ridePost:id}', [RidePostController::class, 'destroy']);
+        Route::get('/ridePost/{ridePost:id}/complete', [RidePostController::class, 'complete']);
+
         // RIDE REQUESTS
         Route::get('/ridePost/{ridePost:id}/requests', [RideRequestController::class, 'getRequestsForPost']);
         Route::get('/ridePost/{ridePost:id}/requests/new', [RideRequestController::class, 'createRequestForPost']);
@@ -54,10 +60,7 @@ Route::middleware('auth:sanctum')
         Route::get('/ridePost/requests/{rideRequest:id}/cancel', [RideRequestController::class, 'destroy']);
     });
 
-// RIDE POSTS
-Route::post('/ridePost', [RidePostController::class, 'store']);
-Route::patch('/ridePost/{ridePost:id}', [RidePostController::class, 'update']);
+// RIDE POSTS UNAUTHORIZED ACCESS
 Route::get('/ridePost', [RidePostController::class, 'index']);
 Route::get('/ridePost/{ridePost:id}', [RidePostController::class, 'show']);
-Route::delete('/ridePost/{ridePost:id}', [RidePostController::class, 'destroy']);
-Route::get('/ridePost/{ridePost:id}/complete', [RidePostController::class, 'complete']);
+
