@@ -96,7 +96,7 @@ export const Header = () => {
                         <List onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)} style={{ width: 250 }}>
                             {headerElements.map((headerElement, index) => (
                                 <ListItem button key={index} style={{ padding: '8px 16px' }}>
-                                    <Link href={headerElement.href} className='header-element' style={{ display: 'flex', alignItems: 'center' }}>
+                                    <Link href={headerElement.href} className='header-element' style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
                                         <img alt={headerElement.text} src={headerElement.imageSrc} className='icon' style={{ width: '20px', height: '20px', marginRight: '8px' }} />
                                         <ListItemText primary={headerElement.text} primaryTypographyProps={{ style: { fontSize: '0.875rem' } }} />
                                     </Link>
@@ -151,15 +151,27 @@ export const Header = () => {
                         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
                             {isAuth ? (
                                 <>
-                                    <MenuItem onClick={handleMenuClose}><Link href="/your-rides">Your Rides</Link></MenuItem>
-                                    <MenuItem onClick={handleMenuClose}><Link href="/inbox">Inbox</Link></MenuItem>
-                                    <MenuItem onClick={handleMenuClose}><Link href="/profile">Profile</Link></MenuItem>
-                                    <MenuItem onClick={() => { handleMenuClose(); handleLogout(); }}>Logout</MenuItem>
+                                    <MenuItem onClick={handleMenuClose}>
+                                        <Link href="/your-rides" style={{ textDecoration: 'none', color: 'inherit' }}>Your Rides</Link>
+                                    </MenuItem>
+                                    <MenuItem onClick={handleMenuClose}>
+                                        <Link href="/inbox" style={{ textDecoration: 'none', color: 'inherit' }}>Inbox</Link>
+                                    </MenuItem>
+                                    <MenuItem onClick={handleMenuClose}>
+                                        <Link href="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>Profile</Link>
+                                    </MenuItem>
+                                    <MenuItem onClick={() => { handleMenuClose(); handleLogout(); }}>
+                                        Logout
+                                    </MenuItem>
                                 </>
                             ) : (
                                 <>
-                                    <MenuItem onClick={handleMenuClose}><Link href="/login">Login</Link></MenuItem>
-                                    <MenuItem onClick={handleMenuClose}><Link href="/register">Register</Link></MenuItem>
+                                    <MenuItem onClick={handleMenuClose}>
+                                        <Link href="/login" style={{ textDecoration: 'none', color: 'inherit' }}>Login</Link>
+                                    </MenuItem>
+                                    <MenuItem onClick={handleMenuClose}>
+                                        <Link href="/register" style={{ textDecoration: 'none', color: 'inherit' }}>Register</Link>
+                                    </MenuItem>
                                 </>
                             )}
                         </Menu>

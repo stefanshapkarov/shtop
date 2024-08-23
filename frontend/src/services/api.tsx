@@ -31,6 +31,18 @@ export const loginUser = async (email: string, password: string, remember: boole
       password,
       remember
     });
+
+      localStorage.setItem('accessToken', response.data.token);
+      console.log('Stored token:', localStorage.getItem('accessToken'));
+
+    return response.data;
+    // , {
+    //   headers: {
+    //     'X-XSRF-TOKEN': xsrfToken,
+    //   },
+    //   withCredentials: true,
+    // });
+    console.log(response);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -41,6 +53,7 @@ export const loginUser = async (email: string, password: string, remember: boole
     }
   }
 };
+
 
 export const registerUser = async (name: string, email: string, password: string, password_confirmation: string) => {
   try {
@@ -114,6 +127,35 @@ export const getCurrentUser = async () => {
   try {
     const response = await api.get('/api/user',{
       withCredentials:true,
+    });
+    console.log(response);
+    return response.data.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+export const getUserReviews = async (userId: number) => {
+  try {
+    const response = await api.get(`/api/users/${userId}/reviews`);
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+
+export const updateUser = async (userData: FormData) => {
+  try {
+
+    userData.append('_method', 'PUT');
+    const response = await api.post('/api/profile', userData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+            },
     });
     console.log(response);
     return response.data;

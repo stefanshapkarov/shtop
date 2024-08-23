@@ -7,6 +7,8 @@ import RegisterPage from "./pages/RegisterPage";
 import {I18nextProvider} from "react-i18next";
 import i18 from "./i18";
 import {SearchRoute} from "./pages/search-route-page/SearchRoute";
+import ProfilePage from './pages/ProfilePage';
+import ProfileEditPage from './pages/ProfileEditPage';
 import {RoutePage} from "./pages/route-page/RoutePage";
 import TransportCard from "./pages/transport-card-page/TransportCard";
 
@@ -28,6 +30,9 @@ const App: React.FC = () => {
                             */}
                             <Route path="/login" element={<LoginPage />}> </Route>
                             <Route path="/register" element={<RegisterPage />}> </Route>
+                            <Route path="/profile" element={<ProfilePage />}> </Route>
+                            <Route path="/profile-edit" element={<ProfileEditPage />}> </Route>
+
                         </Route>
                         
                 </Routes>
