@@ -17,7 +17,7 @@ const ProfileEdit: React.FC = () => {
     name: user.name || '',
     email: user.email || '',
     phone: user.phone || '',
-    birthdate: user.birthdate || '',
+    birth_date: user.birth_date || '',
     bio: user.bio || '',
     location: user.location || '',
     is_verified: user.is_verified || false,
@@ -174,8 +174,8 @@ const ProfileEdit: React.FC = () => {
             <TextField
               variant="outlined"
               label="дата на раѓање"
-              name="birthdate"
-              value={profileData.birthdate}
+              name="birth_date"
+              value={profileData.birth_date}
               onChange={handleInputChange}
 
               className="input-field"
