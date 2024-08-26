@@ -33,9 +33,28 @@ const LocationMarker: React.FC<LocationMarkerProps> = ({ position, setPosition, 
 
             geocoder.reverse({ lat, lon: lng })
                 .then((response: any) => {
-                    const address = response.display_name;
-                    setCity(address);
-                })
+                        const addressParts: string[] = response.display_name.split(',').map((part: string) => part.trim());
+                        const cityKeywords: string[] = ["Municipality", "Region", "City", "Town", "Village"];
+                        let city = '';
+                        for (let part of addressParts) {
+                            if (part.includes("Municipality of")) {
+                                city = part.replace("Municipality of", "").trim();
+                                break;
+                            }
+                        }
+                        
+                        if (!city) {
+                            for (const part of addressParts) {
+                                if (!cityKeywords.some(keyword => part.includes(keyword))) {
+                                    city = part;
+                                    break;
+                                }
+                            }
+                        }
+        
+                        console.log(city);
+                        setCity(city);
+                    })
                 .catch((error: any) => {
                     console.error('Geocoding error:', error);
                 });

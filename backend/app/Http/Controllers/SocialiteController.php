@@ -26,11 +26,30 @@ class SocialiteController extends Controller
     public function handleProviderCallback(Request $request, $provider)
     {
         try {
-            $socialUser = Socialite::driver($provider)->user();
-            $user = User::firstOrCreate(
-                ['email' => $socialUser->getEmail()],
-                ['name' => $socialUser->getName(), 'password' => Hash::make(uniqid())]
-            );
+            $socialUser = Socialite::driver($provider)->stateless()->user();
+
+            // Log::info('Social User Email: ' . $socialUser->getEmail());
+            // Log::info('Social User Name: ' . $socialUser->getName());
+
+            $email = $socialUser->getEmail();
+            $name = $socialUser->getName() ?? substr($email, 0, strpos($email, '@'));
+            $avatar = $socialUser->getAvatar();
+
+            $user = User::where('email', $email)->first();
+
+            if (!$user) {
+                $user = User::create([
+                    'name' => $name,
+                    'email' => $email,
+                    'password' => Hash::make(uniqid()),
+                    'profile_picture' => $avatar, 
+                ]);
+            }
+            else{
+                $user->update([
+                    'profile_picture' => $avatar,
+                ]);
+            }
 
             Auth::login($user);
             $request->session()->regenerate();

@@ -22,7 +22,9 @@ import Car_Icon from '../../shared/styles/icons/car_icon.png';
 import Share_Icon from '../../shared/styles/icons/share_transport_icon.png';
 import './header.scss';
 import {HeaderElementType} from "./types/HeaderElementType";
-import {logout} from "../../services/api";
+import { logout } from "../../services/api";
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export const Header = () => {
     const { t } = useTranslation();
@@ -30,15 +32,17 @@ export const Header = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:1200px)');
     const [isAuth, setIsAuth] = useState(false);
+    const { user } = useAuth() as { user: any };;
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const checkLoggedIn = () => {
-            const isAuthenticated = localStorage.getItem('accessToken') !== null;
-            setIsAuth(isAuthenticated);
-            isAuthenticated ? console.log('logged in') : console.log('logged out');
-        };
-        checkLoggedIn();
-    }, []);
+        if (user) {
+            setIsAuth(true);
+        }
+        else {
+            setIsAuth(false);
+        }
+    }, [user]);
 
     const handleLogout = async () => {
         try {
@@ -92,7 +96,7 @@ export const Header = () => {
                         <List onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)} style={{ width: 250 }}>
                             {headerElements.map((headerElement, index) => (
                                 <ListItem button key={index} style={{ padding: '8px 16px' }}>
-                                    <Link href={headerElement.href} className='header-element' style={{ display: 'flex', alignItems: 'center' }}>
+                                    <Link href={headerElement.href} className='header-element' style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
                                         <img alt={headerElement.text} src={headerElement.imageSrc} className='icon' style={{ width: '20px', height: '20px', marginRight: '8px' }} />
                                         <ListItemText primary={headerElement.text} primaryTypographyProps={{ style: { fontSize: '0.875rem' } }} />
                                     </Link>
@@ -147,15 +151,27 @@ export const Header = () => {
                         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
                             {isAuth ? (
                                 <>
-                                    <MenuItem onClick={handleMenuClose}><Link href="/your-rides">Your Rides</Link></MenuItem>
-                                    <MenuItem onClick={handleMenuClose}><Link href="/inbox">Inbox</Link></MenuItem>
-                                    <MenuItem onClick={handleMenuClose}><Link href="/profile">Profile</Link></MenuItem>
-                                    <MenuItem onClick={() => { handleMenuClose(); handleLogout(); }}>Logout</MenuItem>
+                                    <MenuItem onClick={handleMenuClose}>
+                                        <Link href="/your-rides" style={{ textDecoration: 'none', color: 'inherit' }}>Your Rides</Link>
+                                    </MenuItem>
+                                    <MenuItem onClick={handleMenuClose}>
+                                        <Link href="/inbox" style={{ textDecoration: 'none', color: 'inherit' }}>Inbox</Link>
+                                    </MenuItem>
+                                    <MenuItem onClick={handleMenuClose}>
+                                        <Link href="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>Profile</Link>
+                                    </MenuItem>
+                                    <MenuItem onClick={() => { handleMenuClose(); handleLogout(); }}>
+                                        Logout
+                                    </MenuItem>
                                 </>
                             ) : (
                                 <>
-                                    <MenuItem onClick={handleMenuClose}><Link href="/login">Login</Link></MenuItem>
-                                    <MenuItem onClick={handleMenuClose}><Link href="/register">Register</Link></MenuItem>
+                                    <MenuItem onClick={handleMenuClose}>
+                                        <Link href="/login" style={{ textDecoration: 'none', color: 'inherit' }}>Login</Link>
+                                    </MenuItem>
+                                    <MenuItem onClick={handleMenuClose}>
+                                        <Link href="/register" style={{ textDecoration: 'none', color: 'inherit' }}>Register</Link>
+                                    </MenuItem>
                                 </>
                             )}
                         </Menu>

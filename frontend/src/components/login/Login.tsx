@@ -6,6 +6,8 @@ import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import axios from "axios";
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import './login.scss';
 
 
 const Login: React.FC = () => {
@@ -14,44 +16,40 @@ const Login: React.FC = () => {
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [isAuth, setIsAuth] = useState<boolean>(false);
+    const [rememberMe, setRememberMe] = useState<boolean>(false);
+    const { login, user, logout, loading } = useAuth() as { login: Function, user: any, logout: Function, loading: boolean };
 
     const navigate = useNavigate();
     const location = useLocation();
 
     useEffect(() => {
-        const searchParams = new URLSearchParams(location.search);
-        const code = searchParams.get('code');
-
-        if (code) {
-            axios.post(`/api/auth/google/callback`, { code })
-                .then(response => {
-                    const { token } = response.data;
-                    localStorage.setItem('auth_token', token);
-                    navigate('/');
-                })
-                .catch(error => {
-                    console.error('Error during authentication:', error);
-                    setError('Authentication failed');
-                });
+        if (user) {
+            setIsAuth(true);
         }
-    }, ['google', location.search, navigate]);
+        else {
+            setIsAuth(false);
+        }
+    }, [user]);
+
 
     const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value);
-    };
+    }
 
     const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
         setPassword(event.target.value);
+    };
+
+    const handleRememberMeChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setRememberMe(event.target.checked);
     };
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
         try {
-            const data = await loginUser(email, password, false);
-            localStorage.setItem('accessToken', data.accessToken);
-            setIsAuth(true);
-            window.location.href = '/';
+            await login(email, password, rememberMe);
+            navigate('/');
         } catch (error: any) {
             console.error('Login error:', error.message);
             setError(error.message);
@@ -59,11 +57,12 @@ const Login: React.FC = () => {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = 'http://127.0.0.1:8000/api/auth/google';
+        window.location.href = 'http://localhost:8000/auth/google';
+
     };
 
     const handleFacebookLogin = () => {
-        window.location.href = 'http://127.0.0.1:8000/api/auth/facebook';
+        window.location.href = 'http://localhost:8000/auth/facebook';
     };
 
     return (
