@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { useState } from 'react';
+
+import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { Stepper, Step, StepLabel, Typography, Box, styled, Divider } from '@mui/material';
 import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector';
 import { StepIconProps } from '@mui/material/StepIcon';
@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import TransportCardStepOne from '../../components/transport-card/step-1';
 import TransportCardStepThree from './step-3';
 import { postRide } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+
 
 interface RideData {
   departure_time: Date;
@@ -74,9 +76,17 @@ function getStepContent(step: number, props: StepProps) {
 }
 
 const TransportCardStepper: React.FC = () => {
+  const { login, user, logout, loading } = useAuth() as { login: Function, user: any, logout: Function, loading: boolean };
   const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState(0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) {
+        navigate('/');
+    }
+  }, [user, loading, navigate]);
+
 
   const [rideData, setRideData] = useState<RideData>({
     departure_time: new Date(),

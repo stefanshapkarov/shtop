@@ -98,7 +98,7 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({ rideData, u
 
     const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newDate = event.target.value;
-        updateRideData({ departure_time: new Date(newDate) });
+        updateRideData({...rideData, departure_time: new Date(newDate) });
     };
     return (
         <Box display="flex" flexDirection="column" alignItems="center" className="transport-card-step-one">
