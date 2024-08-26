@@ -1,10 +1,8 @@
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
-import { loginUser } from '../../services/api';
 import './login.scss';
 import { useTranslation } from 'react-i18next';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import axios from "axios";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './login.scss';
@@ -25,6 +23,7 @@ const Login: React.FC = () => {
     useEffect(() => {
         if (user) {
             setIsAuth(true);
+            navigate('/');
         }
         else {
             setIsAuth(false);

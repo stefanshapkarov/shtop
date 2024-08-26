@@ -1,11 +1,13 @@
-// src/components/Register.tsx
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import './register.scss';
 import { registerUser } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 
 const Register: React.FC = () => {
+  const { t } = useTranslation();
   const [name, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -74,13 +76,13 @@ const Register: React.FC = () => {
 
   return (
     <div className="register-container">
-      <h2>Create your account</h2>
-      <p>Unlock all Features!</p>
+      <h2>{t("CREATE-ACC-1")}</h2>
+      <p>{t("UNLOCK-FEATURES")}</p>
       <form onSubmit={handleSubmit}>
         <div className="input-group">
           <input
             type="text"
-            placeholder="Username"
+            placeholder={t("USERNAME")}
             value={name}
             onChange={handleUsernameChange}
             required
@@ -89,7 +91,7 @@ const Register: React.FC = () => {
         <div className="input-group">
           <input
             type="email"
-            placeholder="Email"
+            placeholder={t("EMAIL")}
             value={email}
             onChange={handleEmailChange}
             required
@@ -98,7 +100,7 @@ const Register: React.FC = () => {
         <div className="input-group">
           <input
             type="password"
-            placeholder="Password"
+            placeholder={t("PASSWORD")}
             value={password}
             onChange={handlePasswordChange}
             required
@@ -107,7 +109,7 @@ const Register: React.FC = () => {
         <div className="input-group">
           <input
             type="password"
-            placeholder="Confirm Password"
+            placeholder={t("CONFIRM-PASSWORD")}
             value={passwordConfirmation}
             onChange={handleConfirmPasswordChange}
             required
@@ -121,15 +123,15 @@ const Register: React.FC = () => {
               onChange={handleTermsChange}
               required
             />
-            Accept <a href="#">terms and conditions</a>
+            {t("ACCEPT-TERMS")}<a href="#"></a>
           </label>
         </div>
         {error && <p className="error">{error}</p>}
         {success && <p className="success">{success}</p>}
-        <button type="submit" className="register-button">Register</button>
+        <button type="submit" className="register-button">{t("REGISTER")}</button>
       </form>
       <p className="login-account">
-        You have an account? <a href="/login">Login now</a>
+        {t("HAVE-ACC")} <a href="/login">{t("LOGIN-NOW")}</a>
       </p>
     </div>
   );

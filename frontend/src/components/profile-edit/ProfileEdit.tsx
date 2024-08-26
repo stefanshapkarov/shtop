@@ -9,8 +9,10 @@ import { ButtonBase } from '@mui/material';
 import { updateUser } from '../../services/api';
 import SettingsIcon from '@mui/icons-material/Settings'; // Importing the settings icon
 import CustomButton from '../custom-button/CustomButton';
+import { useTranslation } from 'react-i18next';
 
 const ProfileEdit: React.FC = () => {
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const { user, loading } = useAuth() as { user: any, logout: Function, loading: boolean };
   const [profileData, setProfileData] = useState({
@@ -81,8 +83,6 @@ const ProfileEdit: React.FC = () => {
 
   if (error) return <Typography color="error">{error}</Typography>;
 
-  if (!user) return <Typography>Loading...</Typography>;
-
   return (
     <Card sx={{ maxWidth: 700, maxHeight: 700, margin: 'auto', padding: 2, backgroundColor: "#F1F1F1" }}>
       <Stack direction="row" spacing={2} alignItems="center" ml={6}>
@@ -105,7 +105,7 @@ const ProfileEdit: React.FC = () => {
         <Box>
           <TextField
             variant="outlined"
-            label="Име и Презиме"
+            label={t('NAME')}
             name="name"
             value={profileData.name}
             onChange={handleInputChange}
@@ -121,16 +121,15 @@ const ProfileEdit: React.FC = () => {
               justifyContent: 'center',
               width: 100,
               height: 100,
-              borderRadius: '50%', // Makes the button circular
-              backgroundColor: '#F1F1F1', // Background color to match the icon in your image
-              color: '#6D8B8B', // Text and icon color
-              padding: 2,
+              borderRadius: '50%', 
+              backgroundColor: '#F1F1F1',
+              color: '#6D8B8B',
             }}
             onClick={() => navigate('/settings')}
           >
-            <SettingsIcon sx={{ fontSize: 40 }} /> {/* Icon size to match the image */}
-            <Typography variant="caption" sx={{ marginTop: 1 }}> {/* Text below the icon */}
-              Settings
+            <SettingsIcon sx={{ fontSize: 40 }} /> 
+            <Typography variant="caption" sx={{ marginTop: 1 }}>
+              {t('SETTINGS')}
             </Typography>
           </Button>
 
@@ -138,11 +137,11 @@ const ProfileEdit: React.FC = () => {
       </Stack>
       <CardContent>
         <Box mb={2} ml={4} >
-          <Typography variant="h6" mb={3}>Информации:</Typography>
+          <Typography variant="h6" mb={3}>{t("INFO")}</Typography>
           <Stack direction="row" spacing={2} alignItems="center" mb={1}>
             <TextField
               variant="outlined"
-              label="e-адреса"
+              label={t("EMAIL")}
               name="email"
               value={profileData.email}
               onChange={handleInputChange}
@@ -153,7 +152,7 @@ const ProfileEdit: React.FC = () => {
           <Stack direction="row" spacing={2} alignItems="center" mb={1}>
             <TextField
               variant="outlined"
-              label="телефонски број"
+              label={t('PHONE-NUMBER')}
               name="phone_number"
               value={profileData.phone_number}
               onChange={handleInputChange}
@@ -163,7 +162,7 @@ const ProfileEdit: React.FC = () => {
           <Stack direction="row" spacing={2} alignItems="center" mb={1}>
             <TextField
               variant="outlined"
-              label="дата на раѓање"
+              label={t('BIRTH-DATE')}
               name="birth_date"
               value={profileData.birth_date}
               onChange={handleInputChange}
@@ -174,7 +173,7 @@ const ProfileEdit: React.FC = () => {
           <Stack direction="row" spacing={2} alignItems="center" mb={1}>
             <TextField
               variant="outlined"
-              label="Место на живеење"
+              label={t("BIRTH-PLACE")}
               name="location"
               value={profileData.location}
               onChange={handleInputChange}
@@ -185,7 +184,7 @@ const ProfileEdit: React.FC = () => {
           <Stack direction="row" spacing={2} alignItems="center" mb={1}>
             <TextField
               variant="outlined"
-              label="Додај мини био"
+              label={t('BIO')}
               name="bio"
               value={profileData.bio}
               onChange={handleInputChange}
@@ -197,7 +196,7 @@ const ProfileEdit: React.FC = () => {
             <Stack direction="row" spacing={2} alignItems="center" mb={1}>
               <img src={verified_icon} alt="Verified" width={30} />
               <Typography variant="body2">
-                {user.is_verified ? 'Верифициран профил' : 'Верифицирај го профилот'}
+                {user.is_verified ? t("VERIFIED") : t("VERIFY-PROFILE")}
               </Typography>
             </Stack>
           </ButtonBase>
@@ -205,7 +204,7 @@ const ProfileEdit: React.FC = () => {
 
         <Divider sx={{ borderBottomWidth: 4 }} />
         <Box mb={2} mt={5} display="flex" justifyContent="center" alignItems="center">
-          <CustomButton text="Зачувај" onClick={handleSave} />
+          <CustomButton text={t("SAVE")} onClick={handleSave} />
         </Box>
       </CardContent>
     </Card>

@@ -4,6 +4,7 @@ import {Loader} from "../shared/components/loader/Loader";
 import {Box} from "@mui/material";
 import './auth-context.scss'
 import Logo from '../shared/styles/images/home-page-logo.png'
+import e from 'express';
 interface AuthContextType {
     user: any; // Replace `any` with a more specific type if available
     loading: boolean;
@@ -28,7 +29,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     }, []);
 
     const fetchUser = async () => {
-        setLoading(true)
+        setLoading(true);
         try {
             const userData = await getCurrentUser();
             setUser(userData);

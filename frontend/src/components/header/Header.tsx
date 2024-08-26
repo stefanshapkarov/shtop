@@ -32,8 +32,7 @@ export const Header = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const isMobile = useMediaQuery('(max-width:1200px)');
     const [isAuth, setIsAuth] = useState(false);
-    const { user } = useAuth() as { user: any };;
-    const navigate = useNavigate();
+    const { user } = useAuth() as { user: any };
 
     useEffect(() => {
         if (user) {
@@ -47,7 +46,6 @@ export const Header = () => {
     const handleLogout = async () => {
         try {
             await logout();
-            localStorage.removeItem("accessToken");
             setIsAuth(false);
             console.log("logged out");
             window.location.href = "/";
@@ -106,25 +104,25 @@ export const Header = () => {
                             {isAuth ? (
                                 <>
                                     <ListItem button style={{ padding: '8px 16px' }}>
-                                        <Link href="/your-rides" style={{ textDecoration: 'none', color: 'inherit' }}>Your Rides</Link>
+                                        <Link href="/your-rides" style={{ textDecoration: 'none', color: 'inherit' }}>{t("YOUR-RIDES")}</Link>
                                     </ListItem>
                                     <ListItem button style={{ padding: '8px 16px' }}>
-                                        <Link href="/inbox" style={{ textDecoration: 'none', color: 'inherit' }}>Inbox</Link>
+                                        <Link href="/inbox" style={{ textDecoration: 'none', color: 'inherit' }}>{t("INBOX")}</Link>
                                     </ListItem>
                                     <ListItem button style={{ padding: '8px 16px' }}>
-                                        <Link href="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>Profile</Link>
+                                        <Link href="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>{t("PROFILE")}</Link>
                                     </ListItem>
                                     <ListItem button style={{ padding: '8px 16px' }} onClick={handleLogout}>
-                                        <Link href="#" style={{ textDecoration: 'none', color: 'inherit' }}>Logout</Link>
+                                        <Link href="#" style={{ textDecoration: 'none', color: 'inherit' }}>{t("LOGOUT")}</Link>
                                     </ListItem>
                                 </>
                             ) : (
                                 <>
                                     <ListItem button style={{ padding: '8px 16px' }}>
-                                        <Link href="/login" style={{ textDecoration: 'none', color: 'inherit' }}>Login</Link>
+                                        <Link href="/login" style={{ textDecoration: 'none', color: 'inherit' }}>{t("LOGIN-B-1")}</Link>
                                     </ListItem>
                                     <ListItem button style={{ padding: '8px 16px' }}>
-                                        <Link href="/register" style={{ textDecoration: 'none', color: 'inherit' }}>Register</Link>
+                                        <Link href="/register" style={{ textDecoration: 'none', color: 'inherit' }}>{t("REGISTER")}</Link>
                                     </ListItem>
                                 </>
                             )}
@@ -152,25 +150,25 @@ export const Header = () => {
                             {isAuth ? (
                                 <>
                                     <MenuItem onClick={handleMenuClose}>
-                                        <Link href="/your-rides" style={{ textDecoration: 'none', color: 'inherit' }}>Your Rides</Link>
+                                        <Link href="/your-rides" style={{ textDecoration: 'none', color: 'inherit' }}>{t("YOUR-RIDES")}</Link>
                                     </MenuItem>
                                     <MenuItem onClick={handleMenuClose}>
-                                        <Link href="/inbox" style={{ textDecoration: 'none', color: 'inherit' }}>Inbox</Link>
+                                        <Link href="/inbox" style={{ textDecoration: 'none', color: 'inherit' }}>{t("INBOX")}</Link>
                                     </MenuItem>
                                     <MenuItem onClick={handleMenuClose}>
-                                        <Link href="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>Profile</Link>
+                                        <Link href="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>{t("PROFILE")}</Link>
                                     </MenuItem>
                                     <MenuItem onClick={() => { handleMenuClose(); handleLogout(); }}>
-                                        Logout
+                                        {t("LOGOUT")}
                                     </MenuItem>
                                 </>
                             ) : (
                                 <>
                                     <MenuItem onClick={handleMenuClose}>
-                                        <Link href="/login" style={{ textDecoration: 'none', color: 'inherit' }}>Login</Link>
+                                        <Link href="/login" style={{ textDecoration: 'none', color: 'inherit' }}>{t("LOGIN-B-1")}</Link>
                                     </MenuItem>
                                     <MenuItem onClick={handleMenuClose}>
-                                        <Link href="/register" style={{ textDecoration: 'none', color: 'inherit' }}>Register</Link>
+                                        <Link href="/register" style={{ textDecoration: 'none', color: 'inherit' }}>{t("REGISTER")}</Link>
                                     </MenuItem>
                                 </>
                             )}

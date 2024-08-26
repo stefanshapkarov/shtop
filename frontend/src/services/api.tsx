@@ -1,4 +1,3 @@
-// src/services/api.ts
 import axios from 'axios';
 import {Ride} from "../models/ride/Ride";
 import {RideRequest} from "../models/ride-request/RideRequest";
@@ -32,9 +31,6 @@ export const loginUser = async (email: string, password: string, remember: boole
       remember
     });
 
-      localStorage.setItem('accessToken', response.data.token);
-      console.log('Stored token:', localStorage.getItem('accessToken'));
-
     return response.data;
     // , {
     //   headers: {
@@ -46,7 +42,6 @@ export const loginUser = async (email: string, password: string, remember: boole
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      // Handle Axios error
       throw new Error(error.response?.data.message || 'An error occurred');
     } else {
       throw new Error('An unexpected error occurred');
@@ -57,7 +52,7 @@ export const loginUser = async (email: string, password: string, remember: boole
 
 export const registerUser = async (name: string, email: string, password: string, password_confirmation: string) => {
   try {
-    await getCsrfToken(); // Ensure CSRF token is set
+    await getCsrfToken();
     const response = await api.post('/api/register', {
       name,
       email,
@@ -67,7 +62,6 @@ export const registerUser = async (name: string, email: string, password: string
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      // Handle Axios error
       throw new Error(error.response?.data.message || 'An error occurred');
     } else {
       throw new Error('An unexpected error occurred');
@@ -128,7 +122,7 @@ export const getCurrentUser = async () => {
     const response = await api.get('/api/user',{
       withCredentials:true,
     });
-    console.log(response);
+    console.log(response); 
     return response.data.data;
   } catch (error) {
     console.log(error);
