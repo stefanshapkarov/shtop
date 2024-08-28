@@ -1,4 +1,4 @@
-import {Autocomplete, Box, Button, Checkbox, Divider, Radio, TextField, Typography} from "@mui/material";
+import {Alert, Autocomplete, Box, Button, Checkbox, Divider, Radio, TextField, Typography} from "@mui/material";
 import {useLocation} from "react-router-dom";
 import React, {useEffect, useRef, useState} from "react";
 import './search-route-page.scss'
@@ -20,6 +20,8 @@ import {Ride} from "../../models/ride/Ride";
 import {fetchAllRides} from "../../services/api";
 import {Loader} from "../../shared/components/loader/Loader";
 import {format} from "date-fns";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import CheckIcon from "@mui/icons-material/Check";
 
 
 export const SearchRoute = () => {
@@ -186,6 +188,23 @@ export const SearchRoute = () => {
         setUpdate(prevState => prevState + 1)
     }
 
+    const updateRouteCanRequest = (rideId: number, canRequest: boolean) => {
+        setRoutes(prevState =>
+            prevState.map(prevRoute =>
+                prevRoute.id === rideId
+                    ? { ...prevRoute, canRequest: canRequest }
+                    : prevRoute
+            ));
+        setFilteredRoutes(prevState =>
+            prevState.map(prevRoute =>
+                prevRoute.id === rideId
+                    ? { ...prevRoute, canRequest: canRequest }
+                    : prevRoute
+            )
+        );
+    };
+
+
     return <>
         <Box id='search-route-page-container'>
             <Typography variant='h2' className='title'>{t('WHERE_TO')}</Typography>
@@ -291,7 +310,7 @@ export const SearchRoute = () => {
                                     <Typography>{filteredRoutes.length} {t('AVAILABLE')}</Typography>
                                     <Box className='routes-list' ref={routesListRef}>
                                         {filteredRoutes.map((route) => (
-                                            <RouteCard ride={route} moreStyles={true} key={route.id}/>
+                                            <RouteCard ride={route} moreStyles={true} key={route.id} updateRides={updateRouteCanRequest}/>
                                         ))}
                                     </Box>
                                 </Box>

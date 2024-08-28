@@ -1,4 +1,4 @@
-import {Box, Typography} from "@mui/material"
+import {Box, Button, Typography} from "@mui/material"
 import {RouteCardProps} from "./RouteCardProps";
 import './route-card.scss'
 import Route_Line from '../../styles/icons/route_line_icon.png'
@@ -7,11 +7,24 @@ import {format} from "date-fns";
 import {useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import StarIcon from "@mui/icons-material/Star";
+import {useEffect, useState} from "react";
+import {UserType} from "../../../models/user-type/UserType";
+import {cancelRideRequest, getCurrentUser, makeRideRequest} from "../../../services/api";
+import {Hourglass} from "react-loader-spinner";
 
 export const RouteCard = (props: RouteCardProps) => {
 
     const navigate = useNavigate();
     const {t} = useTranslation()
+    const [loggedUser, setLoggedUser] = useState<UserType | undefined>(undefined);
+    const [isRequestLoading, setIsRequestLoading] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (props.moreStyles)
+            getCurrentUser().then((response) => {
+                setLoggedUser(response);
+            });
+    }, []);
 
     const getDateText = (date: Date | undefined) => {
         if (!date) return;
@@ -35,17 +48,33 @@ export const RouteCard = (props: RouteCardProps) => {
         return result
     }
 
+    const handleRequestClick = (event: any) => {
+        event.stopPropagation();
+        if (!loggedUser)
+            navigate('/login')
+        else if (props.ride.canRequest) {
+            setIsRequestLoading(true)
+            makeRideRequest(props.ride.id)
+                .then(() => {
+                    props.updateRides?.(props.ride.id, false);
+                    setIsRequestLoading(false);
+                });
+        } else {
+            setIsRequestLoading(true)
+        }
+    }
+
     return <Box id='route-card-container' onClick={() => navigate(`/route/${props.ride.id}`)}>
         <Box className={props.moreStyles ? 'route-card-wrapper' : 'route-card-wrapper-vanilla'}>
             <Box className='route-card-content'>
                 <Box className='time-container'>
                     {props.moreStyles &&
-                    <Box className='date-container'>
-                        <Typography variant='h5'
-                                    className='text time'>{format(props.ride.departure_time, 'HH:mm')}</Typography>
+                        <Box className='date-container'>
+                            <Typography variant='h5'
+                                        className='text time'>{format(props.ride.departure_time, 'HH:mm')}</Typography>
                             <Typography variant='h5'
                                         className='text time'>{getDateText(props.ride.departure_time)}</Typography>
-                    </Box>
+                        </Box>
                     }
                     <img src={Route_Line} alt='line'/>
                     <Box className='info-container'>
@@ -53,13 +82,11 @@ export const RouteCard = (props: RouteCardProps) => {
                         <Typography variant='h5' className='text'>{props.ride.destination_city}</Typography>
                     </Box>
                 </Box>
-                <Box className={!props.moreStyles ? 'price-container' : ''}>
+                <Box className='price-container'>
                     <Typography variant='h4' className='text'>{props.ride.price_per_seat}<span
                         className='currency'>ден</span></Typography>
-                    {!props.moreStyles && (
-                        <Typography
-                            variant='h4'>{props.ride.total_seats - props.ride.available_seats} / {props.ride.total_seats}</Typography>
-                    )}
+                    <Typography
+                        variant='h4'>{props.ride.total_seats - props.ride.available_seats} / {props.ride.total_seats}</Typography>
                 </Box>
             </Box>
             {props.moreStyles && (
@@ -76,8 +103,13 @@ export const RouteCard = (props: RouteCardProps) => {
                             ))}
                         </Box>
                     </Box>
-                    <Typography
-                        variant='h4'>{props.ride.total_seats - props.ride.available_seats} / {props.ride.total_seats}</Typography>
+                    <Button variant='contained' size='large' disabled={isRequestLoading}
+                            className={props.ride.canRequest ? 'request-ride-button green' : 'request-ride-button red'}
+                            onClick={(event) => handleRequestClick(event)}>
+                        {isRequestLoading
+                            ? <Hourglass colors={['#ffffff', '#ffffff']} height='32'/>
+                            : props.ride.canRequest ? t('REQUEST_A_RIDE') : t('CANCEL_REQUEST')}
+                    </Button>
                 </Box>
             )}
         </Box>

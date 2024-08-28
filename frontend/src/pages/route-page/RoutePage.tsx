@@ -183,7 +183,6 @@ export const RoutePage = () => {
                 >
                     {ride?.canRequest ? t('REQUEST_SENT') : t('REQUEST_HAS_ALREADY_BEEN_SENT')}
                 </Alert>
-
                 <Box className='route-info-container'>
                     <Typography variant='h3'
                                 className='date'>{getDateText(dayjs(ride.departure_time, 'YYYY-MM-DD HH:mm:ss'))}</Typography>
@@ -292,10 +291,10 @@ export const RoutePage = () => {
                     }
                 </Box>
                 {!isDriver &&
-                    <Button className='book-now-button' variant='contained' onClick={() => handleRequestClick()}
-                            disabled={isWaiting}>
+                    <Button className={ride.canRequest ? 'book-now-button green' : 'book-now-button red'} variant='contained'
+                            onClick={() => handleRequestClick()} disabled={isWaiting}>
                         {!isWaiting
-                            ? (ride.canRequest ? t('REQUEST_A_RIDE') : t('REQUEST_A_RIDE'))
+                            ? (ride.canRequest ? t('REQUEST_A_RIDE') : t('CANCEL_REQUEST'))
                             : <Hourglass colors={['#ffffff', '#ffffff']} height='32'/>
                         }
                     </Button>

@@ -122,7 +122,6 @@ export const getCurrentUser = async () => {
     const response = await api.get('/api/user',{
       withCredentials:true,
     });
-    console.log(response); 
     return response.data.data;
   } catch (error) {
     console.log(error);
