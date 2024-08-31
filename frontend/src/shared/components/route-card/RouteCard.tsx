@@ -11,19 +11,23 @@ import {useEffect, useState} from "react";
 import {UserType} from "../../../models/user-type/UserType";
 import {cancelRideRequest, getCurrentUser, makeRideRequest} from "../../../services/api";
 import {Hourglass} from "react-loader-spinner";
+import {Loader} from "../loader/Loader";
 
 export const RouteCard = (props: RouteCardProps) => {
 
     const navigate = useNavigate();
     const {t} = useTranslation()
     const [loggedUser, setLoggedUser] = useState<UserType | undefined>(undefined);
-    const [isRequestLoading, setIsRequestLoading] = useState<boolean>(false)
+    const [isRequestLoading, setIsRequestLoading] = useState<boolean>(false);
+    const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
     useEffect(() => {
         if (props.moreStyles)
-            getCurrentUser().then((response) => {
-                setLoggedUser(response);
-            });
+            setIsLoaded(false)
+        getCurrentUser().then((response) => {
+            setLoggedUser(response);
+            setIsLoaded(true)
+        });
     }, []);
 
     const getDateText = (date: Date | undefined) => {
@@ -52,66 +56,85 @@ export const RouteCard = (props: RouteCardProps) => {
         event.stopPropagation();
         if (!loggedUser)
             navigate('/login')
-        else if (props.ride.canRequest) {
+        else if (loggedUser.id === props.ride.driver.id) {
+            navigate(`/edit/${props.ride.id}`)
+        } else if (props.ride.existing_request_id === null) {
             setIsRequestLoading(true)
             makeRideRequest(props.ride.id)
-                .then(() => {
-                    props.updateRides?.(props.ride.id, false);
+                .then((response) => {
+                    props.updateRides?.(props.ride.id, response.request_id);
                     setIsRequestLoading(false);
                 });
         } else {
             setIsRequestLoading(true)
+            cancelRideRequest(props.ride.existing_request_id)
+                .then(() => {
+                    props.updateRides?.(props.ride.id, null);
+                    setIsRequestLoading(false);
+                })
         }
     }
 
-    return <Box id='route-card-container' onClick={() => navigate(`/route/${props.ride.id}`)}>
-        <Box className={props.moreStyles ? 'route-card-wrapper' : 'route-card-wrapper-vanilla'}>
-            <Box className='route-card-content'>
-                <Box className='time-container'>
-                    {props.moreStyles &&
-                        <Box className='date-container'>
-                            <Typography variant='h5'
-                                        className='text time'>{format(props.ride.departure_time, 'HH:mm')}</Typography>
-                            <Typography variant='h5'
-                                        className='text time'>{getDateText(props.ride.departure_time)}</Typography>
+    const navigateToRide = () => {
+        if (!isRequestLoading)
+            navigate(`/route/${props.ride.id}`);
+    }
+
+    return isLoaded || !props.moreStyles
+        ? <Box id='route-card-container' onClick={() => navigateToRide()}>
+            <Box
+                className={props.moreStyles ? (!isRequestLoading ? 'route-card-wrapper pointer' : 'route-card-wrapper') : 'route-card-wrapper-vanilla'}>
+                <Box className='route-card-content'>
+                    <Box className='time-container'>
+                        {props.moreStyles &&
+                            <Box className='date-container'>
+                                <Typography variant='h5'
+                                            className='text time'>{format(props.ride.departure_time, 'HH:mm')}</Typography>
+                                <Typography variant='h5'
+                                            className='text time'>{getDateText(props.ride.departure_time)}</Typography>
+                            </Box>
+                        }
+                        <img src={Route_Line} alt='line'/>
+                        <Box className='info-container'>
+                            <Typography variant='h5' className='text'>{props.ride.departure_city}</Typography>
+                            <Typography variant='h5' className='text'>{props.ride.destination_city}</Typography>
                         </Box>
-                    }
-                    <img src={Route_Line} alt='line'/>
-                    <Box className='info-container'>
-                        <Typography variant='h5' className='text'>{props.ride.departure_city}</Typography>
-                        <Typography variant='h5' className='text'>{props.ride.destination_city}</Typography>
+                    </Box>
+                    <Box className='price-container'>
+                        <Typography variant='h4' className='text'>{props.ride.price_per_seat}<span
+                            className='currency'>ден</span></Typography>
+                        <Typography
+                            variant='h4'>{props.ride.total_seats - props.ride.available_seats} / {props.ride.total_seats}</Typography>
                     </Box>
                 </Box>
-                <Box className='price-container'>
-                    <Typography variant='h4' className='text'>{props.ride.price_per_seat}<span
-                        className='currency'>ден</span></Typography>
-                    <Typography
-                        variant='h4'>{props.ride.total_seats - props.ride.available_seats} / {props.ride.total_seats}</Typography>
-                </Box>
+                {props.moreStyles && (
+                    <Box className='route-card-content second'>
+                        <Box className='user-container'>
+                            <img className='profile-picture'
+                                 src={props.ride.driver.profile_picture ? props.ride.driver.profile_picture : Anon_Profile}
+                                 alt='profile-picture'/>
+                            <Box>
+                                <Typography variant='h4'>{props.ride.driver.name}</Typography>
+                                {[...Array(5)].map((_, index) => (
+                                    <StarIcon key={index}
+                                              className={index < Math.round(props.ride.driver.rating) ? 'star' : 'star star-empty'}/>
+                                ))}
+                            </Box>
+                        </Box>
+                        <Button variant='contained' size='large' disabled={isRequestLoading}
+                                className={!props.ride.existing_request_id ? 'request-ride-button green' : 'request-ride-button red'}
+                                onClick={(event) => handleRequestClick(event)}>
+                            {isRequestLoading
+                                ? <Hourglass colors={['#ffffff', '#ffffff']} height='32'/>
+                                : (loggedUser?.id === props.ride.driver.id
+                                    ? t('EDIT_RIDE')
+                                    : !props.ride.existing_request_id ? t('REQUEST_A_RIDE') : t('CANCEL_REQUEST'))}
+                        </Button>
+                    </Box>
+                )}
             </Box>
-            {props.moreStyles && (
-                <Box className='route-card-content second'>
-                    <Box className='user-container'>
-                        <img className='profile-picture'
-                             src={props.ride.driver.profile_picture ? props.ride.driver.profile_picture : Anon_Profile}
-                             alt='profile-picture'/>
-                        <Box>
-                            <Typography variant='h4'>{props.ride.driver.name}</Typography>
-                            {[...Array(5)].map((_, index) => (
-                                <StarIcon key={index}
-                                          className={index < Math.round(props.ride.driver.rating) ? 'star' : 'star star-empty'}/>
-                            ))}
-                        </Box>
-                    </Box>
-                    <Button variant='contained' size='large' disabled={isRequestLoading}
-                            className={props.ride.canRequest ? 'request-ride-button green' : 'request-ride-button red'}
-                            onClick={(event) => handleRequestClick(event)}>
-                        {isRequestLoading
-                            ? <Hourglass colors={['#ffffff', '#ffffff']} height='32'/>
-                            : props.ride.canRequest ? t('REQUEST_A_RIDE') : t('CANCEL_REQUEST')}
-                    </Button>
-                </Box>
-            )}
         </Box>
-    </Box>
+        : <Box id='loader-box'>
+            <Loader/>
+        </Box>
 }

@@ -188,17 +188,17 @@ export const SearchRoute = () => {
         setUpdate(prevState => prevState + 1)
     }
 
-    const updateRouteCanRequest = (rideId: number, canRequest: boolean) => {
+    const updateRouteCanRequest = (rideId: number, existingRequest: number | null) => {
         setRoutes(prevState =>
             prevState.map(prevRoute =>
                 prevRoute.id === rideId
-                    ? { ...prevRoute, canRequest: canRequest }
+                    ? { ...prevRoute, existing_request_id: existingRequest }
                     : prevRoute
             ));
         setFilteredRoutes(prevState =>
             prevState.map(prevRoute =>
                 prevRoute.id === rideId
-                    ? { ...prevRoute, canRequest: canRequest }
+                    ? { ...prevRoute, existing_request_id: existingRequest }
                     : prevRoute
             )
         );
