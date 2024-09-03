@@ -1,0 +1,29 @@
+@import "../../styles/colors/colors.scss";
+#confirm-dialog {
+
+  .title {
+    font-size: 2rem;
+    font-family: serif;
+    color: $primary;
+    font-weight: bold;
+    padding: 1rem 0 1rem 2rem;
+  }
+
+  .text {
+    font-family: serif;
+    font-size: 1.25rem;
+    padding-left: 0.5rem;
+  }
+
+  .dialog-actions {
+    padding: 0.5rem 1.5rem 1rem 0;
+  }
+
+  .button {
+    text-transform: none;
+  }
+
+  .back {
+    background-color: $primary;
+  }
+}
