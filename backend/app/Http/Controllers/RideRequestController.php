@@ -37,21 +37,20 @@ class RideRequestController extends Controller
 
         $userId = auth()->id();
 
-        DB::transaction(function () use ($ridePost, $userId) {
+        $requestId = null;
+
+        DB::transaction(function () use ($ridePost, $userId, &$requestId) {
 
             $available_seats = $ridePost->total_seats - $ridePost->passengers()->count();
 
             if ($available_seats > 0) {
 
-                // Check if user has a request for current ride, or an accepted request for another pending ride
                 $existingRequest =
                     RideRequest::where('passenger_id', $userId)->where('ridepost_id', $ridePost->id)->first();
                 if ($existingRequest != null) {
-
                     throw new GeneralJsonException("You already have a request for this ride post.");
                 }
                 if ($this->isPassengerPartOfAPendingRide($userId)) {
-
                     throw new GeneralJsonException("You are already part of another pending ride post.");
                 }
 
@@ -62,13 +61,16 @@ class RideRequestController extends Controller
 
                 throw_if(!$request, GeneralJsonException::class, "Unable to create request.");
 
+                $requestId = $request->id;
+
             } else {
                 throw new GeneralJsonException("Unable to create request - no seats available.");
             }
         });
 
-        return response()->json(['message' => 'Request created successfully.']);
+        return response()->json(['message' => 'Request created successfully.', 'request_id' => $requestId]);
     }
+
 
     /**
      * @throws AuthorizationException
