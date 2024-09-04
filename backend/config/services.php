@@ -38,7 +38,7 @@ return [
         'scope' => [
             'openid',
             'profile',
-            'email',
+            'email', // Add email scope here
         ],
     ],
 

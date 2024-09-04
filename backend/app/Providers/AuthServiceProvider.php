@@ -3,11 +3,6 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
-use App\Models\Review;
-use App\Models\RidePost;
-use App\Models\RideRequest;
-use App\Policies\ReviewPolicy;
-use App\Policies\RidePostAndRequestPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -18,9 +13,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        Review::class => ReviewPolicy::class,
-        RidePost::class => RidePostAndRequestPolicy::class,
-        RideRequest::class => RidePostAndRequestPolicy::class,
+        //
     ];
 
     /**
@@ -28,6 +21,6 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->registerPolicies();
+        //
     }
 }
