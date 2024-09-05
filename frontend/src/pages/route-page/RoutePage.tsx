@@ -144,7 +144,7 @@ export const RoutePage = () => {
     const handleRequestClick = () => {
         if (!loggedUser)
             navigate('/login')
-        else if (ride && ride.canRequest) {
+        else if (ride && ride.existing_request_id !== null) {
             setIsWaiting(true)
             makeRideRequest(ride.id).then(() => {
                 fireAlert();
@@ -176,14 +176,13 @@ export const RoutePage = () => {
         {ride && !isLoading
             ? <Box className='route-info-wrapper'>
                 <Alert
-                    icon={!ride.canRequest ? <WarningAmberIcon className='check-icon'/> :
+                    icon={ride.existing_request_id ? <WarningAmberIcon className='check-icon'/> :
                         <CheckIcon className='check-icon'/>}
-                    className={!ride.canRequest ? 'alert orange' : 'alert green'}
+                    className={ride.existing_request_id ? 'alert orange' : 'alert green'}
                     ref={alertRef}
                 >
-                    {ride?.canRequest ? t('REQUEST_SENT') : t('REQUEST_HAS_ALREADY_BEEN_SENT')}
+                    {!ride?.existing_request_id ? t('REQUEST_SENT') : t('REQUEST_HAS_ALREADY_BEEN_SENT')}
                 </Alert>
-
                 <Box className='route-info-container'>
                     <Typography variant='h3'
                                 className='date'>{getDateText(dayjs(ride.departure_time, 'YYYY-MM-DD HH:mm:ss'))}</Typography>
@@ -291,13 +290,17 @@ export const RoutePage = () => {
                         </Box>
                     }
                 </Box>
-                {!isDriver &&
-                    <Button className='book-now-button' variant='contained' onClick={() => handleRequestClick()}
-                            disabled={isWaiting}>
+                {!isDriver
+                    ? <Button className={!ride.existing_request_id ? 'book-now-button green' : 'book-now-button red'}
+                              variant='contained'
+                              onClick={() => handleRequestClick()} disabled={isWaiting}>
                         {!isWaiting
-                            ? (ride.canRequest ? t('REQUEST_A_RIDE') : t('REQUEST_A_RIDE'))
+                            ? (!ride.existing_request_id ? t('REQUEST_A_RIDE') : t('CANCEL_REQUEST'))
                             : <Hourglass colors={['#ffffff', '#ffffff']} height='32'/>
                         }
+                    </Button>
+                    : <Button className='book-now-button green' variant='contained' onClick={() => navigate(`/edit/${ride.id}`)}>
+                        {t('EDIT_RIDE')}
                     </Button>
                 }
             </Box>

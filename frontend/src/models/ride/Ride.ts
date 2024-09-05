@@ -10,5 +10,5 @@ export interface Ride {
     departure_city: string
     destination_city: string
     created_at: Date
-    canRequest: boolean
+    existing_request_id: number | null
 }
