@@ -27,25 +27,8 @@
     margin-bottom: -7rem;
   }
 
-  .search-route-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
+  .routes-search-bar-wrapper {
     margin-top: 3rem;
-  }
-
-  .search-field {
-    background-color: $third-background-color;
-    width: 14rem;
-    margin-right: 1rem;
-  }
-
-  .search-button {
-    background-color: $primary !important;
-    width: 14rem;
-    height: 3.5rem;
-    font-size: 1rem;
   }
 
   .infocards-container {

@@ -1,16 +1,8 @@
-import {Alert, Autocomplete, Box, Button, Checkbox, Divider, Radio, TextField, Typography} from "@mui/material";
-import {useLocation} from "react-router-dom";
+import {Box, Checkbox, Divider, Radio, Typography} from "@mui/material";
 import React, {useEffect, useRef, useState} from "react";
 import './search-route-page.scss'
 import {useTranslation} from "react-i18next";
-import {getInitialLanguage} from "../../i18";
-import {cities_mk} from "../../models/cities/cities_mk";
-import {cities_en} from "../../models/cities/cities_en";
-import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
-import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
-import {DemoContainer} from "@mui/x-date-pickers/internals/demo";
-import {DatePicker} from "@mui/x-date-pickers/DatePicker";
-import dayjs, {Dayjs} from "dayjs";
+import dayjs from "dayjs";
 import ClockIcon from '../../shared/styles/icons/clock_icon.png'
 import CoinsIcon from '../../shared/styles/icons/coins_icon_alt.png'
 import StarIcon from '../../shared/styles/icons/star.png'
@@ -20,19 +12,11 @@ import {Ride} from "../../models/ride/Ride";
 import {fetchAllRides} from "../../services/api";
 import {Loader} from "../../shared/components/loader/Loader";
 import {format} from "date-fns";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import CheckIcon from "@mui/icons-material/Check";
+import {RoutesSearchBar} from "../../shared/components/routes-search-bar/RoutesSearchBar";
 
 
 export const SearchRoute = () => {
     const {t} = useTranslation();
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const [locationFrom, setLocationFrom] = useState<string | null>(queryParams.get('from'));
-    const [locationTo, setLocationTo] = useState<string | null>(queryParams.get('to'));
-    const initialDate = queryParams.get('date');
-    const [date, setDate] = useState<Dayjs | null>(initialDate ? dayjs(initialDate, 'DD-MM-YYYY') : dayjs(new Date(Date.now())));
-    const [numPassangers, setNumPassangers] = useState<string | null>(queryParams.get('numPassangers'));
     const [routes, setRoutes] = useState<Ride[]>([]);
     const [filteredRoutes, setFilteredRoutes] = useState<Ride[]>([]);
     const [sortingOptions, setSortingOptions] = useState([
@@ -50,11 +34,24 @@ export const SearchRoute = () => {
     const [update, setUpdate] = useState<number>(0)
     const routesListRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const queryParams = new URLSearchParams(window.location.search);
+    const initialLocationFrom: string | null = queryParams.get('from');
+    const initialLocationTo: string | null = queryParams.get('to');
+    const initialDate: string | null = queryParams.get('date');
+
+    const getInitialNumPassengers = () => {
+        const numPassangers: string | null = queryParams.get('numPassangers');
+        return  numPassangers ? parseInt(numPassangers) : null
+    }
+
+    const initialNumPassangers: number | null = getInitialNumPassengers();
+
 
     useEffect(() => {
-        window.scrollTo(0, 0)
-        fetchRides();
-    }, [])
+        window.scrollTo(0, 0);
+        fetchRides(initialLocationFrom, initialLocationTo, initialDate, initialNumPassangers);
+    }, [initialLocationFrom, initialLocationTo, initialDate, initialNumPassangers]);
+
 
     useEffect(() => {
         if (update !== 0) {
@@ -101,34 +98,18 @@ export const SearchRoute = () => {
         }
     }, [update])
 
-    const fetchRides = async () => {
+    const fetchRides = async (locationFrom: string | null, locationTo: string | null, date: string | null, numPassengers: number | null) => {
         setIsLoading(true)
-        const rides = await fetchAllRides(getLocationFrom(), getLocationTo(), getNumPassangers(), getDate());
+        const rides = await fetchAllRides(locationFrom, locationTo, numPassengers, getDate(date));
         setRoutes(rides)
         setFilteredRoutes(rides)
-        setWhereToText(getWhereToText())
         setIsLoading(false);
     }
 
-    const getLocationFrom = () => {
-        return getInitialLanguage() === 'mk' && locationFrom ? cities_en[cities_mk.indexOf(locationFrom)] : locationFrom
+    const getDate = (date: string | null) => {
+        return date ? format(dayjs(date, 'DD-MM-YYYY').toDate(), "yyyy-MM-dd") : null
     }
 
-    const getLocationTo = () => {
-        return getInitialLanguage() === 'mk' && locationTo ? cities_en[cities_mk.indexOf(locationTo)] : locationTo
-    }
-
-    const getDate = () => {
-        if (date)
-            return format(date.toDate(), "yyyy-MM-dd")
-        return null
-    }
-
-    const getNumPassangers = () => {
-        if (numPassangers)
-            return parseInt(numPassangers)
-        return null
-    }
 
     const handleSortChange = (selectedIndex: number) => {
         setSortingOptions(prevState =>
@@ -139,26 +120,6 @@ export const SearchRoute = () => {
         );
         setUpdate(prevState => prevState + 1);
     };
-
-    const getWhereToText = () => {
-        let from = locationFrom;
-        let to = locationTo;
-        if (getInitialLanguage() === 'mk') {
-            if (locationFrom)
-                from = cities_mk[cities_en.indexOf(locationFrom)];
-            if (locationTo)
-                to = cities_mk[cities_en.indexOf(locationTo)]
-        }
-        if (from && to) {
-            return `${from} → ${to}`
-        }
-        else if (from)
-            return `${from} → ${t('ANYWHERE')}`
-        else if (to)
-            return `${t('ANYWHERE')} → ${to}`
-        else
-            return ''
-    }
 
     const handleFilterChange = async (selectedIndex: number) => {
         setDepartures(prevState =>
@@ -192,13 +153,13 @@ export const SearchRoute = () => {
         setRoutes(prevState =>
             prevState.map(prevRoute =>
                 prevRoute.id === rideId
-                    ? { ...prevRoute, existing_request_id: existingRequest }
+                    ? {...prevRoute, existing_request_id: existingRequest}
                     : prevRoute
             ));
         setFilteredRoutes(prevState =>
             prevState.map(prevRoute =>
                 prevRoute.id === rideId
-                    ? { ...prevRoute, existing_request_id: existingRequest }
+                    ? {...prevRoute, existing_request_id: existingRequest}
                     : prevRoute
             )
         );
@@ -208,38 +169,12 @@ export const SearchRoute = () => {
     return <>
         <Box id='search-route-page-container'>
             <Typography variant='h2' className='title'>{t('WHERE_TO')}</Typography>
-            <Box className='search-route-container'>
-                <Autocomplete
-                    value={locationFrom}
-                    onChange={(event, value) => setLocationFrom(value)}
-                    renderInput={(params) => <TextField {...params} label={t('DEPARTURE_FROM')}/>}
-                    options={getInitialLanguage() === 'mk' ? cities_mk : cities_en}
-                    className='search-field'
-                />
-                <Autocomplete
-                    value={locationTo}
-                    onChange={(event, value) => setLocationTo(value)}
-                    renderInput={(params) => <TextField {...params} label={t('ARRIVAL_TO')}/>}
-                    options={getInitialLanguage() === 'mk' ? cities_mk : cities_en}
-                    className='search-field'
-                />
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DatePicker']}
-                                   sx={{marginTop: '-0.5rem'}}>
-                        <DatePicker disablePast={true} format='DD/MM/YYYY' label={t('DATE')} value={dayjs(date)}
-                                    onChange={value => {
-                                        if (value)
-                                            setDate(value)
-                                        else
-                                            setDate(null)
-                                    }}
-                                    className='search-field'/>
-                    </DemoContainer>
-                </LocalizationProvider>
-                <TextField label={t('NUM_PEOPLE')} className='search-field' value={numPassangers} type='number'
-                           onChange={(event) => setNumPassangers(event.target.value)}/>
-                <Button variant='contained' className='search-button'
-                        onClick={() => fetchRides()}>{t('SEARCH')}</Button>
+            <Box className='search-routes-bar-wrapper'>
+                <RoutesSearchBar locationFrom={initialLocationFrom}
+                                 locationTo={initialLocationTo}
+                                 numPassengers={initialNumPassangers}
+                                 date={initialDate}
+                                 handleSearch={fetchRides}/>
             </Box>
             <Box className='search-route-page-content'>
                 <Box className='filters-container'>
@@ -306,11 +241,11 @@ export const SearchRoute = () => {
                                 ? <Typography variant='h4'
                                               className='no-rides-text'>{t('NO_RIDES_AVAILABLE_AT_THE_MOMENT')}</Typography>
                                 : <Box>
-                                    <Typography>{whereToText}</Typography>
                                     <Typography>{filteredRoutes.length} {t('AVAILABLE')}</Typography>
                                     <Box className='routes-list' ref={routesListRef}>
                                         {filteredRoutes.map((route) => (
-                                            <RouteCard ride={route} moreStyles={true} key={route.id} updateRides={updateRouteCanRequest}/>
+                                            <RouteCard ride={route} moreStyles={true} key={route.id}
+                                                       updateRides={updateRouteCanRequest}/>
                                         ))}
                                     </Box>
                                 </Box>

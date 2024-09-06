@@ -11,6 +11,7 @@ import ProfilePage from './pages/ProfilePage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import {RoutePage} from "./pages/route-page/RoutePage";
 import TransportCard from "./pages/transport-card-page/TransportCard";
+import {RoutesSearchBar} from "./shared/components/routes-search-bar/RoutesSearchBar";
 
 const App: React.FC = () => {
     return (
@@ -18,23 +19,21 @@ const App: React.FC = () => {
             <Router>
                 <Routes>
                     <Route path="/" element={<MainLayout/>}>
-                        <Route index element={<HomePage/>}/>
-                        <Route path="search-route" element={<SearchRoute/>}/>
-                        <Route path="share-transport" element={<TransportCard/>}/>
-                        <Route path="route/:id" element={<RoutePage/>}/>
                         {/*
                             Note: All other routes need to be children of MainLayout route so the header and footer render accordingly
 
                             example:
                             <Route path="list" element={<ListPage />} />
                             */}
-                            <Route path="/login" element={<LoginPage />}> </Route>
-                            <Route path="/register" element={<RegisterPage />}> </Route>
-                            <Route path="/profile" element={<ProfilePage />}> </Route>
-                            <Route path="/profile-edit" element={<ProfileEditPage />}> </Route>
-
-                        </Route>
-                        
+                        <Route index element={<HomePage/>}/>
+                        <Route path="search-route" element={<SearchRoute/>}/>
+                        <Route path="share-transport" element={<TransportCard/>}/>
+                        <Route path="route/:id" element={<RoutePage/>}/>
+                        <Route path="/login" element={<LoginPage/>}> </Route>
+                        <Route path="/register" element={<RegisterPage/>}> </Route>
+                        <Route path="/profile" element={<ProfilePage/>}> </Route>
+                        <Route path="/profile-edit" element={<ProfileEditPage/>}> </Route>
+                    </Route>
                 </Routes>
             </Router>
         </I18nextProvider>
