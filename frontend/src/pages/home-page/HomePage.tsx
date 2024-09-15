@@ -14,6 +14,7 @@ import {InfoCard} from "./components/info-card/InfoCard";
 import {logout} from "../../services/api";
 import {useAuth} from '../../context/AuthContext';
 import {RoutesSearchBar} from "../../shared/components/routes-search-bar/RoutesSearchBar";
+import {Dayjs} from "dayjs";
 
 export const HomePage = () => {
 
@@ -48,14 +49,14 @@ export const HomePage = () => {
         }
     };
 
-    const handleSearch = (locationFrom: string | null, locationTo: string | null, date: string | null, numPassangers: number | null) => {
+    const handleSearch = (locationFrom: string | null, locationTo: string | null, date: Dayjs | null, numPassangers: number | null) => {
         const queryParams = new URLSearchParams();
         if (locationFrom)
             queryParams.append('from', locationFrom);
         if (locationTo)
             queryParams.append('to', locationTo);
         if (date)
-            queryParams.append('date', date);
+            queryParams.append('date', date.format('DD-MM-YYYY'));
         if (numPassangers && numPassangers >= 1)
             queryParams.append('numPassangers', numPassangers.toString());
 

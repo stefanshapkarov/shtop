@@ -1,10 +1,13 @@
+import {Dayjs} from "dayjs";
+
 export interface RoutesSearchBarProps {
     locationFrom?: string | null,
     locationTo?: string | null,
-    date?: string | null,
+    date?: Dayjs | null,
     numPassengers?: number | null,
     handleSearch: (locationFrom: string | null,
                    locationTo: string | null,
-                   date: string | null,
-                   numPassangers: number | null) => void
+                   date: Dayjs | null,
+                   numPassangers: number | null,
+                   update: boolean) => void
 }

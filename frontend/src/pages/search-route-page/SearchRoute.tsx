@@ -2,7 +2,7 @@ import {Box, Checkbox, Divider, Radio, Typography} from "@mui/material";
 import React, {useEffect, useRef, useState} from "react";
 import './search-route-page.scss'
 import {useTranslation} from "react-i18next";
-import dayjs from "dayjs";
+import dayjs, {Dayjs} from "dayjs";
 import ClockIcon from '../../shared/styles/icons/clock_icon.png'
 import CoinsIcon from '../../shared/styles/icons/coins_icon_alt.png'
 import StarIcon from '../../shared/styles/icons/star.png'
@@ -13,6 +13,7 @@ import {fetchAllRides} from "../../services/api";
 import {Loader} from "../../shared/components/loader/Loader";
 import {format} from "date-fns";
 import {RoutesSearchBar} from "../../shared/components/routes-search-bar/RoutesSearchBar";
+import {Hourglass} from "react-loader-spinner";
 
 
 export const SearchRoute = () => {
@@ -30,86 +31,129 @@ export const SearchRoute = () => {
         {text: '18:01 - 06:00', isChecked: true}
     ]);
     const [isVerifiedCheck, setIsVerifiedCheck] = useState<boolean>(false);
-    const [whereToText, setWhereToText] = useState<string>('');
-    const [update, setUpdate] = useState<number>(0)
     const routesListRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isExpanding, setIsExpanding] = useState<boolean>(false);
     const queryParams = new URLSearchParams(window.location.search);
-    const initialLocationFrom: string | null = queryParams.get('from');
-    const initialLocationTo: string | null = queryParams.get('to');
-    const initialDate: string | null = queryParams.get('date');
-
+    const [initialLocationFrom, setInitialLocationFrom] = useState<string | null>(queryParams.get('from'));
+    const [initialLocationTo, setInitialLocationTo] = useState<string | null>(queryParams.get('to'));
+    const [initialDate, setInitialDate] = useState<Dayjs | null>(queryParams.get('date') ? dayjs(queryParams.get('date'), 'DD-MM-YYYY') : null);
+    const [page, setPage] = useState<number>(0);
     const getInitialNumPassengers = () => {
         const numPassangers: string | null = queryParams.get('numPassangers');
-        return  numPassangers ? parseInt(numPassangers) : null
+        return numPassangers ? parseInt(numPassangers) : null
     }
-
-    const initialNumPassangers: number | null = getInitialNumPassengers();
+    const [initialNumPassangers, setInitialNumPassangers] = useState<number | null>(getInitialNumPassengers());
+    const [finalPage, setFinalPage] = useState<boolean>(false)
 
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        fetchRides(initialLocationFrom, initialLocationTo, initialDate, initialNumPassangers);
-    }, [initialLocationFrom, initialLocationTo, initialDate, initialNumPassangers]);
+        fetchRides(initialLocationFrom, initialLocationTo, initialDate, initialNumPassangers, false);
+    }, []);
 
 
-    useEffect(() => {
-        if (update !== 0) {
-            let routesTemp: Ride[] = [];
-            let allUnchecked = true;
+    const updateRides = (rides?: Ride[]) => {
+        let routesTemp: Ride[] = rides ? rides : [];
+        let allUnchecked = true;
 
-            if (departutes[0].isChecked) {
-                routesTemp = routesTemp.concat(routes.filter(route => {
-                    const departure = dayjs(route.departure_time, 'YYYY-MM-DD HH:mm:ss');
-                    return departure.hour() >= 6 && departure.hour() < 12;
-                }));
-                allUnchecked = false;
-            }
-            if (departutes[1].isChecked) {
-                routesTemp = routesTemp.concat(routes.filter(route => {
-                    const departure = dayjs(route.departure_time, 'YYYY-MM-DD HH:mm:ss');
-                    return departure.hour() >= 12 && departure.hour() < 18;
-                }));
-                allUnchecked = false;
-            }
-            if (departutes[2].isChecked) {
-                routesTemp = routesTemp.concat(routes.filter(route => {
-                    const departure = dayjs(route.departure_time, 'YYYY-MM-DD HH:mm:ss');
-                    return departure.hour() >= 18 || departure.hour() < 6;
-                }));
-                allUnchecked = false;
-            }
-            if (allUnchecked) routesTemp = routes;
-
-            if (isVerifiedCheck) {
-                routesTemp = routesTemp.filter(route => route.driver.is_verified);
-            }
-
-            if (sortingOptions[0].isSelected) {
-                routesTemp = routesTemp.sort((a, b) => dayjs(a.departure_time, 'YYYY-MM-DD HH:mm:ss').unix() - dayjs(b.departure_time, 'YYYY-MM-DD HH:mm:ss').unix());
-            } else if (sortingOptions[1].isSelected) {
-                routesTemp = routesTemp.sort((a, b) => a.price_per_seat - b.price_per_seat);
-            } else if (sortingOptions[2].isSelected) {
-                routesTemp = routesTemp.sort((a, b) => b.driver.rating - a.driver.rating);
-            }
-
-            setFilteredRoutes(routesTemp);
-            if (routesListRef.current) routesListRef.current.scrollTop = 0;
+        if (departutes[0].isChecked) {
+            routesTemp = routesTemp.concat(routes.filter(route => {
+                const departure = dayjs(route.departure_time, 'YYYY-MM-DD HH:mm:ss');
+                return departure.hour() >= 6 && departure.hour() < 12;
+            }));
+            allUnchecked = false;
         }
-    }, [update])
+        if (departutes[1].isChecked) {
+            routesTemp = routesTemp.concat(routes.filter(route => {
+                const departure = dayjs(route.departure_time, 'YYYY-MM-DD HH:mm:ss');
+                return departure.hour() >= 12 && departure.hour() < 18;
+            }));
+            allUnchecked = false;
+        }
+        if (departutes[2].isChecked) {
+            routesTemp = routesTemp.concat(routes.filter(route => {
+                const departure = dayjs(route.departure_time, 'YYYY-MM-DD HH:mm:ss');
+                return departure.hour() >= 18 || departure.hour() < 6;
+            }));
+            allUnchecked = false;
+        }
+        if (allUnchecked) routesTemp = routes;
 
-    const fetchRides = async (locationFrom: string | null, locationTo: string | null, date: string | null, numPassengers: number | null) => {
-        setIsLoading(true)
-        const rides = await fetchAllRides(locationFrom, locationTo, numPassengers, getDate(date));
-        setRoutes(rides)
-        setFilteredRoutes(rides)
-        setIsLoading(false);
+        if (isVerifiedCheck) {
+            routesTemp = routesTemp.filter(route => route.driver.is_verified);
+        }
+
+        if (sortingOptions[0].isSelected) {
+            routesTemp = routesTemp.sort((a, b) => dayjs(a.departure_time, 'YYYY-MM-DD HH:mm:ss').unix() - dayjs(b.departure_time, 'YYYY-MM-DD HH:mm:ss').unix());
+        } else if (sortingOptions[1].isSelected) {
+            routesTemp = routesTemp.sort((a, b) => a.price_per_seat - b.price_per_seat);
+        } else if (sortingOptions[2].isSelected) {
+            routesTemp = routesTemp.sort((a, b) => b.driver.rating - a.driver.rating);
+        }
+        setFilteredRoutes(routesTemp);
     }
 
-    const getDate = (date: string | null) => {
-        return date ? format(dayjs(date, 'DD-MM-YYYY').toDate(), "yyyy-MM-dd") : null
+    const handleScroll = () => {
+        if (routesListRef.current) {
+            const box = routesListRef.current;
+            const scrollTop = box.scrollTop;
+            const boxHeight = box.clientHeight;
+            const scrollHeight = box.scrollHeight;
+
+            if (scrollTop + boxHeight >= scrollHeight - 10) {
+                fetchRides(initialLocationFrom, initialLocationTo, initialDate, initialNumPassangers, null)
+            }
+        }
     }
 
+    const fetchRides = async (locationFrom: string | null, locationTo: string | null, date: Dayjs | null, numPassengers: number | null, update: boolean | null) => {
+        let pageTmp = page;
+
+        if (update !== null) {
+            setIsLoading(true);
+            if (routesListRef.current)
+                routesListRef.current.scrollTop = 0;
+            setFinalPage(false);
+        } else if (update === null && !finalPage)
+            setIsExpanding(true);
+
+        if (update === true)
+            pageTmp = 0;
+
+        if (!finalPage || update !== null)
+            fetchAllRides(locationFrom, locationTo, numPassengers, getDate(date), pageTmp + 1)
+                .then(rides => {
+                    if (rides.length === 0 && update === null) {
+                        setFinalPage(true);
+                        setIsExpanding(false);
+                        setIsLoading(false);
+                    } else {
+                        if (pageTmp > 0) {
+                            setRoutes(prevState => [...prevState, ...rides]);
+                        } else if (pageTmp === 0) {
+                            setRoutes(rides);
+                        }
+                        updateRides(rides);
+                        setPage(pageTmp + 1);
+                        if (update) {
+                            setInitialLocationFrom(locationFrom);
+                            setInitialLocationTo(locationTo);
+                            setInitialDate(date);
+                            setInitialNumPassangers(numPassengers);
+                        }
+                    }
+                })
+                // TODO: ADD CATCH THING TO HANDLE IF NO RIDES ARE RETURNED TO RESENT THE ROUTES TO []
+                .finally(() => {
+                    setIsLoading(false);
+                    setIsExpanding(false);
+                });
+    };
+
+    const getDate = (date: Dayjs | null) => {
+        return date ? format(date.toDate(), "yyyy-MM-dd") : format(new Date(Date.now()), "yyyy-MM-dd")
+    }
 
     const handleSortChange = (selectedIndex: number) => {
         setSortingOptions(prevState =>
@@ -118,7 +162,7 @@ export const SearchRoute = () => {
                 isSelected: index === selectedIndex
             }))
         );
-        setUpdate(prevState => prevState + 1);
+        updateRides();
     };
 
     const handleFilterChange = async (selectedIndex: number) => {
@@ -128,7 +172,7 @@ export const SearchRoute = () => {
                 isChecked: index === selectedIndex ? !departure.isChecked : departure.isChecked
             }))
         );
-        setUpdate(prevState => prevState + 1);
+        updateRides();
     };
 
     const handleClearAllFilters = () => {
@@ -146,7 +190,7 @@ export const SearchRoute = () => {
 
     const handleIsAuthorisedClick = () => {
         setIsVerifiedCheck(prevState => !prevState)
-        setUpdate(prevState => prevState + 1)
+        updateRides();
     }
 
     const updateRouteCanRequest = (rideId: number, existingRequest: number | null) => {
@@ -242,7 +286,7 @@ export const SearchRoute = () => {
                                               className='no-rides-text'>{t('NO_RIDES_AVAILABLE_AT_THE_MOMENT')}</Typography>
                                 : <Box>
                                     <Typography>{filteredRoutes.length} {t('AVAILABLE')}</Typography>
-                                    <Box className='routes-list' ref={routesListRef}>
+                                    <Box className='routes-list' ref={routesListRef} onScroll={() => handleScroll()}>
                                         {filteredRoutes.map((route) => (
                                             <RouteCard ride={route} moreStyles={true} key={route.id}
                                                        updateRides={updateRouteCanRequest}/>
@@ -251,6 +295,8 @@ export const SearchRoute = () => {
                                 </Box>
                         )
                     }
+                    {isExpanding &&
+                        <Box className='hourglass'><Hourglass colors={['#5ea79d', '#5ea79d']} height={32}/></Box>}
                 </Box>
             </Box>
         </Box>

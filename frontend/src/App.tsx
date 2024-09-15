@@ -11,7 +11,7 @@ import ProfilePage from './pages/ProfilePage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import {RoutePage} from "./pages/route-page/RoutePage";
 import TransportCard from "./pages/transport-card-page/TransportCard";
-import {RoutesSearchBar} from "./shared/components/routes-search-bar/RoutesSearchBar";
+import {YourRides} from "./pages/your-rides-page/YourRides";
 
 const App: React.FC = () => {
     return (
@@ -29,10 +29,11 @@ const App: React.FC = () => {
                         <Route path="search-route" element={<SearchRoute/>}/>
                         <Route path="share-transport" element={<TransportCard/>}/>
                         <Route path="route/:id" element={<RoutePage/>}/>
-                        <Route path="/login" element={<LoginPage/>}> </Route>
-                        <Route path="/register" element={<RegisterPage/>}> </Route>
-                        <Route path="/profile" element={<ProfilePage/>}> </Route>
-                        <Route path="/profile-edit" element={<ProfileEditPage/>}> </Route>
+                        <Route path="/login" element={<LoginPage/>}/>
+                        <Route path="/register" element={<RegisterPage/>}/>
+                        <Route path="/profile" element={<ProfilePage/>}/>
+                        <Route path="/profile-edit" element={<ProfileEditPage/>}/>
+                        <Route path='/your-rides' element={<YourRides/>}/>
                     </Route>
                 </Routes>
             </Router>

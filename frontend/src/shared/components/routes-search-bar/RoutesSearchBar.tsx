@@ -11,12 +11,10 @@ import React, {useState} from "react";
 import './routes-search-bar.scss';
 import {useTranslation} from "react-i18next";
 import {RoutesSearchBarProps} from "./RoutesSearchBarProps";
-import {format} from "date-fns";
 
 export const RoutesSearchBar = (props: RoutesSearchBarProps) => {
 
     const { t } = useTranslation();
-    const queryParams = new URLSearchParams(window.location.search);
     const [locationFrom, setLocationFrom] = useState<string | undefined | null>(props.locationFrom);
     const [locationTo, setLocationTo] = useState<string | undefined | null>(props.locationTo);
     const [date, setDate] = useState<Dayjs | undefined | null>(props.date ? dayjs(props.date, 'DD-MM-YYYY') : dayjs(new Date(Date.now())));
@@ -31,7 +29,7 @@ export const RoutesSearchBar = (props: RoutesSearchBarProps) => {
     }
 
     const getDate = () => {
-        return date ? format(date.toDate(), "dd-MM-yyyy") : null
+        return date ? date : null;
     }
 
     const getNumPassengers = () => {
@@ -39,7 +37,7 @@ export const RoutesSearchBar = (props: RoutesSearchBarProps) => {
     }
 
     const handleSearch = () => {
-        props.handleSearch(getLocationFrom(), getLocationTo(), getDate(), getNumPassengers())
+        props.handleSearch(getLocationFrom(), getLocationTo(), getDate(), getNumPassengers(), true)
     }
 
   return <Box id='search-route-container'>
