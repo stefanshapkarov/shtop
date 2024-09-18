@@ -52,9 +52,12 @@ export const SearchRoute = () => {
         fetchRides(initialLocationFrom, initialLocationTo, initialDate, initialNumPassangers, false);
     }, []);
 
+    useEffect(() => {
+        updateRides();
+    }, [routes]);
 
-    const updateRides = (rides?: Ride[]) => {
-        let routesTemp: Ride[] = rides ? rides : [];
+    const updateRides = () => {
+        let routesTemp: Ride[] = [];
         let allUnchecked = true;
 
         if (departutes[0].isChecked) {
@@ -123,19 +126,18 @@ export const SearchRoute = () => {
 
         if (!finalPage || update !== null)
             fetchAllRides(locationFrom, locationTo, numPassengers, getDate(date), pageTmp + 1)
-                .then(rides => {
-                    if (rides.length === 0 && update === null) {
+                .then(response => {
+                    if (response.data.length === 0 && update === null) {
                         setFinalPage(true);
                         setIsExpanding(false);
                         setIsLoading(false);
                     } else {
                         if (pageTmp > 0) {
-                            setRoutes(prevState => [...prevState, ...rides]);
+                            setRoutes(prevState => [...prevState, ...response.data]);
                         } else if (pageTmp === 0) {
-                            setRoutes(rides);
+                            setRoutes(response.data);
                         }
-                        updateRides(rides);
-                        setPage(pageTmp + 1);
+                        setPage(response.meta.current_page);
                         if (update) {
                             setInitialLocationFrom(locationFrom);
                             setInitialLocationTo(locationTo);

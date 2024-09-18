@@ -86,7 +86,7 @@ export const fetchAllRides = async (
 
   const response = await api.get('/api/ridePost', { params });
 
-  return response.data.data;
+  return response.data;
 };
 
 export const fetchRideById = async (id: string): Promise<Ride> => {
