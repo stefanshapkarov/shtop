@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')
         Route::patch('/ridePost/{ridePost:id}', [RidePostController::class, 'update']);
         Route::delete('/ridePost/{ridePost:id}', [RidePostController::class, 'destroy']);
         Route::get('/ridePost/{ridePost:id}/complete', [RidePostController::class, 'complete']);
+        Route::get('/ridePost/myRides', [RidePostController::class, 'getLoggedInUserRides']);
 
         // RIDE REQUESTS
         Route::get('/ridePost/{ridePost:id}/requests', [RideRequestController::class, 'getRequestsForPost']);

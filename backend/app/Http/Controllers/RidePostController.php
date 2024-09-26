@@ -23,6 +23,34 @@ class RidePostController extends Controller
         $this->authorizeResource(RidePost::class, 'ridePost');
     }
 
+    public function getLoggedInUserRides(Request $request)
+    {
+        $user = auth()->user();
+
+        $ridePosts = RidePost::query()->with(['driver', 'passengers', 'reviews']);
+
+        if (!empty($request->as_driver)) {
+            if ($request->as_driver) {
+                $ridePosts->where('driver_id', $user->id);
+            } else {
+                $ridePosts->whereHas('passengers', function ($query) use ($user) {
+                    $query->where('passenger_id', $user->id);
+                });
+            }
+        } else {
+            $ridePosts->where('driver_id', $user->id)
+                ->orWhereHas('passengers', function ($query) use ($user) {
+                    $query->where('passenger_id', $user->id);
+                });
+        }
+
+        if (!empty($request->status)) {
+            $ridePosts->where('status', $request->status);
+        }
+
+        return RidePostResource::collection($ridePosts->orderBy('departure_time')->simplePaginate(15));
+    }
+
     public function index(Request $request)
     {
         $filters = RidePost::query();
