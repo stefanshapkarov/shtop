@@ -79,6 +79,16 @@ class RidePostController extends Controller
             $filters->whereDate('departure_time', $request->departure_date);
         }
 
+        if (!empty($request->sort_by)) {
+            $sortBy = $request->sort_by;
+
+            if ($sortBy === 'price') {
+                $filters->orderBy('price_per_seat');
+            } else if ($sortBy === 'departure_time') {
+                $filters->orderBy('departure_time');
+            }
+        }
+
         return RidePostResource::collection($filters->simplePaginate(15));
     }
 
