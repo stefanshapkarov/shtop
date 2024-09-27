@@ -69,4 +69,23 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class, 'reviewee_id');
     }
+
+    public function getRatingAsDriver()
+    {
+        return $this->reviewsReceived()->whereHas('ride', function ($query) {
+            $query->where('driver_id', $this->id);
+        })
+            ->avg('rating');
+    }
+
+    public function getRatingAsPassenger()
+    {
+        return $this->reviewsReceived()
+            ->whereHas('ride', function ($query) {
+                $query->whereHas('passengers', function ($query) {
+                    $query->where('passenger_id', $this->id);
+                });
+            })
+            ->avg('rating');
+    }
 }
