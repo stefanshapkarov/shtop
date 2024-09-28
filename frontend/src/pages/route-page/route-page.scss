@@ -28,6 +28,10 @@
     background-color: #ffa000;
   }
 
+  .red {
+    background-color: red;
+  }
+
   .alert-visible {
     opacity: 1;
     right: 0;
@@ -58,7 +62,6 @@
   }
 
   .book-now-button {
-    background-color: $primary;
     text-transform: none;
     width: 12rem;
     height: 3rem;

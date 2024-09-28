@@ -24,6 +24,8 @@ class UserResource extends JsonResource
             'birth_date' => $this->birth_date,
             'bio' => $this->bio,
             'location' => $this->location,
+            'rating_as_passenger' => $this->getRatingAsPassenger() ?? 'N\A',
+            'rating_as_driver' => $this->getRatingAsDriver() ?? 'N\A',
             'completed_rides' => $this->drivenRidePosts()->count(),
             'rides_as_driver' => $this->drivenRidePosts,
             'rides_as_passenger' => $this->passengerRidePosts,

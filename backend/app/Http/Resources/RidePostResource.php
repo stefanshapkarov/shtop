@@ -25,7 +25,7 @@ class RidePostResource extends JsonResource
             'departure_city' => $this->departure_city,
             'destination_city' => $this->destination_city,
             'vehicle' => $this->vehicle,
-            'canRequest' => $this->hasRequestForRide(),
+            'existing_request_id' => $this->hasRequestForRide(),
             'reviews' => ReviewResource::collection($this->reviews),
             'created_at' => $this->created_at->toDateTimeString()
         ];
@@ -37,20 +37,16 @@ class RidePostResource extends JsonResource
 
         if ($this->driver->id === $userId) {
 
-            return false;
+            return null;
         }
 
         $tmp = RideRequest::with(['passenger', 'ridePost'])
             ->where('ridepost_id', $this->id)
             ->where('passenger_id', $userId)
             ->whereIn('status', ['pending', 'accepted'])
-            ->get();
+            ->first();
 
-        if ($tmp->isEmpty()) {
+        return $tmp?->id;
 
-            return true;
-        }
-
-        return false;
     }
 }
