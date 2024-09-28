@@ -30,15 +30,6 @@ export const loginUser = async (email: string, password: string, remember: boole
       password,
       remember
     });
-
-    return response.data;
-    // , {
-    //   headers: {
-    //     'X-XSRF-TOKEN': xsrfToken,
-    //   },
-    //   withCredentials: true,
-    // });
-    console.log(response);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
