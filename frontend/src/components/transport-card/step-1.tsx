@@ -22,39 +22,39 @@ const geocoder = new Geocoder();
 interface LocationMarkerProps {
     position: LatLng | null;
     setPosition: (position: LatLng) => void;
-    setCity: (city: string) => void;
+    setCityAndCoordinates: (city: string, coordinates: string) => void;
 }
 
-const LocationMarker: React.FC<LocationMarkerProps> = ({ position, setPosition, setCity }) => {
+const LocationMarker: React.FC<LocationMarkerProps> = ({ position, setPosition, setCityAndCoordinates }) => {
     useMapEvents({
         click(e: L.LeafletMouseEvent) {
             const { lat, lng } = e.latlng;
             setPosition(e.latlng);
+            const coordinates = `${lat},${lng}`;
 
             geocoder.reverse({ lat, lon: lng })
                 .then((response: any) => {
-                        const addressParts: string[] = response.display_name.split(',').map((part: string) => part.trim());
-                        const cityKeywords: string[] = ["Municipality", "Region", "City", "Town", "Village"];
-                        let city = '';
-                        for (let part of addressParts) {
-                            if (part.includes("Municipality of")) {
-                                city = part.replace("Municipality of", "").trim();
+                    const addressParts: string[] = response.display_name.split(',').map((part: string) => part.trim());
+                    const cityKeywords: string[] = ["Municipality", "Region", "City", "Town", "Village"];
+                    let city = '';
+                    for (let part of addressParts) {
+                        if (part.includes("Municipality of")) {
+                            city = part.replace("Municipality of", "").trim();
+                            break;
+                        }
+                    }
+
+                    if (!city) {
+                        for (const part of addressParts) {
+                            if (!cityKeywords.some(keyword => part.includes(keyword))) {
+                                city = part;
                                 break;
                             }
                         }
-                        
-                        if (!city) {
-                            for (const part of addressParts) {
-                                if (!cityKeywords.some(keyword => part.includes(keyword))) {
-                                    city = part;
-                                    break;
-                                }
-                            }
-                        }
-        
-                        console.log(city);
-                        setCity(city);
-                    })
+                    }
+
+                    setCityAndCoordinates(city, coordinates);
+                })
                 .catch((error: any) => {
                     console.error('Geocoding error:', error);
                 });
@@ -75,31 +75,32 @@ interface TransportCardStepOneProps {
     updateRideData: (newData: Partial<TransportCardStepOneProps['rideData']>) => void;
 }
 
-
-
 const combineDateAndTime = (date: string, time: string): string => {
-    return `${date} ${time}:00`; // Keep seconds as "00" in the backend data
+    return `${date} ${time}:00`; 
 };
 
 const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({ rideData, updateRideData }) => {
     const { t } = useTranslation();
     const [startLocation, setStartLocation] = React.useState<LatLng | null>(null);
     const [endLocation, setEndLocation] = React.useState<LatLng | null>(null);
+    const [departureCityDisplay, setDepartureCityDisplay] = React.useState<string>(''); 
+    const [destinationCityDisplay, setDestinationCityDisplay] = React.useState<string>(''); 
 
-    const handleLocationChange = (field: 'departure_city' | 'destination_city') => (city: string) => {
-        updateRideData({ [field]: city });
+    const handleLocationChange = (field: 'departure_city' | 'destination_city', displaySetter: React.Dispatch<React.SetStateAction<string>>) => (city: string, coordinates: string) => {
+        updateRideData({ [field]: coordinates });  
+        displaySetter(city); 
     };
 
     const formatDateForInput = (date: Date): string => {
-        // Adjust the date to local time
         const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-        return localDate.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
+        return localDate.toISOString().slice(0, 16); 
     };
 
     const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newDate = event.target.value;
         updateRideData({...rideData, departure_time: new Date(newDate) });
     };
+
     return (
         <Box display="flex" flexDirection="column" alignItems="center" className="transport-card-step-one">
             <Box display="flex" justifyContent="space-between" width="1200px" mb={2} className="maps-container">
@@ -112,7 +113,7 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({ rideData, u
                         <LocationMarker
                             position={startLocation}
                             setPosition={setStartLocation}
-                            setCity={handleLocationChange('departure_city')}
+                            setCityAndCoordinates={handleLocationChange('departure_city', setDepartureCityDisplay)}
                         />
                     </MapContainer>
                 </Box>
@@ -125,7 +126,7 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({ rideData, u
                         <LocationMarker
                             position={endLocation}
                             setPosition={setEndLocation}
-                            setCity={handleLocationChange('destination_city')}
+                            setCityAndCoordinates={handleLocationChange('destination_city', setDestinationCityDisplay)}
                         />
                     </MapContainer>
                 </Box>
@@ -134,12 +135,12 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({ rideData, u
             <Grid container className="grids" spacing={2} width="97%" mb={2}>
                 <Grid item xs={6}>
                     <Typography component="div">
-                        <strong>{t('DEPARTURE_FROM')}:</strong> {rideData.departure_city}
+                        <strong>{t('DEPARTURE_FROM')}:</strong> {departureCityDisplay}
                     </Typography>
                 </Grid>
                 <Grid item xs={6}>
                     <Typography component="div" paddingLeft={2}>
-                        <strong>{t('ARRIVAL_TO')}:</strong> {rideData.destination_city}
+                        <strong>{t('ARRIVAL_TO')}:</strong> {destinationCityDisplay}
                     </Typography>
                 </Grid>
             </Grid>
@@ -150,7 +151,7 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({ rideData, u
                         label={t('ADD_DEPT_DATE')}
                         type="datetime-local"
                         fullWidth
-                        value={formatDateForInput(rideData.departure_time)} // Format the date correctly for input
+                        value={formatDateForInput(rideData.departure_time)} 
                         onChange={handleDateChange}
                         InputLabelProps={{
                             shrink: true,
@@ -158,7 +159,6 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({ rideData, u
                         margin="normal"
                     />
                 </Grid>
-               
             </Grid>
         </Box>
     );
