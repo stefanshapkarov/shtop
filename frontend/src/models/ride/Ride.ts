@@ -11,4 +11,5 @@ export interface Ride {
     destination_city: string
     created_at: Date
     existing_request_id: number | null
+    vehicle: string 
 }

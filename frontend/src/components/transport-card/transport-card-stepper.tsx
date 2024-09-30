@@ -1,5 +1,4 @@
-
-import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Stepper, Step, StepLabel, Typography, Box, styled, Divider } from '@mui/material';
 import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector';
 import { StepIconProps } from '@mui/material/StepIcon';
@@ -10,7 +9,7 @@ import TransportCardStepOne from '../../components/transport-card/step-1';
 import TransportCardStepThree from './step-3';
 import { postRide } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-
+import { LatLng } from 'leaflet'; // Add LatLng for position management
 
 interface RideData {
   departure_time: Date;
@@ -24,6 +23,10 @@ interface RideData {
 interface StepProps {
   rideData: RideData;
   updateRideData: (newData: Partial<RideData>) => void;
+  departurePosition: LatLng | null;
+  destinationPosition: LatLng | null;
+  setDeparturePosition: React.Dispatch<React.SetStateAction<LatLng | null>>;
+  setDestinationPosition: React.Dispatch<React.SetStateAction<LatLng | null>>;
 }
 
 const CustomConnector = styled(StepConnector)(({ theme }) => ({
@@ -87,7 +90,6 @@ const TransportCardStepper: React.FC = () => {
     }
   }, [user, loading, navigate]);
 
-
   const [rideData, setRideData] = useState<RideData>({
     departure_time: new Date(),
     total_seats: 0,
@@ -96,6 +98,10 @@ const TransportCardStepper: React.FC = () => {
     vehicle: '',
     destination_city: '',
   });
+
+  // New state for departure and destination positions
+  const [departurePosition, setDeparturePosition] = useState<LatLng | null>(null);
+  const [destinationPosition, setDestinationPosition] = useState<LatLng | null>(null);
 
   const [isSubmittedSuccessfully, setIsSubmittedSuccessfully] = useState<boolean | null>(null);
 
@@ -160,7 +166,16 @@ const TransportCardStepper: React.FC = () => {
         </Box>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2, pb: 2 }}>
-          <Typography>{getStepContent(activeStep, { rideData, updateRideData })}</Typography>
+          <Typography>
+            {getStepContent(activeStep, {
+              rideData,
+              updateRideData,
+              departurePosition,
+              destinationPosition,
+              setDeparturePosition,
+              setDestinationPosition,
+            })}
+          </Typography>
 
           <Box sx={{ display: 'flex', gap: 2, pt: 2 }}>
             <button className="button button--secondary" onClick={handleBack}>

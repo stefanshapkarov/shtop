@@ -11,6 +11,7 @@ import ProfilePage from './pages/ProfilePage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import {RoutePage} from "./pages/route-page/RoutePage";
 import TransportCard from "./pages/transport-card-page/TransportCard";
+import TransportCardEditPage from './pages/transport-card-edit-page/TranspordCardEditPage';
 
 const App: React.FC = () => {
     return (
@@ -32,6 +33,7 @@ const App: React.FC = () => {
                             <Route path="/register" element={<RegisterPage />}> </Route>
                             <Route path="/profile" element={<ProfilePage />}> </Route>
                             <Route path="/profile-edit" element={<ProfileEditPage />}> </Route>
+                            <Route path="/edit/:id" element={<TransportCardEditPage />} />
 
                         </Route>
                         

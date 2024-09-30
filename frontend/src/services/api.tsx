@@ -186,3 +186,24 @@ export const postRide = async (rideData: {
     }
   }
 };
+export const updateRide = async (rideId: string, rideData: Ride) => {
+  try {
+      await getCsrfToken();
+      
+      const formattedRideData = {
+          ...rideData,
+          departure_time: formatDateForBackend(rideData.departure_time),
+      };
+
+      const response = await api.patch(`/api/ridePost/${rideId}`, formattedRideData);
+      return response.data;
+  } catch (error) {
+      if (axios.isAxiosError(error)) {
+          console.error('Error updating ride:', error.response?.data.message || 'An error occurred');
+          throw new Error(error.response?.data.message || 'An error occurred');
+      } else {
+          console.error('Unexpected error:', error);
+          throw new Error('An unexpected error occurred');
+      }
+  }
+};

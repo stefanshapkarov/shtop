@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Typography, Box, Grid } from '@mui/material';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -10,6 +10,7 @@ import './step-1.scss';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
+// Set default icon for the markers
 const DefaultIcon = L.icon({
     iconUrl: icon,
     shadowUrl: iconShadow
@@ -23,36 +24,35 @@ interface LocationMarkerProps {
     position: LatLng | null;
     setPosition: (position: LatLng) => void;
     setCityAndCoordinates: (city: string, coordinates: string) => void;
+    initialCoordinates?: LatLng | null;
 }
 
-const LocationMarker: React.FC<LocationMarkerProps> = ({ position, setPosition, setCityAndCoordinates }) => {
+const LocationMarker: React.FC<LocationMarkerProps> = ({ position, setPosition, setCityAndCoordinates, initialCoordinates }) => {
+    useEffect(() => {
+        // If initial coordinates are provided, set the marker position and reverse geocode it
+        if (initialCoordinates) {
+            setPosition(initialCoordinates);
+            geocoder.reverse({ lat: initialCoordinates.lat, lon: initialCoordinates.lng })
+                .then((response: any) => {
+                    const city = response.address.city || 'Unknown location';
+                    const coordinates = `${initialCoordinates.lat},${initialCoordinates.lng}`;
+                    setCityAndCoordinates(city, coordinates);
+                })
+                .catch((error: any) => {
+                    console.error('Geocoding error:', error);
+                });
+        }
+    }, [initialCoordinates, setPosition, setCityAndCoordinates]);
+
     useMapEvents({
         click(e: L.LeafletMouseEvent) {
             const { lat, lng } = e.latlng;
-            setPosition(e.latlng);
+            setPosition(e.latlng); // Update marker position
             const coordinates = `${lat},${lng}`;
 
             geocoder.reverse({ lat, lon: lng })
                 .then((response: any) => {
-                    const addressParts: string[] = response.display_name.split(',').map((part: string) => part.trim());
-                    const cityKeywords: string[] = ["Municipality", "Region", "City", "Town", "Village"];
-                    let city = '';
-                    for (let part of addressParts) {
-                        if (part.includes("Municipality of")) {
-                            city = part.replace("Municipality of", "").trim();
-                            break;
-                        }
-                    }
-
-                    if (!city) {
-                        for (const part of addressParts) {
-                            if (!cityKeywords.some(keyword => part.includes(keyword))) {
-                                city = part;
-                                break;
-                            }
-                        }
-                    }
-
+                    const city = response.address.city || 'Unknown location';
                     setCityAndCoordinates(city, coordinates);
                 })
                 .catch((error: any) => {
@@ -73,24 +73,51 @@ interface TransportCardStepOneProps {
         destination_city: string;
     };
     updateRideData: (newData: Partial<TransportCardStepOneProps['rideData']>) => void;
+    departurePosition: LatLng | null;
+    destinationPosition: LatLng | null;
+    setDeparturePosition: React.Dispatch<React.SetStateAction<LatLng | null>>;
+    setDestinationPosition: React.Dispatch<React.SetStateAction<LatLng | null>>;
+    isEditing?: boolean;  // Indicates if editing mode is active
 }
 
-const combineDateAndTime = (date: string, time: string): string => {
-    return `${date} ${time}:00`; 
-};
-
-const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({ rideData, updateRideData }) => {
+const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({
+    rideData,
+    updateRideData,
+    departurePosition,
+    destinationPosition,
+    setDeparturePosition,
+    setDestinationPosition,
+    isEditing
+}) => {
     const { t } = useTranslation();
-    const [startLocation, setStartLocation] = React.useState<LatLng | null>(null);
-    const [endLocation, setEndLocation] = React.useState<LatLng | null>(null);
-    const [departureCityDisplay, setDepartureCityDisplay] = React.useState<string>(''); 
-    const [destinationCityDisplay, setDestinationCityDisplay] = React.useState<string>(''); 
+    const [departureCityDisplay, setDepartureCityDisplay] = useState<string>(''); 
+    const [destinationCityDisplay, setDestinationCityDisplay] = useState<string>(''); 
 
+    useEffect(() => {
+        // If editing mode is active and coordinates are provided, reverse geocode the locations to get city names
+        if (isEditing && departurePosition) {
+            geocoder.reverse({ lat: departurePosition.lat, lon: departurePosition.lng })
+                .then((response: any) => {
+                    setDepartureCityDisplay(response.address.city || 'Unknown location');
+                })
+                .catch((error: any) => console.error(error));
+        }
+        if (isEditing && destinationPosition) {
+            geocoder.reverse({ lat: destinationPosition.lat, lon: destinationPosition.lng })
+                .then((response: any) => {
+                    setDestinationCityDisplay(response.address.city || 'Unknown location');
+                })
+                .catch((error: any) => console.error(error));
+        }
+    }, [isEditing, departurePosition, destinationPosition]);
+
+    // Handles location and city name updates when a location is selected on the map
     const handleLocationChange = (field: 'departure_city' | 'destination_city', displaySetter: React.Dispatch<React.SetStateAction<string>>) => (city: string, coordinates: string) => {
-        updateRideData({ [field]: coordinates });  
-        displaySetter(city); 
+        updateRideData({ [field]: coordinates });  // Update the ride data with the coordinates
+        displaySetter(city); // Update the displayed city name
     };
 
+    // Formats the date input to be compatible with the datetime-local input field
     const formatDateForInput = (date: Date): string => {
         const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
         return localDate.toISOString().slice(0, 16); 
@@ -106,27 +133,29 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({ rideData, u
             <Box display="flex" justifyContent="space-between" width="1200px" mb={2} className="maps-container">
                 <Box className="map-box">
                     <Typography className="map-title">{t('START_LOCATION')}</Typography>
-                    <MapContainer center={[41.9996479336892, 21.438695249988935]} zoom={13} className="map-container">
+                    <MapContainer center={departurePosition ?? [41.9996479336892, 21.438695249988935]} zoom={13} className="map-container">
                         <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
                         <LocationMarker
-                            position={startLocation}
-                            setPosition={setStartLocation}
+                            position={departurePosition}
+                            setPosition={setDeparturePosition}
                             setCityAndCoordinates={handleLocationChange('departure_city', setDepartureCityDisplay)}
+                            initialCoordinates={isEditing ? departurePosition : null}  // Set initial marker position if editing
                         />
                     </MapContainer>
                 </Box>
                 <Box className="map-box">
                     <Typography className="map-title">{t('END_LOCATION')}</Typography>
-                    <MapContainer center={[41.9996479336892, 21.438695249988935]} zoom={13} className="map-container">
+                    <MapContainer center={destinationPosition ?? [41.9996479336892, 21.438695249988935]} zoom={13} className="map-container">
                         <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
                         <LocationMarker
-                            position={endLocation}
-                            setPosition={setEndLocation}
+                            position={destinationPosition}
+                            setPosition={setDestinationPosition}
                             setCityAndCoordinates={handleLocationChange('destination_city', setDestinationCityDisplay)}
+                            initialCoordinates={isEditing ? destinationPosition : null}  // Set initial marker position if editing
                         />
                     </MapContainer>
                 </Box>
