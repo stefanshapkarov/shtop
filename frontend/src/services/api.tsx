@@ -64,10 +64,12 @@ export const fetchAllRides = async (
     departure_city: string | null,
     destination_city: string | null,
     available_seats: number | null,
-    departure_date: string | null
+    departure_date: string | null,
+    page: number
 ) => {
   const params: { [key: string]: string | number } = {};
 
+  params.page = page
   if (departure_city) params.departure_city = departure_city;
   if (destination_city) params.destination_city = destination_city;
   if (available_seats !== null) params.available_seats = available_seats;
@@ -75,7 +77,7 @@ export const fetchAllRides = async (
 
   const response = await api.get('/api/ridePost', { params });
 
-  return response.data.data;
+  return response.data;
 };
 
 export const fetchRideById = async (id: string): Promise<Ride> => {
@@ -115,7 +117,7 @@ export const getCurrentUser = async () => {
     });
     return response.data.data;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };
 
