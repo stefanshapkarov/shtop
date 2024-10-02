@@ -18,10 +18,13 @@ return new class extends Migration
             $table->dateTime('departure_time');
             $table->integer('total_seats');
             $table->float('price_per_seat');
+            $table->string('departure_coords');
             $table->string('departure_city');
             $table->string('vehicle');
+            $table->string('destination_coords');
             $table->string('destination_city');
             $table->enum('status', ['pending', 'completed'])->default('pending');
+            $table->time('duration')->nullable();
             $table->timestamps();
         });
     }
