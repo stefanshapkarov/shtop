@@ -1,0 +1,21 @@
+@import "../../styles/colors/colors.scss";
+
+#search-route-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  .search-field {
+    background-color: $third-background-color;
+    width: 14rem;
+    margin-right: 1rem;
+  }
+
+  .search-button {
+    background-color: $primary !important;
+    width: 14rem;
+    height: 3.5rem;
+    font-size: 1rem;
+  }
+}

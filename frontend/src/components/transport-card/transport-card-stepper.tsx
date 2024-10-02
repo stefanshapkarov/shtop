@@ -83,7 +83,7 @@ const TransportCardStepper: React.FC = () => {
 
   useEffect(() => {
     if (!loading && !user) {
-        navigate('/');
+        // navigate('/');
     }
   }, [user, loading, navigate]);
 

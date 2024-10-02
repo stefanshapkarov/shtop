@@ -14,14 +14,17 @@ import lightningIcon from '../../shared/styles/icons/lightning_icon.png';
 const Profile: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [userRating, setUserRating] = useState<number>(0);
-  const { user, loading } = useAuth() as { user: any, loading: any };;
+  const { user, loading } = useAuth() as { user: any, loading: any };
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (!user) {
+    console.log("user1:" +user);
+    if (!loading && !user) {
+      console.log("user2:" +user);
       // navigate('/login');
     } else if (user) {
+      console.log("user3:" +user);
       getRating();
     }
   }, [user, loading, navigate]);
