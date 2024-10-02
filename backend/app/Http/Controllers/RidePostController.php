@@ -66,8 +66,11 @@ class RidePostController extends Controller
                 'departure_time' => 'required|date|after:now|date_format:d-m-Y H:i',
                 'total_seats' => 'required|numeric|min:1',
                 'price_per_seat' => 'required|numeric|min:1',
+                'departure_coords' => 'required|string',
                 'departure_city' => 'required|string',
+                'destination:coords' => 'required|string|different:departure_coords',
                 'destination_city' => 'required|string|different:departure_city',
+                'duration' => 'required|date_format:H:i',
                 'vehicle' => 'required|string',
             ]);
 
@@ -105,8 +108,11 @@ class RidePostController extends Controller
                 'departure_time' => 'sometimes|date|after:now|date_format:d-m-Y H:i',
                 'total_seats' => 'sometimes|numeric|min:1',
                 'price_per_seat' => 'sometimes|numeric|min:1',
+                'departure_coords' => 'required|string',
                 'departure_city' => 'sometimes|string',
+                'destination:coords' => 'required|string|different:departure_coords',
                 'destination_city' => 'sometimes|string|different:departure_city',
+                'duration' => 'required|date_format:H:i',
                 'vehicle' => 'required|string',
             ]);
 
