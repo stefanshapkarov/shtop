@@ -88,14 +88,6 @@ export const HomePage = () => {
 
     return <>
         <Box id='homepage-container'>
-            <>
-
-                {isAuth ? (
-                    <p>{t("LOGGED_IN")}</p>
-                ) : (
-                    <p>{t("NOT_LOGGED_IN")}</p>
-                )}
-            </>
             <Box className='logo-container'>
                 <Typography variant='h3' className='title'>{t('HOME_PAGE_TITLE')}</Typography>
                 <img src={HomePageLogo} alt='home-page-logo' className='home-page-logo'/>
