@@ -203,4 +203,12 @@
     background-color: $primary;
     margin-right: 1rem;
   }
+
+  .is-ride-completed{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
 }

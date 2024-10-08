@@ -25,6 +25,7 @@ class RidePostResource extends JsonResource
             'departure_city' => $this->departure_city,
             'destination_city' => $this->destination_city,
             'vehicle' => $this->vehicle,
+            'status'=> $this->status,
             'existing_request_id' => $this->hasRequestForRide(),
             'reviews' => ReviewResource::collection($this->reviews),
             'created_at' => $this->created_at->toDateTimeString()

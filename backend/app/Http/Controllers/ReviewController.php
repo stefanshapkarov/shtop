@@ -25,36 +25,77 @@ class ReviewController extends Controller
         return ReviewResource::collection(Review::all());
     }
 
+    // public function store(StoreReviewRequest $request)
+    // {
+    //     return DB::transaction(function () use ($request) {
+    //         $rideId = $request->input('ride_id');
+    //         $ride = RidePost::findOrFail($rideId);
+
+    //         $passengerIds = $ride->passengers->pluck('id')->toArray();
+
+    //         throw_if(in_array(Auth::id(), $passengerIds) || $ride->driver_id != Auth::id(),
+    //             GeneralJsonException::class,
+    //             'Can`t add a review on a ride where you`re not a passenger or driver.');
+
+    //         throw_if($ride->status !== 'completed',
+    //             GeneralJsonException::class,
+    //             'Can`t add a review on an uncompleted ride.');
+
+    //         $review = Review::create([
+    //             'ride_id' => $rideId,
+    //             'reviewer_id' => Auth::id(),
+    //             'reviewee_id' => $request->input('reviewee_id'),
+    //             'rating' => $request->input('rating'),
+    //             'comment' => $request->input('comment'),
+    //         ]);
+
+    //         throw_if(!$review, GeneralJsonException::class, 'Failed to create review.');
+
+    //         return new ReviewResource($review);
+    //     });
+    // }
+
+
+
     public function store(StoreReviewRequest $request)
-    {
-        return DB::transaction(function () use ($request) {
-            $rideId = $request->input('ride_id');
-            $ride = RidePost::findOrFail($rideId);
+{
+    return DB::transaction(function () use ($request) {
+        $rideId = $request->input('ride_id');
+        $ride = RidePost::findOrFail($rideId);
 
-            $passengerIds = $ride->passengers->pluck('id')->toArray();
+        // Get all passengers' IDs from the ride
+        $passengerIds = $ride->passengers->pluck('id')->toArray();
 
-            throw_if(in_array(Auth::id(), $passengerIds) || $ride->driver_id != Auth::id(),
-                GeneralJsonException::class,
-                'Can`t add a review on a ride where you`re not a passenger or driver.');
+        // Check if the user is allowed to submit a review (driver reviews passengers, passenger reviews driver)
+        $isPassengerReviewingDriver = in_array(Auth::id(), $passengerIds) && $request->input('reviewee_id') == $ride->driver_id;
+        $isDriverReviewingPassenger = Auth::id() == $ride->driver_id && in_array($request->input('reviewee_id'), $passengerIds);
 
-            throw_if($ride->status !== 'completed',
-                GeneralJsonException::class,
-                'Can`t add a review on an uncompleted ride.');
+        // If neither condition is true, throw an exception
+        throw_if(
+            !$isPassengerReviewingDriver && !$isDriverReviewingPassenger,
+            GeneralJsonException::class,
+            'Can`t add a review on a ride where you`re not a passenger or driver.'
+        );
 
-            $review = Review::create([
-                'ride_id' => $rideId,
-                'reviewer_id' => Auth::id(),
-                'reviewee_id' => $request->input('reviewee_id'),
-                'rating' => $request->input('rating'),
-                'comment' => $request->input('comment'),
-            ]);
+        // Ensure the ride is completed before adding reviews
+        throw_if($ride->status !== 'completed',
+            GeneralJsonException::class,
+            'Can`t add a review on an uncompleted ride.');
 
-            throw_if(!$review, GeneralJsonException::class, 'Failed to create review.');
+        // Create the review
+        $review = Review::create([
+            'ride_id' => $rideId,
+            'reviewer_id' => Auth::id(),
+            'reviewee_id' => $request->input('reviewee_id'),
+            'rating' => $request->input('rating'),
+            'comment' => $request->input('comment'),
+        ]);
 
-            return new ReviewResource($review);
-        });
-    }
+        throw_if(!$review, GeneralJsonException::class, 'Failed to create review.');
 
+        return new ReviewResource($review);
+    });
+}
     public function show(Review $review)
     {
         return new ReviewResource($review);
