@@ -295,7 +295,7 @@ export const RoutePage = () => {
                                 <Box className='bio'>
                                     {[...Array(5)].map((_, index) => (
                                         <StarIcon key={index}
-                                                  className={index < Math.round(ride.driver.rating) ? 'star' : 'star star-empty'}/>
+                                                  className={index < Math.round(ride.driver.rating_as_driver) ? 'star' : 'star star-empty'}/>
                                     ))}
                                 </Box>
                             </Box>
@@ -304,6 +304,7 @@ export const RoutePage = () => {
                                 <Typography variant='body2'
                                             className='bio'>{ride.driver.is_verified ? t('YES') : t('NO')}</Typography>
                             </Box>
+                            
                         </Box>
                         <Typography fontWeight='bold'>{t('BIO')}:</Typography>
                         <Typography variant='body2' className='bio'>{ride.driver.bio}</Typography>

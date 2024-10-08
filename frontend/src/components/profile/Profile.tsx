@@ -19,15 +19,13 @@ const Profile: React.FC = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    console.log("user1:" +user);
+    // Converts user object to string for logging
     if (!loading && !user) {
-      console.log("user2:" +user);
-      // navigate('/login');
+        navigate('/login');
     } else if (user) {
-      console.log("user3:" +user);
-      getRating();
+        getRating();
     }
-  }, [user, loading, navigate]);
+}, [user, loading, navigate]);
 
   const getRating = async () => {
     try {
@@ -99,6 +97,10 @@ const Profile: React.FC = () => {
           <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={1}>
             <img src={carIcon} width={20} alt="Car Icon" />
             <span style={{ marginLeft: '4px' }}>{user.completed_rides || '0'} {t('RIDES')}</span>
+          </Typography>
+          <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={1}>
+            <img src={carIcon} width={20} alt="Car Icon" />
+            <span style={{ marginLeft: '4px' }}>{user.rides_as_passenger.length || '0'} {t('RIDES-AS-PASSENGER')}</span>
           </Typography>
           <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={3}>
             <img src={starIcon} width={20} alt="Star" />

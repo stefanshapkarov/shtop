@@ -93,7 +93,7 @@ export const SearchRoute = () => {
             } else if (sortingOptions[1].isSelected) {
                 routesTemp = routesTemp.sort((a, b) => a.price_per_seat - b.price_per_seat);
             } else if (sortingOptions[2].isSelected) {
-                routesTemp = routesTemp.sort((a, b) => b.driver.rating - a.driver.rating);
+                routesTemp = routesTemp.sort((a, b) => b.driver.rating_as_driver - a.driver.rating_as_driver);
             }
 
             setFilteredRoutes(routesTemp);

@@ -9,5 +9,6 @@ export interface UserType {
     created_at: Date
     updated_at: Date
     is_verified: boolean
-    rating: number
+    rating_as_driver: number
+    rating_as_passenger: number
 }

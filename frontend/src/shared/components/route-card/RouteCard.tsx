@@ -117,7 +117,7 @@ export const RouteCard = (props: RouteCardProps) => {
                                 <Typography variant='h4'>{props.ride.driver.name}</Typography>
                                 {[...Array(5)].map((_, index) => (
                                     <StarIcon key={index}
-                                              className={index < Math.round(props.ride.driver.rating) ? 'star' : 'star star-empty'}/>
+                                              className={index < Math.round(props.ride.driver.rating_as_driver) ? 'star' : 'star star-empty'}/>
                                 ))}
                             </Box>
                         </Box>
