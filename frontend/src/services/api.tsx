@@ -220,3 +220,13 @@ export const submitRideReview = async (
         throw error; // Let the calling function handle the error
     }
 };
+
+
+export const getUserById = async (id: string) => {
+  try {
+    const response = await api.get(`/api/user/${id}`);
+    return response.data.data; // Assuming the response has a 'data' key for user info
+  } catch (error: any) {
+    throw error.response ? error.response.data.message : error.message;
+  }
+};

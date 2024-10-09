@@ -308,7 +308,7 @@ export const RoutePage = () => {
                         </Box>
                         <Typography fontWeight='bold'>{t('BIO')}:</Typography>
                         <Typography variant='body2' className='bio'>{ride.driver.bio}</Typography>
-                    </Box>
+                        <Button onClick={() => navigate(`/profile/${ride.driver.id}`)}>Open Full Profile</Button>                    </Box>
                     {isDriver &&
                         <Box className='is-driver-container'>
                             <Divider className='divider'/>
