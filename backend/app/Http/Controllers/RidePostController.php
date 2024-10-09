@@ -10,9 +10,7 @@ use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
@@ -27,26 +25,23 @@ class RidePostController extends Controller
     {
         $user = auth()->user();
 
-        $ridePosts = RidePost::query()->with(['driver', 'passengers', 'reviews']);
+        $as_driver = $request->boolean('as_driver', null);
+        $status = $request->input('status');
 
-        if (!empty($request->as_driver)) {
-            if ($request->as_driver) {
-                $ridePosts->where('driver_id', $user->id);
-            } else {
-                $ridePosts->whereHas('passengers', function ($query) use ($user) {
-                    $query->where('passenger_id', $user->id);
-                });
-            }
-        } else {
-            $ridePosts->where('driver_id', $user->id)
-                ->orWhereHas('passengers', function ($query) use ($user) {
-                    $query->where('passenger_id', $user->id);
-                });
-        }
+        $prom = DB::table('ride_post_passenger')
+            ->select('ride_post_id')
+            ->where('passenger_id', $user->id);
 
-        if (!empty($request->status)) {
-            $ridePosts->where('status', $request->status);
-        }
+        $ridePosts = RidePost::query()->with(['driver', 'passengers', 'reviews'])
+            ->when($as_driver !== null, function ($query) use ($prom, $user, $as_driver) {
+                $query->when($as_driver,
+                    fn($query) => $query->where('driver_id', $user->id),
+                    fn($query) => $query->whereIn('id', $prom));
+            }, function ($query) use ($prom, $user) {
+                $query->where(fn($query) => $query->where('driver_id', $user->id)
+                    ->orWhereIn('id', $prom));
+            })
+            ->when($status, fn($query) => $query->where('status', $status));
 
         return RidePostResource::collection($ridePosts->orderBy('departure_time')->simplePaginate(15));
     }
@@ -194,11 +189,11 @@ class RidePostController extends Controller
 
             if (Carbon::now()->isAfter($ridePost->departure_time)) {
 
-                    $ridePost->requests()->delete();
+                $ridePost->requests()->delete();
 
-                    $ridePost->status = "completed";
+                $ridePost->status = "completed";
 
-                    $ridePost->save();
+                $ridePost->save();
 
             } else {
                 throw new GeneralJsonException("You must finish the ride to complete it.", 405);
