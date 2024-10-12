@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {Ride} from "../models/ride/Ride";
 import {RideRequest} from "../models/ride-request/RideRequest";
+import {RideStatus} from "../models/ride-status/RideStatus";
 
 const api = axios.create({
     baseURL: 'http://localhost:8000',
@@ -80,17 +81,11 @@ export const fetchAllRides = async (departureCity: string | null,
 
 export const getRidesForLoggedUser = async (asDriver: boolean,
                                             page: number,
-                                            status: string,
-                                            departureCity: string | null,
-                                            destinationCity: string | null,
-                                            departureDate: string | null) => {
+                                            status: RideStatus) => {
     const params: { [key: string]: string | number | boolean} = {};
     params.page = page;
     params.as_driver = asDriver;
-    params.status = status;
-    if (departureCity) params.departure_city = departureCity;
-    if (destinationCity) params.destination_city = destinationCity;
-    if (departureDate) params.departure_date = departureDate;
+    params.status = RideStatus[status];
 
     const response = await api.get('/api/ridePost/myRides', {params});
 

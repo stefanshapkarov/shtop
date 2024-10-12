@@ -129,14 +129,17 @@ export const RouteCard = (props: RouteCardProps) => {
                             </Box>
                         </Box>
                         <Button variant='contained' size='large' disabled={isRequestLoading}
-                                className={!props.ride.existing_request_id ? 'request-ride-button green' : 'request-ride-button red'}
+                                className={!props.ride.existing_request_id ||
+                                            props.ride.status.toString() === RideStatus[RideStatus.completed]
+                                                ? 'request-ride-button green'
+                                                : 'request-ride-button red'}
                                 onClick={(event) => handleRequestClick(event)}>
                             {isRequestLoading
                                 ? <Hourglass colors={['#ffffff', '#ffffff']} height='32'/>
                                 : (loggedUser?.id === props.ride.driver.id
                                     ? props.ride.status === RideStatus.pending ? t('EDIT_RIDE') : t('RATE_PASSENGERS')
                                     : !props.ride.existing_request_id ? t('REQUEST_A_RIDE')
-                                        : props.ride.status === RideStatus.pending ? t('CANCEL_REQUEST') : t('RATE_DRIVER'))}
+                                        : props.ride.status.toString() === RideStatus[RideStatus.pending] ? t('CANCEL_REQUEST') : t('RATE_DRIVER'))}
                         </Button>
                     </Box>
                 )}

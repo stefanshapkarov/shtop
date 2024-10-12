@@ -17,7 +17,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
     gap: 1rem;
 
     :hover {
@@ -28,7 +27,6 @@
 
   .filter-element {
     display: flex;
-    width: 40rem;
     align-items: center;
     justify-content: center;
     padding: 0.75rem 0;
@@ -37,6 +35,15 @@
     border-radius: 1rem;
     transition: border-bottom-width 200ms ease;
     background-color: $third-background-color;
+  }
+
+  .big {
+    width: 40rem;
+  }
+
+  .small {
+    width: 26.5rem;
+    margin-bottom: 1rem;
   }
 
   .selected {
@@ -49,8 +56,12 @@
     width: 3.5rem;
   }
 
+  .icon-small {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
+
   .search-route-page-content {
-    margin-top: 2rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -69,10 +80,11 @@
     font-family: 'Manrope-Medium', serif !important;
     color: $primary;
     text-align: center;
+    margin-top: 2rem;
   }
 
   .routes-list {
-    height: 50rem;
+    max-height: 50rem;
     padding-bottom: 4rem;
     margin-bottom: 2rem;
     scrollbar-width: none;

@@ -145,7 +145,12 @@
   "SAVE": "Save",
   "EDIT_RIDE": "Edit ride",
   "MY_RIDES": "My Rides",
-  "THERE_ARE_NO_COMPLETED_RIDES_WITH_ROLE": "There are no completed rides with role: ",
+  "THERE_ARE_NO_COMPLETED_RIDES_WITH_ROLE": "There are no rides with role: ",
+  "AND_STATUS": " and status: ",
   "RATE_PASSENGERS": "Rate passengers",
-  "RATE_DRIVER": "Rate driver"
+  "RATE_DRIVER": "Rate driver",
+  "PENDING": "Pending",
+  "ACTIVE": "Active",
+  "COMPLETED": "Completed",
+  "RATE": "Rate"
 }

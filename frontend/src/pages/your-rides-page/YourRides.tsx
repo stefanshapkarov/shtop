@@ -1,5 +1,4 @@
-import {Box, Divider, Typography} from "@mui/material";
-import {RoutesSearchBar} from "../../shared/components/routes-search-bar/RoutesSearchBar";
+import {Box, Typography} from "@mui/material";
 import './your-rides.scss'
 import React, {useEffect, useRef, useState} from "react";
 import SteeringWheel from "../../shared/styles/icons/steering_wheel.png";
@@ -12,6 +11,11 @@ import {Ride} from "../../models/ride/Ride";
 import {getRidesForLoggedUser} from "../../services/api";
 import {Dayjs} from "dayjs";
 import {format} from "date-fns";
+import {RideStatus} from "../../models/ride-status/RideStatus";
+import RidePendingIcon from '../../shared/styles/icons/pending.png'
+import RideActiveIcon from '../../shared/styles/icons/active.png'
+import RideCompletedIcon from '../../shared/styles/icons/finished.png'
+
 
 export const YourRides = () => {
 
@@ -22,16 +26,30 @@ export const YourRides = () => {
     const [filteredRoutes, setFilteredRoutes] = useState<Ride[]>([]);
     const routesListRef = useRef<HTMLDivElement>(null);
     const [asDriver, setAsDriver] = useState<boolean>(false);
-    const [searchFilters, setSearchFilters] = useState({
-        locationFrom: null as string | null,
-        locationTo: null as string | null,
-        date: null as Dayjs | null,
-    });
     const [page, setPage] = useState<number>(0);
+    const [selectedStatus, setSelectedStatus] = useState<RideStatus>(RideStatus.completed);
+
+    const statusOptions = [
+        {
+            name: 'PENDING',
+            value: RideStatus.pending,
+            icon: RidePendingIcon
+        },
+        {
+            name: 'ACTIVE',
+            value: RideStatus.active,
+            icon: RideActiveIcon
+        },
+        {
+            name: 'COMPLETED',
+            value: RideStatus.completed,
+            icon: RideCompletedIcon
+        }
+    ]
 
     useEffect(() => {
         fetchRides(true);
-    }, [searchFilters, asDriver]);
+    }, [asDriver, selectedStatus]);
 
     const fetchRides = (reset: boolean, expanding?: boolean) => {
 
@@ -43,7 +61,7 @@ export const YourRides = () => {
 
         const pageTmp = reset ? 0 : page;
 
-        getRidesForLoggedUser(asDriver, pageTmp + 1, 'completed', searchFilters.locationFrom, searchFilters.locationTo, getDate(searchFilters.date)).then(response => {
+        getRidesForLoggedUser(asDriver, pageTmp + 1, selectedStatus).then(response => {
 
             setPage(response.meta.current_page);
 
@@ -85,30 +103,29 @@ export const YourRides = () => {
         console.log('updating...');
     };
 
-    const handleSearch = (locationFrom: string | null, locationTo: string | null, date: Dayjs | null) => {
-        setSearchFilters({
-            locationFrom: locationFrom,
-            locationTo: locationTo,
-            date: date
-        })
-    }
-
     const handleFilterChange = (index: boolean) => {
         setAsDriver(index);
     }
 
     return <Box id='your-rides-container'>
         <Typography variant='h2' className='title'>{t('MY_RIDES')}</Typography>
-        <RoutesSearchBar handleSearch={handleSearch}/>
         <Box className='search-route-page-content'>
             <Box className='filters-container'>
-                <Box className={!asDriver ? 'filter-element selected' : 'filter-element'}
+                {statusOptions.map((option, index) => (
+                    <Box key={index} className={selectedStatus === option.value ? 'filter-element selected small' : 'filter-element small'}
+                         onClick={() => setSelectedStatus(option.value)}>
+                        <img src={option.icon} alt={option.name} className='icon-small'/>
+                        <Typography variant='h5'>{t(option.name)}</Typography>
+                    </Box>
+                ))}
+            </Box>
+            <Box className='filters-container'>
+                <Box className={!asDriver ? 'filter-element selected big' : 'filter-element big'}
                      onClick={() => handleFilterChange(false)}>
                     <img src={Passenger} alt='As passanger' className='icon'/>
                     <Typography variant='h4'>{t('PASSENGER_U')}</Typography>
                 </Box>
-                <Divider orientation='vertical' className='divider'/>
-                <Box className={asDriver ? 'filter-element selected' : 'filter-element'}
+                <Box className={asDriver ? 'filter-element selected big' : 'filter-element big'}
                      onClick={() => handleFilterChange(true)}>
                     <img src={SteeringWheel} alt='As Driver' className='icon'/>
                     <Typography variant='h4'>{t('DRIVER')}</Typography>
@@ -120,7 +137,14 @@ export const YourRides = () => {
                     <Loader/>
                     : (filteredRoutes.length === 0
                             ? <Typography variant='h4'
-                                          className='no-rides-text'>{t('THERE_ARE_NO_COMPLETED_RIDES_WITH_ROLE')} {asDriver ? t('DRIVER') : t('PASSENGER_U')}</Typography>
+                                          className='no-rides-text'>
+                                {t('THERE_ARE_NO_COMPLETED_RIDES_WITH_ROLE')}
+                                <strong>{asDriver ? t('DRIVER') : t('PASSENGER_U')}</strong>
+                                {t('AND_STATUS')}
+                                <strong>{selectedStatus === RideStatus.pending ? t('PENDING')
+                                    : selectedStatus === RideStatus.active ? t('ACTIVE')
+                                        : t('COMPLETED')}</strong>
+                    </Typography>
                             : <Box className='routes-list' ref={routesListRef} onScroll={() => handleScroll()}>
                                 {filteredRoutes.map((route) => (
                                     <RouteCard ride={route} moreStyles={true} key={route.id}
