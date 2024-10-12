@@ -1,6 +1,5 @@
-
-import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
-import { Stepper, Step, StepLabel, Typography, Box, styled, Divider } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Stepper, Step, StepLabel, Typography, Box, styled, Divider, duration } from '@mui/material';
 import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector';
 import { StepIconProps } from '@mui/material/StepIcon';
 import './transport-card-stepper.scss';
@@ -10,7 +9,7 @@ import TransportCardStepOne from '../../components/transport-card/step-1';
 import TransportCardStepThree from './step-3';
 import { postRide } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-
+import { LatLng } from 'leaflet'; 
 
 interface RideData {
   departure_time: Date;
@@ -19,11 +18,18 @@ interface RideData {
   departure_city: string;
   vehicle: string;
   destination_city: string;
+  destination_coords: string;
+  departure_coords: string;
+  duration: string;
 }
 
 interface StepProps {
   rideData: RideData;
   updateRideData: (newData: Partial<RideData>) => void;
+  departurePosition: LatLng | null;
+  destinationPosition: LatLng | null;
+  setDeparturePosition: React.Dispatch<React.SetStateAction<LatLng | null>>;
+  setDestinationPosition: React.Dispatch<React.SetStateAction<LatLng | null>>;
 }
 
 const CustomConnector = styled(StepConnector)(({ theme }) => ({
@@ -87,7 +93,6 @@ const TransportCardStepper: React.FC = () => {
     }
   }, [user, loading, navigate]);
 
-
   const [rideData, setRideData] = useState<RideData>({
     departure_time: new Date(),
     total_seats: 0,
@@ -95,7 +100,13 @@ const TransportCardStepper: React.FC = () => {
     departure_city: '',
     vehicle: '',
     destination_city: '',
+    destination_coords: '',
+    departure_coords: '',
+    duration: '',
   });
+
+  const [departurePosition, setDeparturePosition] = useState<LatLng | null>(null);
+  const [destinationPosition, setDestinationPosition] = useState<LatLng | null>(null);
 
   const [isSubmittedSuccessfully, setIsSubmittedSuccessfully] = useState<boolean | null>(null);
 
@@ -106,20 +117,48 @@ const TransportCardStepper: React.FC = () => {
     }));
   };
 
-  const handleSubmit = async () => {
-    console.log('Submitting the following data:', rideData);
-
-    try {
-      const response = await postRide(rideData);
-      console.log('Ride post created successfully:', response);
-      setIsSubmittedSuccessfully(true); // Set success state to true
-      navigate('/search-route'); // Redirect to search-route
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      setIsSubmittedSuccessfully(false); // Set success state to false if there was an error
+  const formatTravelTime = (duration: number): string => {
+    if (duration < 60) {
+        return `${duration} min`;
+    } else {
+        const hours = Math.floor(duration / 60);
+        const minutes = duration % 60;
+        return `${hours}h ${minutes}min`;
     }
+};
+
+const convertToDatabaseTime = (duration: number): string => {
+  const hours = Math.floor(duration / 3600);
+  const minutes = Math.floor((duration % 3600) / 60);
+
+
+  const formattedHours = hours < 10 ? `0${hours}` : `${hours}`;
+  const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+
+  return `${formattedHours}:${formattedMinutes}`; 
+};
+
+
+const handleSubmit = async () => {
+  const updatedRideData = {
+      ...rideData,
   };
 
+  console.log('Submitting the following data:', updatedRideData);
+
+  try {
+      const response = await postRide(updatedRideData);
+      console.log('Ride post created successfully:', response);
+      setIsSubmittedSuccessfully(true); 
+      navigate('/search-route'); 
+  } catch (error) {
+      console.error('Error submitting form:', error);
+      setIsSubmittedSuccessfully(false); 
+  }
+};
+
+
+  
   const steps = [
     <Typography variant="body1">{t('STEP_1')}</Typography>,
     <Typography variant="body1">{t('STEP_2')}</Typography>,
@@ -160,7 +199,16 @@ const TransportCardStepper: React.FC = () => {
         </Box>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2, pb: 2 }}>
-          <Typography>{getStepContent(activeStep, { rideData, updateRideData })}</Typography>
+          <Typography>
+            {getStepContent(activeStep, {
+              rideData,
+              updateRideData,
+              departurePosition,
+              destinationPosition,
+              setDeparturePosition,
+              setDestinationPosition,
+            })}
+          </Typography>
 
           <Box sx={{ display: 'flex', gap: 2, pt: 2 }}>
             <button className="button button--secondary" onClick={handleBack}>

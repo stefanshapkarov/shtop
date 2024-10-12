@@ -1,0 +1,76 @@
+.edit-page-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
+    h4 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .step-content {
+        padding: 20px;
+    }
+
+    .additional-fields {
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px; /* Adds spacing between the fields */
+        width: 1260px;
+        padding-left: 50px;
+    }
+
+    .stepper-controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    /* Center the button */
+    .button-container {
+        display: flex;
+        justify-content: center; /* Center the button horizontally */
+        margin-top: 30px; /* Add some spacing from the content above */
+    }
+
+    .button {
+        &--primary {
+            background-color: #26a69a;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+
+            &:hover {
+                background-color: darken(#26a69a, 10%);
+            }
+        }
+
+        &--secondary {
+            background-color: #fff;
+            color: #26a69a;
+            border: 2px solid #26a69a;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+
+            &:hover {
+                background-color: #26a69a;
+                color: #fff;
+            }
+        }
+    }
+
+    .success-message {
+        text-align: center;
+        padding: 20px;
+    }
+}

@@ -22,12 +22,15 @@ class RidePostResource extends JsonResource
             'total_seats' => $this->total_seats,
             'available_seats' => $this->total_seats - $this->passengers()->count(),
             'price_per_seat' => $this->price_per_seat,
+            'departure_coords' => $this->departure_coords,
             'departure_city' => $this->departure_city,
+            'destination_coords' => $this->destination_coords,
             'destination_city' => $this->destination_city,
             'vehicle' => $this->vehicle,
             'status' => $this->status,
             'existing_request_id' => $this->hasRequestForRide(),
             'reviews' => ReviewResource::collection($this->reviews),
+            'duration' => $this->duration,
             'created_at' => $this->created_at->toDateTimeString()
         ];
     }

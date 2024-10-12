@@ -95,19 +95,28 @@ class RidePostController extends Controller
     public function store(Request $request)
     {
         try {
+            Log::info('Request data:', $request->all());
+
             $validatedRequestData = $request->validate([
                 'departure_time' => 'required|date|after:now|date_format:d-m-Y H:i',
                 'total_seats' => 'required|numeric|min:1',
                 'price_per_seat' => 'required|numeric|min:1',
+                'departure_coords' => 'required|string',
                 'departure_city' => 'required|string',
+                'destination_coords' => 'required|string|different:departure_coords',
                 'destination_city' => 'required|string|different:departure_city',
+                'duration' => 'required|date_format:H:i',
                 'vehicle' => 'required|string',
             ]);
 
+
+            
             $validatedRequestData['departure_time'] =
                 Carbon::createFromFormat('d-m-Y H:i', $validatedRequestData['departure_time'])
                     ->format('Y-m-d H:i:s');
 
+                    
+        
             $ridePost = RidePost::create([
                 'driver_id' => auth()->id(),
                 'departure_time' => $validatedRequestData['departure_time'],
@@ -115,17 +124,25 @@ class RidePostController extends Controller
                 'price_per_seat' => $validatedRequestData['price_per_seat'],
                 'departure_city' => $validatedRequestData['departure_city'],
                 'destination_city' => $validatedRequestData['destination_city'],
+                'duration' => $validatedRequestData['duration'],
                 'vehicle' => $validatedRequestData['vehicle'],
+                'destination_coords' => $validatedRequestData['destination_coords'],
+                'departure_coords' => $validatedRequestData['departure_coords'],
             ]);
 
             throw_if(!$ridePost, GeneralJsonException::class);
-
             return new RidePostResource($ridePost);
 
         } catch (ValidationException $e) {
+            Log::error('Validation failed:', $e->errors());
 
             return response()->json(['message' => 'Invalid input.'], 500);
-        } catch (Exception) {
+            // return response()->json([
+            //     'message' => 'Validation failed',
+            //     'errors' => $e->errors()
+            // ], 422);  // Use 422 for validation errors
+        } catch (Exception $e) {
+            Log::error('Store failed:', ['error' => $e->getMessage()]);
 
             return response()->json(['message' => 'An error occurred when storing the ride post.'], 500);
         }
@@ -138,8 +155,11 @@ class RidePostController extends Controller
                 'departure_time' => 'sometimes|date|after:now|date_format:d-m-Y H:i',
                 'total_seats' => 'sometimes|numeric|min:1',
                 'price_per_seat' => 'sometimes|numeric|min:1',
+                'departure_coords' => 'required|string',
                 'departure_city' => 'sometimes|string',
+                'destination_coords' => 'required|string|different:departure_coords',
                 'destination_city' => 'sometimes|string|different:departure_city',
+                'duration' => 'required|date_format:H:i',
                 'vehicle' => 'required|string',
             ]);
 
@@ -157,7 +177,11 @@ class RidePostController extends Controller
 
         } catch (ValidationException $e) {
 
-            return response()->json(['message' => 'Invalid input.'], 500);
+            // return response()->json(['message' => 'Invalid input.'], 500);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);  // Use 422 for validation errors
         } catch (Exception) {
 
             return response()->json(['message' => 'An error occurred when updating the ride post.'], 500);
