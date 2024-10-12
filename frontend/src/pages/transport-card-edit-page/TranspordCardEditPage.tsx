@@ -9,6 +9,7 @@ import { Ride } from '../../models/ride/Ride';
 import Geocoder from 'nominatim-geocoder';
 import './TranspordCardEditPage.scss';
 import L, { LatLng } from 'leaflet';
+import { RideStatus } from '../../models/ride-status/RideStatus';
 
 const geocoder = new Geocoder();
 
@@ -44,7 +45,8 @@ const TransportCardEditPage: React.FC = () => {
         vehicle: '',
         duration: '',  
         created_at: new Date(),
-        existing_request_id: null
+        existing_request_id: null,
+        status: RideStatus.pending,
     });
     
 

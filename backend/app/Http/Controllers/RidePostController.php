@@ -13,6 +13,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
+
 
 class RidePostController extends Controller
 {
