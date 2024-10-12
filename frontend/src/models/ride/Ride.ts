@@ -16,5 +16,5 @@ export interface Ride {
     duration: string;   
     created_at: Date;
     existing_request_id: number | null;
-    status: RideStatus;
+    status: 'pending' | 'completed';
 }

@@ -146,6 +146,8 @@
   "VERIFY-PROFILE": "Верифицирај го твојот профил",
   "SAVE": "Зачувај",
   "EDIT_RIDE": "Измени превоз",
+  "IS THIS RIDE COMPLETED?": "Дали овој превоз е завршен?",
+  "RIDES-AS-PASSENGER":  "Возења како патник",
   "ESTIMATED_TRAVEL_TIME": "Предвидено време на патување",
   "MY_RIDES": "Мои Превози",
   "THERE_ARE_NO_COMPLETED_RIDES_WITH_ROLE": "Немате превози како улога: ",
@@ -155,5 +157,5 @@
   "PENDING": "Во очекување",
   "ACTIVE": "Активни",
   "COMPLETED": "Завршени",
-  "RATE": "Отцени"
+  "RATE": "Оцени"
 }

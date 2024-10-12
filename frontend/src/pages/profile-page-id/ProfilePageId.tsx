@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Avatar, Box, Button, Card, CardContent, Typography, Stack, Divider } from '@mui/material';
-import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
+import axios from 'axios';
 import verifiedIcon from '../../shared/styles/icons/verified_icon.png';
 import infoMessageIcon from '../../shared/styles/icons/info_message.png';
 import phoneIcon from '../../shared/styles/icons/phone.png';
@@ -10,27 +10,44 @@ import carIcon from '../../shared/styles/icons/car_icon.png';
 import locationIcon from '../../shared/styles/icons/location.png';
 import starIcon from '../../shared/styles/icons/star.png';
 import lightningIcon from '../../shared/styles/icons/lightning_icon.png';
+import { getUserById } from '../../services/api';
 
-const Profile: React.FC = () => {
+const ProfilePageId: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null); 
+  const [loading, setLoading] = useState(true);
   const [userRating, setUserRating] = useState<number>(0);
-  const { user, loading } = useAuth() as { user: any, loading: any };
-  const navigate = useNavigate();
   const { t } = useTranslation();
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Converts user object to string for logging
-    if (!loading && !user) {
-        navigate('/login');
-    } else if (user) {
-        getRating();
+    const fetchUser = async () => {
+      try {
+        const userData = await getUserById(id!);
+        setUser(userData); 
+        getRating(userData); 
+      } catch (error: any) {
+        if (error.response && error.response.data && error.response.data.message) {
+          setError(error.response.data.message);
+        } else {
+          setError(error.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchUser();
+    } else {
+      navigate('/login');
     }
-}, [user, loading, navigate]);
+  }, [id, navigate]);
 
-  const getRating = async () => {
+  const getRating = (userData: any) => {
     try {
-      const reviews = user?.reviews_received;
-
+      const reviews = userData?.reviews_received;
       if (reviews && reviews.length > 0) {
         const totalRating = reviews.reduce((sum: number, review: { rating: number }) => sum + review.rating, 0);
         const averageRating = totalRating / reviews.length;
@@ -41,9 +58,8 @@ const Profile: React.FC = () => {
     }
   };
 
- 
   if (loading) return <Typography>{t('Loading...')}</Typography>;
-  if (!user) return null;
+  if (!user) return <Typography>{t('User not found')}</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
 
   const profilePictureUrl = user.profile_picture || 'path_to_default_profile_picture';
@@ -58,7 +74,7 @@ const Profile: React.FC = () => {
   const formattedYear = user.created_at ? new Date(user.created_at).getFullYear() : t("YEAR");
 
   return (
-    <Card sx={{ maxWidth: 700, maxHeight: 700, margin: 'auto', padding: 2, backgroundColor: "#F1F1F1" }}>
+    <Card sx={{ maxWidth: 700, maxHeight: 700, padding: 10, backgroundColor: "#F1F1F1", marginTop: 10, marginBottom:10, marginLeft: 'auto', marginRight:'auto' }}>
       <Stack direction="row" spacing={2} alignItems="center" ml={6}>
         <Avatar
           src={profilePictureUrl}
@@ -106,17 +122,35 @@ const Profile: React.FC = () => {
             <img src={starIcon} width={20} alt="Star" />
             <span style={{ marginLeft: '4px' }}>{userRating.toFixed(1) || '0.0'}</span>
           </Typography>
+          
+          <Divider sx={{ borderBottomWidth: 2 }} /> 
+          <Typography variant="h6" mt={4}>{t('REVIEWS')}:</Typography>
+          {user.reviews_received && user.reviews_received.length > 0 ? (
+            user.reviews_received.map((review: any, index: number) => (
+              <Card key={index} sx={{ marginTop: 2 }}>
+                <CardContent>
+                  <Typography variant="body2">
+                    <strong>{t('Rating')}:</strong> {review.rating} {t('stars')}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>{t('Comment')}:</strong> {review.comment || t('No comment provided')}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <Typography>{t('No reviews yet')}</Typography>
+          )} 
           <Divider sx={{ borderBottomWidth: 2 }} />
           <Stack direction="row" spacing={2} alignItems="center" mb={2} mt={2}>
             <img src={lightningIcon} alt="Member Since" width={10} />
             <Typography variant="body2">{t('MEMBER-SINCE')} {formattedYear || 'YEAR'}</Typography>
-          </Stack>
-          <Divider sx={{ borderBottomWidth: 2 }} />
-          <Button onClick={() => navigate('/profile-edit')} variant="contained" color="error">{t('EDIT')}</Button>
+          </Stack>  
+
         </Box>
       </CardContent>
     </Card>
   );
 };
 
-export default Profile;
+export default ProfilePageId;

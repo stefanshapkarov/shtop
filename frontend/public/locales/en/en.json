@@ -144,6 +144,8 @@
   "VERIFY-PROFILE": "Verify your profile",
   "SAVE": "Save",
   "EDIT_RIDE": "Edit ride",
+  "IS THIS RIDE COMPLETED?": "Is this ride completed?",
+  "RIDES-AS-PASSENGER":  "Rides as passenger",
   "ESTIMATED_TRAVEL_TIME": "Estimated Travel Time",
   "MY_RIDES": "My Rides",
   "THERE_ARE_NO_COMPLETED_RIDES_WITH_ROLE": "There are no rides with role: ",

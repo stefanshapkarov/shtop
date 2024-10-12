@@ -108,4 +108,14 @@
   .red {
     background-color: red;
   }
+
+  .star {
+    height: 1.25rem;
+    width: 1.25rem;
+    color: black;
+  }
+
+  .star-empty {
+    color: $primary-background-color !important;
+  }
 }

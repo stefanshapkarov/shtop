@@ -224,3 +224,48 @@ export const updateRide = async (rideId: string, rideData: Ride) => {
       }
   }
 };
+
+
+export const completeRide = async (rideId: string) => {
+  try {
+    const response = await api.get(`/api/ridePost/${rideId}/complete`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Error completing ride:', error.response?.data.message || 'An error occurred');
+      throw new Error(error.response?.data.message || 'An error occurred');
+    } else {
+      console.error('Unexpected error:', error);
+      throw new Error('An unexpected error occurred');
+    }
+  }
+};
+
+export const submitRideReview = async (
+  rideId: number, 
+  revieweeId: number, 
+  rating: number, 
+  comment: string
+) => {
+    try {
+        const response = await api.post('/api/reviews', {
+            ride_id: rideId,
+            reviewee_id: revieweeId,
+            rating,
+            comment,
+        });
+        return response.data; // Return response data if necessary
+    } catch (error) {
+        throw error; // Let the calling function handle the error
+    }
+};
+
+
+export const getUserById = async (id: string) => {
+  try {
+    const response = await api.get(`/api/user/${id}`);
+    return response.data.data; // Assuming the response has a 'data' key for user info
+  } catch (error: any) {
+    throw error.response ? error.response.data.message : error.message;
+  }
+};
