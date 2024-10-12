@@ -1,4 +1,5 @@
 import {UserType} from "../user-type/UserType";
+import {RideStatus} from "../ride-status/RideStatus";
 
 export interface Ride {
     id: number
@@ -11,4 +12,5 @@ export interface Ride {
     destination_city: string
     created_at: Date
     existing_request_id: number | null
+    status: RideStatus
 }

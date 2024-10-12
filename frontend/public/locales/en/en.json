@@ -109,6 +109,7 @@
   "REMOVE_DIALOG": "Are you sure you remove this passenger from your ride? Doing so will be irreversible until said user submits another request.",
   "REJECT_DIALOG": "Are you sure you reject this passengers request? Doing so will be irreversible until said user submits another request.",
   "PASSENGER": "passenger",
+  "PASSENGER_U": "Passenger",
   "REQUEST_A_RIDE": "Request ride",
   "CANCEL_REQUEST": "Cancel request",
   "REQUEST_SENT": "Request sent!",
@@ -142,5 +143,14 @@
   "BIRTH-PLACE": "Birth place",
   "VERIFY-PROFILE": "Verify your profile",
   "SAVE": "Save",
-  "EDIT_RIDE": "Edit ride"
+  "EDIT_RIDE": "Edit ride",
+  "MY_RIDES": "My Rides",
+  "THERE_ARE_NO_COMPLETED_RIDES_WITH_ROLE": "There are no rides with role: ",
+  "AND_STATUS": " and status: ",
+  "RATE_PASSENGERS": "Rate passengers",
+  "RATE_DRIVER": "Rate driver",
+  "PENDING": "Pending",
+  "ACTIVE": "Active",
+  "COMPLETED": "Completed",
+  "RATE": "Rate"
 }

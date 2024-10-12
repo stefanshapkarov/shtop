@@ -26,6 +26,7 @@ import {SelectedPassengerOption} from "../../models/selected-passenger/SelectedP
 import {Hourglass} from "react-loader-spinner";
 import CheckIcon from '@mui/icons-material/Check';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import {RideStatus} from "../../models/ride-status/RideStatus";
 
 export const RoutePage = () => {
 
@@ -125,12 +126,17 @@ export const RoutePage = () => {
         return `${t('REMOVE')} ${t('PASSENGER')}: ${selectedRequest.passenger.name}?`;
     }
 
-    const handleRemoveClick = (request: any) => {
-        setSelectedRequest({
-            ...request,
-            action: SelectedPassengerOption.REMOVE
-        })
-        setIsDialogOpen(true);
+    const handleRemoveOrRateClick = (request: any) => {
+        if (ride?.status.toString() !== RideStatus[RideStatus.completed]) {
+            setSelectedRequest({
+                ...request,
+                action: SelectedPassengerOption.REMOVE
+            })
+            setIsDialogOpen(true);
+        }
+        else {
+            navigate(`/rate/${request.passenger.id}`)
+        }
     }
 
     const handleRejectClick = (request: any) => {
@@ -166,7 +172,6 @@ export const RoutePage = () => {
             alertRef.current.classList.remove('alert-visible');
         }, 2000);
     }
-
 
     return <Box id='route-page-wrapper'>
         {isDriver &&
@@ -248,49 +253,54 @@ export const RoutePage = () => {
                                                 <Typography
                                                     className='contact-user-text'>{t('CONTACT')} {request.passenger.name}</Typography>
                                             </Box>
-                                            <Button variant='contained' size='small' color='error'
-                                                    className='button'
-                                                    onClick={() => handleRemoveClick(request)}>{t('REMOVE')}</Button>
+                                            <Button variant='contained' size='small'
+                                                    className={ride.status.toString() === RideStatus[RideStatus.completed] ? 'button green' : 'button red'}
+                                                    onClick={() => handleRemoveOrRateClick(request)}>
+                                                {ride.status.toString() === RideStatus[RideStatus.completed] ? t('RATE') : t('REMOVE')}
+                                            </Button>
                                         </Box>
                                     ))}
                                 </Box>
                             </Box>
-                            <Divider className='divider'/>
-                            <Box className='accepted-passengers-container'>
-                                <Typography variant='h6'>
-                                    {t('PENDING_REQUESTS')}: {pendingRequests.length}
-                                </Typography>
-                                <Box className='users-list'>
-                                    {pendingRequests.map((request) => (
-                                        <Box className='user-list-item'>
-                                            <Box className='pair'>
-                                                <img
-                                                    src={request.passenger.profile_picture ? request.passenger.profile_picture : Anon_Photo}
-                                                    alt='driver-photo'
-                                                    className='profile-picture'/>
-                                                <Typography variant='h6'>{request.passenger.name}</Typography>
+                            {ride.status.toString() !== RideStatus[RideStatus.completed] && <>
+                                <Divider className='divider'/>
+                                <Box className='accepted-passengers-container'>
+                                    <Typography variant='h6'>
+                                        {t('PENDING_REQUESTS')}: {pendingRequests.length}
+                                    </Typography>
+                                    <Box className='users-list'>
+                                        {pendingRequests.map((request) => (
+                                            <Box className='user-list-item'>
+                                                <Box className='pair'>
+                                                    <img
+                                                        src={request.passenger.profile_picture ? request.passenger.profile_picture : Anon_Photo}
+                                                        alt='driver-photo'
+                                                        className='profile-picture'/>
+                                                    <Typography variant='h6'>{request.passenger.name}</Typography>
+                                                </Box>
+                                                <Box className='pair'>
+                                                    <img className='chat-icon' src={Chat_Icon} alt='chat'/>
+                                                    <Typography
+                                                        className='contact-user-text'>{t('CONTACT')} {request.passenger.name}</Typography>
+                                                </Box>
+                                                <Box>
+                                                    <Button variant='contained' size='small' color='error'
+                                                            className='button button-green'
+                                                            onClick={() => handleAcceptRequest(request)}>{t('ACCEPT')}</Button>
+                                                    <Button variant='contained' size='small' color='error'
+                                                            className='button'
+                                                            onClick={() => handleRejectClick(request)}>{t('DECLINE')}</Button>
+                                                </Box>
                                             </Box>
-                                            <Box className='pair'>
-                                                <img className='chat-icon' src={Chat_Icon} alt='chat'/>
-                                                <Typography
-                                                    className='contact-user-text'>{t('CONTACT')} {request.passenger.name}</Typography>
-                                            </Box>
-                                            <Box>
-                                                <Button variant='contained' size='small' color='error'
-                                                        className='button button-green'
-                                                        onClick={() => handleAcceptRequest(request)}>{t('ACCEPT')}</Button>
-                                                <Button variant='contained' size='small' color='error'
-                                                        className='button'
-                                                        onClick={() => handleRejectClick(request)}>{t('DECLINE')}</Button>
-                                            </Box>
-                                        </Box>
-                                    ))}
+                                        ))}
+                                    </Box>
                                 </Box>
-                            </Box>
+                            </>}
                         </Box>
                     }
                 </Box>
-                {!isDriver
+                {ride.status.toString() !== RideStatus[RideStatus.completed] && (
+                !isDriver
                     ? <Button className={!ride.existing_request_id ? 'book-now-button green' : 'book-now-button red'}
                               variant='contained'
                               onClick={() => handleRequestClick()} disabled={isWaiting}>
@@ -299,9 +309,11 @@ export const RoutePage = () => {
                             : <Hourglass colors={['#ffffff', '#ffffff']} height='32'/>
                         }
                     </Button>
-                    : <Button className='book-now-button green' variant='contained' onClick={() => navigate(`/edit/${ride.id}`)}>
+                    : <Button className='book-now-button green' variant='contained'
+                              onClick={() => navigate(`/edit/${ride.id}`)}>
                         {t('EDIT_RIDE')}
                     </Button>
+                )
                 }
             </Box>
             :
