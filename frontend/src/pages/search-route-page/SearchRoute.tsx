@@ -267,7 +267,7 @@ export const SearchRoute = () => {
                             <Typography variant='h4'>{t('TRUST_AND_SAFETY')}</Typography>
                         </Box>
                         <Box className='sorting-option-container' onClick={() => handleIsAuthorisedClick()}>
-                            <Box className='sorting-option-content-wrapper'>
+                            <Box className='sorting-option-content-wrapper last'>
                                 <Box className='sorting-option-content'>
                                     <img className='icon' src={VerifiedIcon} alt='Verified'/>
                                     <Typography variant='h6'>

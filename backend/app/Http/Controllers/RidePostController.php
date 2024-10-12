@@ -29,7 +29,7 @@ class RidePostController extends Controller
 
         $ridePosts = RidePost::query()->with(['driver', 'passengers', 'reviews']);
 
-        if (!empty($request->as_driver)) {
+        if ($request->has('as_driver')) {
             if ($request->as_driver) {
                 $ridePosts->where('driver_id', $user->id);
             } else {
@@ -50,6 +50,7 @@ class RidePostController extends Controller
 
         return RidePostResource::collection($ridePosts->orderBy('departure_time')->simplePaginate(15));
     }
+
 
     public function index(Request $request)
     {

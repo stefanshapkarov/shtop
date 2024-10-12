@@ -1,0 +1,93 @@
+@import "../../shared/styles/colors/colors.scss";
+@import "../../shared/styles/fonts/fonts.scss";
+
+
+#your-rides-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .title {
+    font-family: 'Manrope-Medium', serif !important;
+    color: $title !important;
+    margin: 2rem 0;
+  }
+
+  .filters-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 1rem;
+
+    :hover {
+      background-color: $secondary-background-color;
+      cursor: pointer;
+    }
+  }
+
+  .filter-element {
+    display: flex;
+    width: 40rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 0;
+    gap: 1rem;
+    border-bottom: 2px solid $primary;
+    border-radius: 1rem;
+    transition: border-bottom-width 200ms ease;
+    background-color: $third-background-color;
+  }
+
+  .selected {
+    transition: border-bottom-width 200ms ease;
+    border-bottom: 8px solid $primary;
+  }
+
+  .icon {
+    height: 3.5rem;
+    width: 3.5rem;
+  }
+
+  .search-route-page-content {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .no-rides-text {
+    font-family: 'Manrope-Medium', serif !important;
+    color: $primary;
+    text-align: center;
+  }
+
+  .routes-list {
+    height: 50rem;
+    padding-bottom: 4rem;
+    margin-bottom: 2rem;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    width: 90rem;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+    justify-content: center;
+  }
+
+  .hourglass {
+    color: $primary;
+    margin-top: -3rem;
+    margin-bottom: 1rem;
+  }
+}

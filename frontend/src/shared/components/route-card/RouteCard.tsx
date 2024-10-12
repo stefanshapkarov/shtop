@@ -12,6 +12,7 @@ import {UserType} from "../../../models/user-type/UserType";
 import {cancelRideRequest, getCurrentUser, makeRideRequest} from "../../../services/api";
 import {Hourglass} from "react-loader-spinner";
 import {Loader} from "../loader/Loader";
+import {RideStatus} from "../../../models/ride-status/RideStatus";
 
 export const RouteCard = (props: RouteCardProps) => {
 
@@ -57,7 +58,10 @@ export const RouteCard = (props: RouteCardProps) => {
         if (!loggedUser)
             navigate('/login')
         else if (loggedUser.id === props.ride.driver.id) {
-            navigate(`/edit/${props.ride.id}`)
+            if (props.ride.status === RideStatus.pending)
+                navigate(`/edit/${props.ride.id}`)
+            else
+                navigate('rate')
         } else if (props.ride.existing_request_id === null) {
             setIsRequestLoading(true)
             makeRideRequest(props.ride.id)
@@ -67,11 +71,14 @@ export const RouteCard = (props: RouteCardProps) => {
                 });
         } else {
             setIsRequestLoading(true)
-            cancelRideRequest(props.ride.existing_request_id)
-                .then(() => {
-                    props.updateRides?.(props.ride.id, null);
-                    setIsRequestLoading(false);
-                })
+            if (props.ride.status === RideStatus.pending)
+                cancelRideRequest(props.ride.existing_request_id)
+                    .then(() => {
+                        props.updateRides?.(props.ride.id, null);
+                        setIsRequestLoading(false);
+                    })
+            else
+                navigate('rate')
         }
     }
 
@@ -127,8 +134,9 @@ export const RouteCard = (props: RouteCardProps) => {
                             {isRequestLoading
                                 ? <Hourglass colors={['#ffffff', '#ffffff']} height='32'/>
                                 : (loggedUser?.id === props.ride.driver.id
-                                    ? t('EDIT_RIDE')
-                                    : !props.ride.existing_request_id ? t('REQUEST_A_RIDE') : t('CANCEL_REQUEST'))}
+                                    ? props.ride.status === RideStatus.pending ? t('EDIT_RIDE') : t('RATE_PASSENGERS')
+                                    : !props.ride.existing_request_id ? t('REQUEST_A_RIDE')
+                                        : props.ride.status === RideStatus.pending ? t('CANCEL_REQUEST') : t('RATE_DRIVER'))}
                         </Button>
                     </Box>
                 )}

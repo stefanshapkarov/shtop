@@ -3,8 +3,6 @@
 #search-route-container {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: center;
 
   .search-field {
     background-color: $third-background-color;
@@ -16,6 +14,7 @@
     background-color: $primary !important;
     width: 14rem;
     height: 3.5rem;
-    font-size: 1rem;
+    font-size: 1.25rem;
+    text-transform: none;
   }
 }

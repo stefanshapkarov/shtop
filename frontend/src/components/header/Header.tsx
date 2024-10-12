@@ -104,7 +104,7 @@ export const Header = () => {
                             {isAuth ? (
                                 <>
                                     <ListItem button style={{ padding: '8px 16px' }}>
-                                        <Link href="/your-rides" style={{ textDecoration: 'none', color: 'inherit' }}>{t("YOUR-RIDES")}</Link>
+                                        <Link href="/my-rides" style={{ textDecoration: 'none', color: 'inherit' }}>{t("YOUR-RIDES")}</Link>
                                     </ListItem>
                                     <ListItem button style={{ padding: '8px 16px' }}>
                                         <Link href="/inbox" style={{ textDecoration: 'none', color: 'inherit' }}>{t("INBOX")}</Link>
@@ -150,7 +150,7 @@ export const Header = () => {
                             {isAuth ? (
                                 <>
                                     <MenuItem onClick={handleMenuClose}>
-                                        <Link href="/your-rides" style={{ textDecoration: 'none', color: 'inherit' }}>{t("YOUR-RIDES")}</Link>
+                                        <Link href="/my-rides" style={{ textDecoration: 'none', color: 'inherit' }}>{t("YOUR-RIDES")}</Link>
                                     </MenuItem>
                                     <MenuItem onClick={handleMenuClose}>
                                         <Link href="/inbox" style={{ textDecoration: 'none', color: 'inherit' }}>{t("INBOX")}</Link>
