@@ -164,6 +164,9 @@ export const postRide = async (rideData: {
   price_per_seat: number;
   departure_city: string;
   vehicle: string;
+  duration: string;
+  destination_coords: string;
+  departure_coords: string;
   destination_city: string;
 }) => {
   try {

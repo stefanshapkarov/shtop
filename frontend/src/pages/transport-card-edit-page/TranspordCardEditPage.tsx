@@ -19,30 +19,34 @@ const TransportCardEditPage: React.FC = () => {
     const { user, loading } = useAuth() as { user: any, loading: boolean };
 
     const [rideData, setRideData] = useState<Ride>({
-        id: 0,  
-        driver: { 
-            id: 0, 
-            admin: 0,  
-            name: "", 
-            email: "", 
-            profile_picture: null, 
-            bio: null, 
-            location: null, 
+        id: 0,
+        driver: {
+            id: 0,
+            admin: 0,
+            name: "",
+            email: "",
+            profile_picture: null,
+            bio: null,
+            location: null,
             created_at: new Date(),
             updated_at: new Date(),
-            is_verified: false, 
-            rating: 0 
+            is_verified: false,
+            rating: 0
         },
         departure_time: new Date(),
         total_seats: 0,
         available_seats: 0,
         price_per_seat: 0,
-        departure_city: '41.99318377046385,21.424541473388675',  
-        destination_city: '41.99500956877393,21.43089294433594',  
-        created_at: new Date(),
-        existing_request_id: null,
+        departure_coords: '',
+        departure_city: '',
+        destination_coords: '',
+        destination_city: '',
         vehicle: '',
+        duration: '',  
+        created_at: new Date(),
+        existing_request_id: null
     });
+    
 
     const [departureCityName, setDepartureCityName] = useState<string>('Fetching city...');
     const [destinationCityName, setDestinationCityName] = useState<string>('Fetching city...');
@@ -81,16 +85,14 @@ const TransportCardEditPage: React.FC = () => {
                     departure_time: new Date(ride.departure_time),
                 });
 
-                const [departureLat, departureLon] = ride.departure_city.split(',').map(Number);
-                const [destinationLat, destinationLon] = ride.destination_city.split(',').map(Number);
+                const [departureLat, departureLon] = ride.departure_coords.split(',').map(Number);
+                const [destinationLat, destinationLon] = ride.destination_coords.split(',').map(Number);
                 setDeparturePosition(new L.LatLng(departureLat, departureLon));
                 setDestinationPosition(new L.LatLng(destinationLat, destinationLon));
 
-                const departureCity = await reverseGeocode(ride.departure_city);
-                const destinationCity = await reverseGeocode(ride.destination_city);
-
-                setDepartureCityName(departureCity);
-                setDestinationCityName(destinationCity);
+                setDepartureCityName(ride.departure_city);
+                setDestinationCityName(ride.destination_city);
+                
             } catch (error) {
                 console.error('Error fetching ride details:', error);
             } finally {
@@ -98,7 +100,7 @@ const TransportCardEditPage: React.FC = () => {
             }
         }
         fetchRideDetails();
-    }, [id]);
+    }, []);
 
     const updateRideData = (newData: Partial<Ride>) => {
         setRideData((prevData) => ({
@@ -132,7 +134,7 @@ const TransportCardEditPage: React.FC = () => {
                     destinationPosition={destinationPosition} 
                     setDeparturePosition={setDeparturePosition}
                     setDestinationPosition={setDestinationPosition}
-                    isEditing
+                    isEditing={true}
                 />
 
                 <Box mt={3} className="additional-fields">

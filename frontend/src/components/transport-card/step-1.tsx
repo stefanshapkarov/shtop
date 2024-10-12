@@ -23,7 +23,7 @@ const geocoder = new Geocoder();
 interface LocationMarkerProps {
     position: LatLng | null;
     setPosition: (position: LatLng) => void;
-    setCityAndCoordinates: (city: string, coordinates: string) => void;
+    setCityAndCoordinates: (coordinates: string, city: string) => void;
     initialCoordinates?: LatLng | null;
 }
 
@@ -32,29 +32,27 @@ const LocationMarker: React.FC<LocationMarkerProps> = ({ position, setPosition, 
         // If initial coordinates are provided, set the marker position and reverse geocode it
         if (initialCoordinates) {
             setPosition(initialCoordinates);
+            const coordinates = `${initialCoordinates.lat},${initialCoordinates.lng}`;
+
             geocoder.reverse({ lat: initialCoordinates.lat, lon: initialCoordinates.lng })
                 .then((response: any) => {
                     const city = response.address.city || response.address.town || response.address.village || 'Unknown location';
-                    const coordinates = `${initialCoordinates.lat},${initialCoordinates.lng}`;
-                    setCityAndCoordinates(city, coordinates);
-                })
-                .catch((error: any) => {
-                    console.error('Geocoding error:', error);
+                    setCityAndCoordinates(coordinates, city);
                 });
         }
-    }, [initialCoordinates, setPosition, setCityAndCoordinates]);
+
+    }, []);
 
     useMapEvents({
         click(e: L.LeafletMouseEvent) {
             const { lat, lng } = e.latlng;
-            setPosition(e.latlng); // Update marker position
+            setPosition(e.latlng); 
             const coordinates = `${lat},${lng}`;
 
             geocoder.reverse({ lat, lon: lng })
                 .then((response: any) => {
-                    // Dynamically get the nearest city name from the geocoding response
                     const city = response.address.city || response.address.town || response.address.village || 'Unknown location';
-                    setCityAndCoordinates(city, coordinates);
+                    setCityAndCoordinates(coordinates, city);
                 })
                 .catch((error: any) => {
                     console.error('Geocoding error:', error);
@@ -70,15 +68,18 @@ const LocationMarker: React.FC<LocationMarkerProps> = ({ position, setPosition, 
 interface TransportCardStepOneProps {
     rideData: {
         departure_time: Date;
+        departure_coords: string;
+        destination_coords: string;
         departure_city: string;
         destination_city: string;
+        duration: string;  
     };
     updateRideData: (newData: Partial<TransportCardStepOneProps['rideData']>) => void;
     departurePosition: LatLng | null;
     destinationPosition: LatLng | null;
     setDeparturePosition: React.Dispatch<React.SetStateAction<LatLng | null>>;
     setDestinationPosition: React.Dispatch<React.SetStateAction<LatLng | null>>;
-    isEditing?: boolean;  // Indicates if editing mode is active
+    isEditing?: boolean;
 }
 
 const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({
@@ -91,11 +92,8 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({
     isEditing
 }) => {
     const { t } = useTranslation();
-    const [departureCityDisplay, setDepartureCityDisplay] = useState<string>(''); 
-    const [destinationCityDisplay, setDestinationCityDisplay] = useState<string>(''); 
-    const [travelTime, setTravelTime] = useState<string>(''); // New state for travel time
+    const [travelTime, setTravelTime] = useState<string>(''); 
 
-    // Function to format travel time from minutes to hours and minutes
     const formatTravelTime = (duration: number): string => {
         if (duration < 60) {
             return `${duration} min`;
@@ -106,23 +104,16 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({
         }
     };
 
-    useEffect(() => {
-        // If editing mode is active and coordinates are provided, reverse geocode the locations to get city names
-        if (isEditing && departurePosition) {
-            geocoder.reverse({ lat: departurePosition.lat, lon: departurePosition.lng })
-                .then((response: any) => {
-                    setDepartureCityDisplay(response.address.city || 'Unknown location');
-                })
-                .catch((error: any) => console.error(error));
-        }
-        if (isEditing && destinationPosition) {
-            geocoder.reverse({ lat: destinationPosition.lat, lon: destinationPosition.lng })
-                .then((response: any) => {
-                    setDestinationCityDisplay(response.address.city || 'Unknown location');
-                })
-                .catch((error: any) => console.error(error));
-        }
-    }, [isEditing, departurePosition, destinationPosition]);
+    const convertToDatabaseTime = (duration: number): string => {
+        const hours = Math.floor(duration / 3600);
+        const minutes = Math.floor((duration % 3600) / 60);
+    
+        const formattedHours = hours < 10 ? `0${hours}` : `${hours}`;
+        const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+    
+        return `${formattedHours}:${formattedMinutes}`; 
+    };
+    
 
     const fetchTravelTime = async (departurePosition: LatLng | null, destinationPosition: LatLng | null) => {
         if (departurePosition && destinationPosition) {
@@ -133,9 +124,12 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({
                 const response = await fetch(`http://router.project-osrm.org/route/v1/driving/${startCoords};${endCoords}?overview=false`);
                 const data = await response.json();
                 if (data.routes && data.routes.length > 0) {
-                    const duration = data.routes[0].duration; // Duration in seconds
-                    const travelTimeFormatted = formatTravelTime(Math.floor(duration / 60)); // Update the travel time state
+                    const durationInSeconds = data.routes[0].duration; 
+                    const travelTimeFormatted = formatTravelTime(Math.floor(durationInSeconds / 60)); 
+                    const travelTimeForDB = convertToDatabaseTime(durationInSeconds); 
+                    
                     setTravelTime(travelTimeFormatted); 
+                    updateRideData({ duration: travelTimeForDB }); 
                 }
             } catch (error) {
                 console.error('Error fetching travel time:', error);
@@ -144,12 +138,11 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({
     };
 
     useEffect(() => {
-        fetchTravelTime(departurePosition, destinationPosition); // Fetch travel time when positions change
+        fetchTravelTime(departurePosition, destinationPosition); 
     }, [departurePosition, destinationPosition]);
 
-    const handleLocationChange = (field: 'departure_city' | 'destination_city', displaySetter: React.Dispatch<React.SetStateAction<string>>) => (city: string, coordinates: string) => {
-        updateRideData({ [field]: coordinates });  
-        displaySetter(city); 
+    const handleLocationChange = (field: 'departure_coords' | 'destination_coords', cityField: 'departure_city' | 'destination_city') => (coordinates: string, city: string) => {
+        updateRideData({ [field]: coordinates, [cityField]: city });
     };
 
     const formatDateForInput = (date: Date): string => {
@@ -161,6 +154,7 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({
         const newDate = event.target.value;
         updateRideData({...rideData, departure_time: new Date(newDate) });
     };
+
 
     return (
         <Box display="flex" flexDirection="column" alignItems="center" className="transport-card-step-one">
@@ -174,8 +168,8 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({
                         <LocationMarker
                             position={departurePosition}
                             setPosition={setDeparturePosition}
-                            setCityAndCoordinates={handleLocationChange('departure_city', setDepartureCityDisplay)}
-                            initialCoordinates={isEditing ? departurePosition : null}  // Set initial marker position if editing
+                            setCityAndCoordinates={handleLocationChange('departure_coords', 'departure_city')}
+                            initialCoordinates={isEditing ? departurePosition : null}
                         />
                     </MapContainer>
                 </Box>
@@ -185,11 +179,12 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({
                         <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
+                        
                         <LocationMarker
                             position={destinationPosition}
                             setPosition={setDestinationPosition}
-                            setCityAndCoordinates={handleLocationChange('destination_city', setDestinationCityDisplay)}
-                            initialCoordinates={isEditing ? destinationPosition : null}  // Set initial marker position if editing
+                            setCityAndCoordinates={handleLocationChange('destination_coords', 'destination_city')}
+                            initialCoordinates={isEditing ? destinationPosition : null}
                         />
                     </MapContainer>
                 </Box>
@@ -198,12 +193,12 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({
             <Grid container className="grids" spacing={2} width="97%" mb={2}>
                 <Grid item xs={6}>
                     <Typography component="div">
-                        <strong>{t('DEPARTURE_FROM')}:</strong> {departureCityDisplay}
+                        <strong>{t('DEPARTURE_FROM')}:</strong> {rideData.departure_city || ''}
                     </Typography>
                 </Grid>
                 <Grid item xs={6}>
                     <Typography component="div" paddingLeft={2}>
-                        <strong>{t('ARRIVAL_TO')}:</strong> {destinationCityDisplay}
+                        <strong>{t('ARRIVAL_TO')}:</strong> {rideData.destination_city || ''}
                     </Typography>
                 </Grid>
             </Grid>
@@ -214,7 +209,7 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({
                         label={t('ADD_DEPT_DATE')}
                         type="datetime-local"
                         fullWidth
-                        value={formatDateForInput(rideData.departure_time)} 
+                        value={formatDateForInput(rideData.departure_time)}
                         onChange={handleDateChange}
                         InputLabelProps={{
                             shrink: true,
@@ -228,7 +223,7 @@ const TransportCardStepOne: React.FC<TransportCardStepOneProps> = ({
             <Grid container className="grids" spacing={2} width="98%" mb={2}>
                 <Grid item xs={12}>
                     <Typography component="div">
-                        <strong>{t('ESTIMATED_TRAVEL_TIME')}:</strong> {travelTime || 'Calculating...'}
+                        <strong>{t('ESTIMATED_TRAVEL_TIME')}:</strong> {travelTime || ''}
                     </Typography>
                 </Grid>
             </Grid>
