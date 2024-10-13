@@ -30,6 +30,7 @@ import { completeRide } from "../../services/api";
 import { submitRideReview } from "../../services/api";
 import {RideStatus} from "../../models/ride-status/RideStatus";
 
+
 export const RoutePage = () => {
 
     const { t } = useTranslation();
@@ -42,6 +43,8 @@ export const RoutePage = () => {
     const [pendingRequests, setPendingRequests] = useState<RideRequest[]>([])
     const [selectedRequest, setSelectedRequest] = useState<any>(undefined)
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+    const [isReviewDialogOpen, setIsReviewDialogOpen] = useState<boolean>(false);
+
     const [loggedUser, setLoggedUser] = useState<UserType | undefined>(undefined);
     const navigate = useNavigate();
     const [isWaiting, setIsWaiting] = useState<boolean>(false);
@@ -49,6 +52,9 @@ export const RoutePage = () => {
     const [rideCompleted, setRideCompleted] = useState(ride?.status === 'completed');
     const [rating, setRating] = useState<number | null>(0); // Rating value (1-5 stars)
     const [comment, setComment] = useState<string>(''); // Comment value
+    const [hours, minutes] = ride?.duration?.split(':').map(Number) || [0, 0];
+    const durationInMilliseconds = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
+
 
     useEffect(() => {
         getCurrentUser().then((response) => {
@@ -101,13 +107,12 @@ export const RoutePage = () => {
         setIsDialogOpen(false);
     }
 
+
     async function handleRideCompletion(isCompleted: boolean) {
         if (isCompleted && ride) {
             try {
                 const response = await completeRide(ride.id.toString());
                 alert('Ride has been successfully completed.');
-                
-                // Update the state to mark the ride as completed
                 setRideCompleted(true);
     
             } catch (error: any) {
@@ -201,11 +206,11 @@ export const RoutePage = () => {
 
 
     const handleReviewDialogClose = () => {
-        setIsDialogOpen(false);
+        setIsReviewDialogOpen(false);
     };
 
     const handleAddReviewClick = () => {
-        setIsDialogOpen(true);
+        setIsReviewDialogOpen(true);
     };
 
     const handleSubmitReview = async () => {
@@ -220,13 +225,10 @@ export const RoutePage = () => {
         }
     
         try {
-
-
-            console.log("Accepted Requests: ", acceptedRequests);
-        console.log("Logged User ID: ", loggedUser.id);
+        //     console.log("Accepted Requests: ", acceptedRequests);
+        // console.log("Logged User ID: ", loggedUser.id);
             // If the current user is the driver
             if (loggedUser.id === ride.driver.id) {
-                // Review all passengers with accepted requests
                 if (acceptedRequests && acceptedRequests.length > 0) {
                     for (const acceptedRequest of acceptedRequests) {
                         const passenger = acceptedRequest.passenger;
@@ -237,18 +239,13 @@ export const RoutePage = () => {
                     alert("There are no accepted passengers to review.");
                 }
             } 
-            // If the current user is a passenger
             else {
-                // Passengers don’t need to see other passengers, they review only the driver
                 await submitRideReview(ride.id, ride.driver.id, rating, comment);
                 alert("Review submitted for the driver!");
             }
             
-        
-            // Close the dialog after successful submission
             setIsDialogOpen(false);
-            
-            // Optionally, reset the rating and comment fields
+
             setRating(0);
             setComment("");
         } catch (error) {
@@ -389,33 +386,31 @@ export const RoutePage = () => {
                     className={!ride.existing_request_id ? 'book-now-button green' : 'book-now-button red'}
                     variant='contained'
                     onClick={() => {
-                        // If 1 hour has passed, the user is not the driver, and the ride is completed, redirect to rate page
-                        if (!isWaiting && !isDriver && ride.existing_request_id && rideCompleted && new Date() > new Date(new Date(ride.departure_time).getTime() + 60 * 60 * 1000)) {
+                        if (!isWaiting && !isDriver && ride.existing_request_id && rideCompleted && new Date() > new Date(new Date(ride.departure_time).getTime() + durationInMilliseconds)) {
                             // navigate(`/rate/${ride.id}`); // Redirect to rate the ride page
                             handleAddReviewClick();
                         } else {
-                            handleRequestClick(); // Handle request/cancel ride for eligible users
+                            handleRequestClick(); 
                         }
                     }} 
                     disabled={isWaiting}
                 >
                     {!isWaiting ? (
-                        // Check if the user is a passenger (not the driver), has an existing request, and 1 hour has passed since departure
-                        (!isDriver && ride.existing_request_id && rideCompleted && new Date() > new Date(new Date(ride.departure_time).getTime() + 60 * 60 * 1000))
-                            ? t('RATE_YOUR_RIDE') // Show "Rate your ride" if the user is a passenger, 1 hour has passed, and the ride is completed
-                            : (!isDriver && (!ride.existing_request_id ? t('REQUEST_A_RIDE') : t('CANCEL_REQUEST'))) // Show "Request a ride" or "Cancel request" only if the ride is not completed for passengers
+                        (!isDriver && ride.existing_request_id && rideCompleted && new Date() > new Date(new Date(ride.departure_time).getTime() + durationInMilliseconds))
+                            ? t('RATE_YOUR_RIDE')
+                            : (!isDriver && (!ride.existing_request_id ? t('REQUEST_A_RIDE') : t('CANCEL_REQUEST')))
                     ) : (
                         <Hourglass colors={['#ffffff', '#ffffff']} height='32'/>
                     )}
                 </Button>
                     : (
-                        new Date() < new Date(new Date(ride.departure_time).getTime() + 60 * 60 * 1000)
+                        new Date() < new Date(new Date(ride.departure_time).getTime() + durationInMilliseconds)
                         ? <Button className='book-now-button green' variant='contained' onClick={() => navigate(`/edit/${ride.id}`)}>
                             {t('EDIT_RIDE')}
                         </Button>
                         : (
                             rideCompleted
-                            ? <Button className='rate-ride-button' variant='contained' onClick={() => 
+                            ? <Button className='rate-ride-button button-green' variant='contained' onClick={() => 
                                 // navigate(`/rate/${ride.id}`)}
                                 handleAddReviewClick()}
                                 >
@@ -449,16 +444,8 @@ export const RoutePage = () => {
                         )
                     )
                 }
-                {/* {!isDriver && ride.existing_request_id !== null && 
-    new Date() > new Date(new Date(ride.departure_time).getTime() + 60 * 60 * 1000) ? (
-        <Button className="rate-ride-button" variant="contained" onClick={() => navigate(`/rate/${ride.id}`)}>
-            {t('RATE_YOUR_RIDE')}
-        </Button>
-    ) : null */}
-{/* } */}
-
                     {/* Review Dialog */}
-            <Dialog open={isDialogOpen} onClose={handleDialogClose}>
+            <Dialog open={isReviewDialogOpen} onClose={handleReviewDialogClose}>
                 <DialogTitle>{t('Add Your Review')}</DialogTitle>
                 <DialogContent>
                     <Rating
@@ -477,7 +464,7 @@ export const RoutePage = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleDialogClose}>{t('Cancel')}</Button>
+                    <Button onClick={handleReviewDialogClose}>{t('Cancel')}</Button>
                     <Button onClick={handleSubmitReview}>{t('Submit')}</Button>
                 </DialogActions>
             </Dialog>

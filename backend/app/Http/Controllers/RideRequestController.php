@@ -159,7 +159,8 @@ class RideRequestController extends Controller
 
     private function isPassengerPartOfAPendingRide($userId)
     {
-        $rideRequest = RideRequest::where('passenger_id', $userId)->where('status', 'accepted')->first();
+        $rideRequest = RideRequest::where('passenger_id', $userId)->where('status', 'pending')->first();
+        //status bese accept
 
         if ($rideRequest === null) {
 

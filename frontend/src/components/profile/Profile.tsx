@@ -21,7 +21,7 @@ const Profile: React.FC = () => {
   useEffect(() => {
     // Converts user object to string for logging
     if (!loading && !user) {
-        navigate('/login');
+        // navigate('/login');
     } else if (user) {
         getRating();
     }
@@ -74,7 +74,7 @@ const Profile: React.FC = () => {
       </Stack>
       <CardContent>
         <Box mb={2} ml={4}>
-          <Typography variant="h6" mb={3}>{t('INFO')}:</Typography>
+          <Typography variant="h6" mb={3}>{t('INFO')}</Typography>
           <Stack direction="row" spacing={2} alignItems="center" mb={1}>
             <img src={verifiedIcon} alt="Verified" width={20} />
             <Typography variant="body2">{user.is_verified ? t('VERIFIED_PROFILE') : t('UNVERIFIED_PROFILE')}</Typography>

@@ -32,7 +32,8 @@ const TransportCardEditPage: React.FC = () => {
             created_at: new Date(),
             updated_at: new Date(),
             is_verified: false,
-            rating: 0
+            rating_as_driver: 0,
+            rating_as_passenger: 0
         },
         departure_time: new Date(),
         total_seats: 0,
@@ -46,7 +47,7 @@ const TransportCardEditPage: React.FC = () => {
         duration: '',  
         created_at: new Date(),
         existing_request_id: null,
-        status: RideStatus.pending,
+        status: 'pending'
     });
     
 

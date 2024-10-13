@@ -55,37 +55,72 @@ export const RouteCard = (props: RouteCardProps) => {
 
     const handleRequestClick = (event: any) => {
         event.stopPropagation();
-        if (!loggedUser)
-            navigate('/login')
+
+    
+        // Check if the user is logged in
+        if (!loggedUser) {
+            navigate('/login');
+        } 
+
+        // Check if the logged-in user is the driver
         else if (loggedUser.id === props.ride.driver.id) {
-            if (props.ride.status === RideStatus.pending)
-                navigate(`/edit/${props.ride.id}`)
-            else
-                navigate('rate')
-        } else if (props.ride.existing_request_id === null) {
-            setIsRequestLoading(true)
-            makeRideRequest(props.ride.id)
-                .then((response) => {
-                    props.updateRides?.(props.ride.id, response.request_id);
-                    setIsRequestLoading(false);
-                });
-        } else {
-            setIsRequestLoading(true)
-            if (props.ride.status === RideStatus.pending)
+            if (props.ride.status === RideStatus.pending.toString()) {
+                navigate(`/edit/${props.ride.id}`);
+            } else {
+                navigate('rate');
+            }
+        } 
+        // If the user is not the driver, check if a ride request has been made
+        else if (props.ride.existing_request_id === null) {
+            if (props.ride.status === 'completed') {
+                alert('This ride has already been completed.');
+                return; // Exit the function early if the ride is completed
+            }
+            else{
+                setIsRequestLoading(true);
+                makeRideRequest(props.ride.id)
+                    .then((response) => {
+                        props.updateRides?.(props.ride.id, response.request_id);
+                        setIsRequestLoading(false);
+                    });
+            }
+        } 
+        // If a request has already been made, allow the user to cancel it or rate the ride
+        else {
+            setIsRequestLoading(true);
+            if (props.ride.status === RideStatus.pending.toString()) {
                 cancelRideRequest(props.ride.existing_request_id)
                     .then(() => {
                         props.updateRides?.(props.ride.id, null);
                         setIsRequestLoading(false);
-                    })
-            else
-                navigate('rate')
+                    });
+            } else {
+                navigate('rate');
+            }
         }
-    }
+    };
 
     const navigateToRide = () => {
         if (!isRequestLoading)
             navigate(`/route/${props.ride.id}`);
     }
+
+    function formatDuration(duration: string): string {
+        // Split the duration into hours, minutes, and seconds
+        const [hours, minutes] = duration.split(':').map(Number);
+    
+        // Construct the human-readable format
+        if (hours > 0 && minutes > 0) {
+            return `${hours} hour${hours > 1 ? 's' : ''} and ${minutes} minute${minutes > 1 ? 's' : ''}`;
+        } else if (hours > 0) {
+            return `${hours} hour${hours > 1 ? 's' : ''}`;
+        } else if (minutes > 0) {
+            return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+        } else {
+            return '0 minutes';
+        }
+    }
+    
 
     return isLoaded || !props.moreStyles
         ? <Box id='route-card-container' onClick={() => navigateToRide()}>
@@ -104,6 +139,14 @@ export const RouteCard = (props: RouteCardProps) => {
                         <img src={Route_Line} alt='line'/>
                         <Box className='info-container'>
                             <Typography variant='h5' className='text'>{props.ride.departure_city}</Typography>
+                            <Typography 
+                                    variant='body1' // Smaller font size variant in Material-UI
+                                    className='duration-text' // Use a CSS class for styling
+                                >
+                                     {/* {props.ride.duration.slice(0, 5)} */}
+                                     {formatDuration(props.ride.duration)}
+
+                                </Typography>
                             <Typography variant='h5' className='text'>{props.ride.destination_city}</Typography>
                         </Box>
                     </Box>
@@ -137,7 +180,7 @@ export const RouteCard = (props: RouteCardProps) => {
                             {isRequestLoading
                                 ? <Hourglass colors={['#ffffff', '#ffffff']} height='32'/>
                                 : (loggedUser?.id === props.ride.driver.id
-                                    ? props.ride.status === RideStatus.pending ? t('EDIT_RIDE') : t('RATE_PASSENGERS')
+                                    ? props.ride.status === 'pending' ? t('EDIT_RIDE') : t('RATE_PASSENGERS')
                                     : !props.ride.existing_request_id ? t('REQUEST_A_RIDE')
                                         : props.ride.status.toString() === RideStatus[RideStatus.pending] ? t('CANCEL_REQUEST') : t('RATE_DRIVER'))}
                         </Button>

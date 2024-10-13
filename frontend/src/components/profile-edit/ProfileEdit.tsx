@@ -160,14 +160,17 @@ const ProfileEdit: React.FC = () => {
             />
           </Stack>
           <Stack direction="row" spacing={2} alignItems="center" mb={1}>
-            <TextField
-              variant="outlined"
-              label={t('BIRTH-DATE')}
-              name="birth_date"
-              value={profileData.birth_date}
-              onChange={handleInputChange}
-
-              className="input-field"
+          <TextField
+            variant="outlined"
+            label={t('BIRTH-DATE')}
+            name="birth_date"
+            type="date"  // Use the "date" type for a native date picker
+            value={profileData.birth_date}
+            onChange={handleInputChange}
+            className="input-field"
+            InputLabelProps={{
+                shrink: true, // Ensures the label stays when a date is selected
+            }}
             />
           </Stack>
           <Stack direction="row" spacing={2} alignItems="center" mb={1}>
