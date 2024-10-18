@@ -1,3 +1,3 @@
 export enum RideStatus {
-    pending, active, completed
+    pending, completed
 }

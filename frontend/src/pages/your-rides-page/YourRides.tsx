@@ -9,11 +9,8 @@ import {RouteCard} from "../../shared/components/route-card/RouteCard";
 import {Hourglass} from "react-loader-spinner";
 import {Ride} from "../../models/ride/Ride";
 import {getRidesForLoggedUser} from "../../services/api";
-import {Dayjs} from "dayjs";
-import {format} from "date-fns";
 import {RideStatus} from "../../models/ride-status/RideStatus";
 import RidePendingIcon from '../../shared/styles/icons/pending.png'
-import RideActiveIcon from '../../shared/styles/icons/active.png'
 import RideCompletedIcon from '../../shared/styles/icons/finished.png'
 
 
@@ -34,11 +31,6 @@ export const YourRides = () => {
             name: 'PENDING',
             value: RideStatus.pending,
             icon: RidePendingIcon
-        },
-        {
-            name: 'ACTIVE',
-            value: RideStatus.active,
-            icon: RideActiveIcon
         },
         {
             name: 'COMPLETED',
@@ -80,10 +72,6 @@ export const YourRides = () => {
                 setIsExpanding(false);
                 setIsLoading(false);
             });
-    }
-
-    const getDate = (date: Dayjs | null) => {
-        return date ? format(date.toDate(), "yyyy-MM-dd") : null;
     }
 
     const handleScroll = () => {
@@ -141,9 +129,7 @@ export const YourRides = () => {
                                 {t('THERE_ARE_NO_COMPLETED_RIDES_WITH_ROLE')}
                                 <strong>{asDriver ? t('DRIVER') : t('PASSENGER_U')}</strong>
                                 {t('AND_STATUS')}
-                                <strong>{selectedStatus === RideStatus.pending ? t('PENDING')
-                                    : selectedStatus === RideStatus.active ? t('ACTIVE')
-                                        : t('COMPLETED')}</strong>
+                                <strong>{selectedStatus === RideStatus.pending ? t('PENDING') : t('COMPLETED')}</strong>
                     </Typography>
                             : <Box className='routes-list' ref={routesListRef} onScroll={() => handleScroll()}>
                                 {filteredRoutes.map((route) => (
