@@ -78,12 +78,12 @@ export const HomePage = () => {
                 <InfoCard imageSrc={Profile} title={t('TRUST_WHO_YOU_TRAVEL')} text={t('WE_TAKE_TIME')}/>
                 <InfoCard imageSrc={Lightning} title={t('SCROLL_TAP_GO')} text={t('BOOKING_A_RIDE_HAS_NEVER')}/>
             </Box>
-            <Box className='ai-info-container'>
+            {/* <Box className='ai-info-container'>
                 <Box className={'ai-info-content'}>
                     <img src={Robot} className='robot-image' alt='shtop-ai'/>
                     <Typography variant='h4' className='ai-text'>{t('AI_TEXT')}</Typography>
                 </Box>
-            </Box>
+            </Box> */}
         </Box>
     </>
 }

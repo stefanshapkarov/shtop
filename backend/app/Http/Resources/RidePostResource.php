@@ -31,7 +31,8 @@ class RidePostResource extends JsonResource
             'existing_request_id' => $this->hasRequestForRide(),
             'reviews' => ReviewResource::collection($this->reviews),
             'duration' => $this->duration,
-            'created_at' => $this->created_at->toDateTimeString()
+            'created_at' => $this->created_at->toDateTimeString(),
+            'passengers' => UserResource::collection($this->passengers),
         ];
     }
 
@@ -52,5 +53,11 @@ class RidePostResource extends JsonResource
 
         return $tmp?->id;
 
+    }
+
+
+    public function isUserDriver(){
+        return $this->driver->id === auth()->id();
+        // return auth()->id() === $this->driver->id;
     }
 }

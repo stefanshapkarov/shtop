@@ -17,7 +17,7 @@ const ProfilePageId: React.FC = () => {
   const [user, setUser] = useState<any>(null); 
   const [loading, setLoading] = useState(true);
   const [userRating, setUserRating] = useState<number>(0);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -74,7 +74,7 @@ const ProfilePageId: React.FC = () => {
   const formattedYear = user.created_at ? new Date(user.created_at).getFullYear() : t("YEAR");
 
   return (
-    <Card sx={{ maxWidth: 700, maxHeight: 700, padding: 10, backgroundColor: "#F1F1F1", marginTop: 10, marginBottom:10, marginLeft: 'auto', marginRight:'auto' }}>
+    <Card sx={{ maxWidth: 700,  padding: 10, backgroundColor: "#F1F1F1", marginTop: 10, marginBottom:10, marginLeft: 'auto', marginRight:'auto' }}>
       <Stack direction="row" spacing={2} alignItems="center" ml={6}>
         <Avatar
           src={profilePictureUrl}
@@ -110,19 +110,37 @@ const ProfilePageId: React.FC = () => {
         </Box>
         <Divider sx={{ borderBottomWidth: 4 }} />
         <Box mb={2} ml={4} mt={5}>
+          
           <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={1}>
             <img src={carIcon} width={20} alt="Car Icon" />
-            <span style={{ marginLeft: '4px' }}>{user.completed_rides || '0'} {t('RIDES')}</span>
+            <span style={{ marginLeft: '4px' }}>{user.completed_rides || '0'} {t('RIDES-AS-DRIVER')}</span>
+          </Typography>
+          <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={3}>
+            <img src={starIcon} width={20} alt="Star" />
+            <span style={{ marginLeft: '4px' }}>
+              {user.rating_as_driver && !isNaN(user.rating_as_driver) && user.rating_as_driver !== 'N\A'
+                ? parseFloat(user.rating_as_driver).toFixed(1)
+                : '0.0'}
+            </span>
           </Typography>
           <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={1}>
             <img src={carIcon} width={20} alt="Car Icon" />
             <span style={{ marginLeft: '4px' }}>{user.rides_as_passenger.length || '0'} {t('RIDES-AS-PASSENGER')}</span>
           </Typography>
-          <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={3}>
+          <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={1}>
             <img src={starIcon} width={20} alt="Star" />
-            <span style={{ marginLeft: '4px' }}>{userRating.toFixed(1) || '0.0'}</span>
+            <span style={{ marginLeft: '4px' }}>
+              {user.rating_as_passenger && !isNaN(user.rating_as_passenger) && user.rating_as_driver !== 'N\A'
+                ? parseFloat(user.rating_as_passenger).toFixed(1)
+                : '0.0'}
+            </span>
           </Typography>
-          
+
+          <Divider sx={{ borderBottomWidth: 2 }} />
+          <Stack direction="row" spacing={2} alignItems="center" mb={2} mt={2}>
+            <img src={lightningIcon} alt="Member Since" width={10} />
+            <Typography variant="body2">{t('MEMBER-SINCE')} {formattedYear || 'YEAR'}</Typography>
+          </Stack>
           <Divider sx={{ borderBottomWidth: 2 }} /> 
           <Typography variant="h6" mt={4}>{t('REVIEWS')}:</Typography>
           {user.reviews_received && user.reviews_received.length > 0 ? (

@@ -212,8 +212,11 @@ class RidePostController extends Controller
         $this->authorize('complete', $ridePost);
 
         DB::transaction(function () use ($ridePost) {
+            Log::info('Current Time:', ['now' => Carbon::now()->toDateTimeString()]);
+            Log::info('Departure Time:', ['departure_time' => $ridePost->departure_time]);
 
             if (Carbon::now()->isAfter($ridePost->departure_time)) {
+                
 
                 $ridePost->requests()->delete();
 

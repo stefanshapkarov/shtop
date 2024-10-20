@@ -66,7 +66,7 @@ const Register: React.FC = () => {
       const response = await registerUser(name, email, password, passwordConfirmation);
       setSuccess('Registration successful');
       console.log('Registration successful:', response);
-      navigate('/login');
+      navigate('/');
 
     } catch (error) {
       console.error('Registration error:', error);

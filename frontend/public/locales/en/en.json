@@ -155,5 +155,6 @@
   "PENDING": "Pending",
   "ACTIVE": "Active",
   "COMPLETED": "Completed",
-  "RATE": "Rate"
+  "RATE": "Rate",
+  "RIDES-AS-DRIVER" : "Rides as driver"
 }

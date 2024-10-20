@@ -28,7 +28,7 @@ export const Footer = () => {
         return getInitialLanguage() === 'mk' ? cities_en[cities_mk.indexOf(city)] : city
     }
 
-    return <Grid container xs={12} id='footer-container'>
+    return <Grid item container xs={12} id='footer-container'>
         <Grid item xs={12} lg={4} className='footer-element-container logos'>
             <Link href={'/'}>
                 <img src={Logo} alt='logo' className='logo'/>

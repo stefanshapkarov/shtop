@@ -96,16 +96,29 @@ const Profile: React.FC = () => {
         <Box mb={2} ml={4} mt={5}>
           <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={1}>
             <img src={carIcon} width={20} alt="Car Icon" />
-            <span style={{ marginLeft: '4px' }}>{user.completed_rides || '0'} {t('RIDES')}</span>
+            <span style={{ marginLeft: '4px' }}>{user.completed_rides || '0'} {t('RIDES-AS-DRIVER')}</span>
+          </Typography>
+          <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={3}>
+            <img src={starIcon} width={20} alt="Star" />
+            <span style={{ marginLeft: '4px' }}>
+              {user.rating_as_driver && !isNaN(user.rating_as_driver) && user.rating_as_driver !== 'N\A'
+                ? parseFloat(user.rating_as_driver).toFixed(1)
+                : '0.0'}
+            </span>
           </Typography>
           <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={1}>
             <img src={carIcon} width={20} alt="Car Icon" />
             <span style={{ marginLeft: '4px' }}>{user.rides_as_passenger.length || '0'} {t('RIDES-AS-PASSENGER')}</span>
           </Typography>
-          <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={3}>
+          <Typography variant="body2" style={{ display: 'flex', alignItems: 'center' }} mb={1}>
             <img src={starIcon} width={20} alt="Star" />
-            <span style={{ marginLeft: '4px' }}>{userRating.toFixed(1) || '0.0'}</span>
+            <span style={{ marginLeft: '4px' }}>
+              {user.rating_as_passenger && !isNaN(user.rating_as_passenger) && user.rating_as_driver !== 'N\A'
+                ? parseFloat(user.rating_as_passenger).toFixed(1)
+                : '0.0'}
+            </span>
           </Typography>
+
           <Divider sx={{ borderBottomWidth: 2 }} />
           <Stack direction="row" spacing={2} alignItems="center" mb={2} mt={2}>
             <img src={lightningIcon} alt="Member Since" width={10} />

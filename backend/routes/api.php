@@ -8,7 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Auth;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+
+Route::post('/loginFrontend/{id}', function ($id) {
+    Auth::loginUsingId($id);
+});
 
 Route::get('/reset-password/{token}', function ($token){
     return response([

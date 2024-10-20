@@ -47,7 +47,8 @@ const TransportCardEditPage: React.FC = () => {
         duration: '',  
         created_at: new Date(),
         existing_request_id: null,
-        status: 'pending'
+        status: 'pending',
+        passengers: [],
     });
     
 

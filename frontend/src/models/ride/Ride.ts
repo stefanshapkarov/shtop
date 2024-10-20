@@ -17,4 +17,5 @@ export interface Ride {
     created_at: Date;
     existing_request_id: number | null;
     status: 'pending' | 'completed';
+    passengers: UserType[];
 }

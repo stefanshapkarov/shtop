@@ -71,7 +71,7 @@ export const Header = () => {
 
 
     const headerElements: HeaderElementType[] = [
-        {imageSrc: AI_Icon, text: t('SHTOP_AI'), href: '/shtop-ai'},
+        {imageSrc: AI_Icon, text: t('YOUR-RIDES'), href: '/my-rides'},
         {imageSrc: Car_Icon, text: t('FIND_TRANSPORT'), href: '/search-route'},
         {imageSrc: Share_Icon, text: t('SHARE_TRANSPORT'), href: '/share-transport'}
     ];
@@ -103,11 +103,11 @@ export const Header = () => {
 
                             {isAuth ? (
                                 <>
-                                    <ListItem button style={{ padding: '8px 16px' }}>
+                                    {/* <ListItem button style={{ padding: '8px 16px' }}>
                                         <Link href="/my-rides" style={{ textDecoration: 'none', color: 'inherit' }}>{t("YOUR-RIDES")}</Link>
-                                    </ListItem>
+                                    </ListItem> */}
                                     <ListItem button style={{ padding: '8px 16px' }}>
-                                        <Link href="/inbox" style={{ textDecoration: 'none', color: 'inherit' }}>{t("INBOX")}</Link>
+                                        <Link href="http://localhost:8000/chatify/" style={{ textDecoration: 'none', color: 'inherit' }}>{t("INBOX")}</Link>
                                     </ListItem>
                                     <ListItem button style={{ padding: '8px 16px' }}>
                                         <Link href="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>{t("PROFILE")}</Link>
@@ -147,32 +147,36 @@ export const Header = () => {
                             <AccountCircleIcon className="profile-icon" style={{ fontSize: '3rem' }} />
                         </IconButton>
                         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-                            {isAuth ? (
-                                <>
-                                    <MenuItem onClick={handleMenuClose}>
-                                        <Link href="/my-rides" style={{ textDecoration: 'none', color: 'inherit' }}>{t("YOUR-RIDES")}</Link>
-                                    </MenuItem>
-                                    <MenuItem onClick={handleMenuClose}>
-                                        <Link href="/inbox" style={{ textDecoration: 'none', color: 'inherit' }}>{t("INBOX")}</Link>
-                                    </MenuItem>
-                                    <MenuItem onClick={handleMenuClose}>
-                                        <Link href="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>{t("PROFILE")}</Link>
-                                    </MenuItem>
-                                    <MenuItem onClick={() => { handleMenuClose(); handleLogout(); }}>
-                                        {t("LOGOUT")}
-                                    </MenuItem>
-                                </>
-                            ) : (
-                                <>
-                                    <MenuItem onClick={handleMenuClose}>
-                                        <Link href="/login" style={{ textDecoration: 'none', color: 'inherit' }}>{t("LOGIN-B-1")}</Link>
-                                    </MenuItem>
-                                    <MenuItem onClick={handleMenuClose}>
-                                        <Link href="/register" style={{ textDecoration: 'none', color: 'inherit' }}>{t("REGISTER")}</Link>
-                                    </MenuItem>
-                                </>
-                            )}
-                        </Menu>
+    {isAuth
+        ? [
+            <MenuItem key="inbox" onClick={handleMenuClose}>
+                <Link href="http://localhost:8000/chatify/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    {t("INBOX")}
+                </Link>
+            </MenuItem>,
+            <MenuItem key="profile" onClick={handleMenuClose}>
+                <Link href="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    {t("PROFILE")}
+                </Link>
+            </MenuItem>,
+            <MenuItem key="logout" onClick={() => { handleMenuClose(); handleLogout(); }}>
+                {t("LOGOUT")}
+            </MenuItem>
+        ]
+        : [
+            <MenuItem key="login" onClick={handleMenuClose}>
+                <Link href="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    {t("LOGIN-B-1")}
+                </Link>
+            </MenuItem>,
+            <MenuItem key="register" onClick={handleMenuClose}>
+                <Link href="/register" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    {t("REGISTER")}
+                </Link>
+            </MenuItem>
+        ]
+    }
+</Menu>
                     </Grid>
                     <Grid item container xs={12} lg={2} className='header-element-container'>
                         <LanguageSwitcher />
