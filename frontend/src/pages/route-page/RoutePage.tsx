@@ -340,7 +340,9 @@ export const RoutePage = () => {
                                                 <img
                                                     src={request.profile_picture ? request.profile_picture : Anon_Photo}
                                                     alt='driver-photo'
-                                                    className='profile-picture'/>
+                                                    className='profile-picture'
+                                                    onClick={() => navigate(`/profile/${request.id}`)}/>
+                                                    
                                                 <Typography variant='h6'>{request.name}</Typography>
                                             </Box>
                                             <Box className='pair'>
@@ -378,7 +380,8 @@ export const RoutePage = () => {
                                                     <img
                                                         src={request.passenger.profile_picture ? request.passenger.profile_picture : Anon_Photo}
                                                         alt='driver-photo'
-                                                        className='profile-picture'/>
+                                                        className='profile-picture'
+                                                        onClick={() => navigate(`/profile/${request.id}`)}/>
                                                     <Typography variant='h6'>{request.passenger.name}</Typography>
                                                 </Box>
                                                 <Box className='pair'>
