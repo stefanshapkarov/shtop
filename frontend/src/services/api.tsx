@@ -104,9 +104,13 @@ export const getRideRequests = async (rideId: string): Promise<any> => {
 }
 
 export const makeRideRequest = async (rideId: number) => {
-    const response = await api.get(`/api/ridePost/${rideId}/requests/new`);
-    return response.data;
-}
+    try {
+        const response = await api.get(`/api/ridePost/${rideId}/requests/new`);
+        return response.data;  // Return the data from the response
+    } catch (error: any) {
+        alert(error.response.data.errors.message);  // Handle the error gracefully
+    }
+};
 
 export const acceptRideRequest = async (requestId: number) => {
     const response = await api.get(`api/ridePost/requests/${requestId}/accept`);

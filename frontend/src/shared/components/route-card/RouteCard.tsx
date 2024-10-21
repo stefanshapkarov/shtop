@@ -82,9 +82,12 @@ export const RouteCard = (props: RouteCardProps) => {
                     .then((response) => {
                         props.updateRides?.(props.ride.id, response.request_id);
                         setIsRequestLoading(false);
-                    });
+                    })
+                    .catch((e) => alert(e.message));
+                    
             }
-        } 
+        }
+        
         // If a request has already been made, allow the user to cancel it or rate the ride
         else {
             setIsRequestLoading(true);
