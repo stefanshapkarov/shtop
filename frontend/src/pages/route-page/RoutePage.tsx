@@ -5,7 +5,7 @@ import {useTranslation} from "react-i18next";
 import {RouteCard} from "../../shared/components/route-card/RouteCard";
 import Anon_Photo from '../../shared/styles/images/anon_profile.jpg'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import {format, set} from "date-fns";
+import {format} from "date-fns";
 import StarIcon from '@mui/icons-material/Star';
 import {useEffect, useRef, useState} from "react";
 import Chat_Icon from '../../shared/styles/icons/chat_icon.png'
@@ -29,7 +29,6 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { completeRide } from "../../services/api";
 import { submitRideReview } from "../../services/api";
 import {RideStatus} from "../../models/ride-status/RideStatus";
-import { RidePostPassengers } from "../../models/ridepost-passengers/RidePostPassengers";
 
 
 export const RoutePage = () => {
@@ -40,7 +39,7 @@ export const RoutePage = () => {
     const {id} = useParams();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isDriver, setIsDriver] = useState<boolean>(false);
-    const [acceptedRequests, setAcceptedRequests] = useState<UserType[]>([])
+    const [acceptedRequests, setAcceptedRequests] = useState<RideRequest[]>([])
     const [pendingRequests, setPendingRequests] = useState<RideRequest[]>([])
     const [selectedRequest, setSelectedRequest] = useState<any>(undefined)
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -75,9 +74,7 @@ export const RoutePage = () => {
         if (loggedUserId === rideTmp?.driver.id) {
             setIsDriver(true)
             const requestsTmp: RideRequest[] = await getRideRequests(rideTmp.id.toString());
-            setAcceptedRequests(rideTmp.passengers);
-            // setAcceptedRequests(passengers);
-            // setAcceptedRequests(requestsTmp.filter((request) => request.status === 'accepted'));
+            setAcceptedRequests(requestsTmp.filter((request) => request.status === 'accepted'));
             setPendingRequests(requestsTmp.filter((request) => request.status === 'pending'));
         }
         if (rideTmp.passengers?.some((passenger) => passenger.id === loggedUserId)) {
@@ -142,7 +139,21 @@ export const RoutePage = () => {
     }
 
     const handleAcceptRequest = (request: any) => {
-        acceptRideRequest(request.id).then(() => setAcceptedRequests(prevRequests => [...prevRequests, request]));
+        acceptRideRequest(request.id).then(() => {
+            setAcceptedRequests(prevRequests => [...prevRequests, request]);
+            setPendingRequests(prevRequests => prevRequests.filter(req => req.id !== request.id));
+            setRide(prevState => {
+                if (!prevState) {
+                    return undefined;
+                }
+
+                return {
+                    ...prevState,
+                    available_seats: acceptedRequests.length,
+                    id: prevState.id,
+                };
+            });
+        });
     }
 
     const getDialogText = (): string => {
@@ -154,11 +165,13 @@ export const RoutePage = () => {
     }
 
     const getTitleText = (): string => {
-        if (!selectedRequest)
+        if (!selectedRequest) {
             return '';
-        if (selectedRequest.action === SelectedPassengerOption.REJECT)
+        } else if (selectedRequest.action === SelectedPassengerOption.REJECT) {
             return `${t('DECLINE')} ${t('PASSENGER')}: ${selectedRequest.passenger.name}?`;
-        return `${t('REMOVE')} ${t('PASSENGER')}: ${selectedRequest.passenger.name}?`;
+        } else {
+            return `${t('REMOVE')} ${t('PASSENGER')}?`;
+        }
     }
 
     const handleRemoveOrRateClick = (request: any) => {
@@ -166,7 +179,18 @@ export const RoutePage = () => {
             setSelectedRequest({
                 ...request,
                 action: SelectedPassengerOption.REMOVE
-            })
+            });
+            setRide(prevState => {
+                if (!prevState) {
+                    return undefined;
+                }
+
+                return {
+                    ...prevState,
+                    available_seats: acceptedRequests.length,
+                    id: prevState.id,
+                };
+            });
             setIsDialogOpen(true);
         }
         else {
@@ -330,20 +354,20 @@ export const RoutePage = () => {
                             <Divider className='divider'/>
                             <Box className='accepted-passengers-container'>
                                 <Typography variant='h6'>
-                                    {t('ACCEPTED_PASSENGERS')}:
-                                    {ride.total_seats - ride.available_seats}
+                                    {ride?.status.toString() !== RideStatus[RideStatus.completed] ? t('ACCEPTED_PASSENGERS') : t('PASSENGERS')}:
+                                    {ride?.status.toString() !== RideStatus[RideStatus.completed] ? acceptedRequests.length : ''}
                                 </Typography>
                                 <Box className='users-list'>
-                                    {acceptedRequests.map((request) => (
+                                    {ride?.status.toString() !== RideStatus[RideStatus.completed] ? acceptedRequests.map((request) => (
                                         <Box className='user-list-item'>
                                             <Box className='pair'>
                                                 <img
-                                                    src={request.profile_picture ? request.profile_picture : Anon_Photo}
+                                                    src={request.passenger.profile_picture ? request.passenger.profile_picture : Anon_Photo}
                                                     alt='driver-photo'
                                                     className='profile-picture'
                                                     onClick={() => navigate(`/profile/${request.id}`)}/>
                                                     
-                                                <Typography variant='h6'>{request.name}</Typography>
+                                                <Typography variant='h6'>{request.passenger.name}</Typography>
                                             </Box>
                                             <Box className='pair'>
                                                 <img className='chat-icon' src={Chat_Icon} alt='chat'/>
@@ -354,7 +378,7 @@ export const RoutePage = () => {
                                                         rel="noopener noreferrer"
                                                         style={{ textDecoration: 'none', color: 'inherit' }}
                                                     >
-                                                        {t('CONTACT')} {request.name}
+                                                        {t('CONTACT')} {request.passenger.name}
                                                     </a>
                                                     </Typography>
                                             </Box>
@@ -364,7 +388,36 @@ export const RoutePage = () => {
                                                 {rideCompleted ? t('RATE') : t('REMOVE')}
                                             </Button>
                                         </Box>
-                                    ))}
+                                    )) : ride.passengers?.map(passenger => {
+                                        return <Box className='user-list-item'>
+                                            <Box className='pair'>
+                                                <img
+                                                    src={passenger.profile_picture ? passenger.profile_picture : Anon_Photo}
+                                                    alt='driver-photo'
+                                                    className='profile-picture'
+                                                    onClick={() => navigate(`/profile/${passenger.id}`)}/>
+                                                <Typography variant='h6'>{passenger.name}</Typography>
+                                            </Box>
+                                            <Box className='pair'>
+                                                <img className='chat-icon' src={Chat_Icon} alt='chat'/>
+                                                <Typography className='contact-user-text'>
+                                                    <a
+                                                        href={`http://localhost:8000/chatify/${passenger.id}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        style={{ textDecoration: 'none', color: 'inherit' }}
+                                                    >
+                                                        {t('CONTACT')} {passenger.name}
+                                                    </a>
+                                                </Typography>
+                                            </Box>
+                                            <Button variant='contained' size='small'
+                                                    className={rideCompleted ? 'button green' : 'button red'}
+                                                    onClick={() => handleRemoveOrRateClick(passenger)}>
+                                                {rideCompleted ? t('RATE') : t('REMOVE')}
+                                            </Button>
+                                        </Box>
+                                    })}
                                 </Box>
                             </Box>
                             {ride.status.toString() !== RideStatus[RideStatus.completed] && <>
@@ -448,11 +501,7 @@ export const RoutePage = () => {
                         </Button>
                         : (
                             rideCompleted
-                            ? <Button className='rate-ride-button button-green' variant='contained' onClick={() => 
-                                handleAddReviewClick()}
-                                >
-                                {t('RATE_PASSENGERS')}
-                            </Button>
+                            ? <></>
                             : <Box className="is-ride-completed">
                                 <Typography variant="h5">{t('IS THIS RIDE COMPLETED?')}</Typography>
                                 <Box className="users-list">
